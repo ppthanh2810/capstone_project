@@ -6,16 +6,6 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    motion_node = Node(
-        package='da1',
-        executable='motion',
-        name='direction',
-        output='screen',
-        # emulate_tty=True,
-
-        prefix='gnome-terminal --'
-    )
-
     m_to_m_node = Node(
         package='da1',
         executable='m_to_m_test_move',
@@ -33,7 +23,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        motion_node,
         m_to_m_node,
         move_node
     ])

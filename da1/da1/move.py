@@ -25,7 +25,6 @@ class Move (Node):
     def move_sub_callback (self, msg: Float64MultiArray):
 
         self.motors.set_rpm (int(msg.data[0]), int(msg.data[1]))
-        l_rpm, r_rpm = self.motors.get_rpm ()
         
         # print(f"rpmL-rpmL ouput: {l_rpm: .4f}, {-r_rpm: .4f}")
 
