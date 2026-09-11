@@ -33,6 +33,7 @@ setup(
         'console_scripts': [
             "motion = da1.motion:main",
             "m_to_m = da1.m_to_m:main",
+            "m_to_m_test_move = da1.m_to_m_test_move:main",
             "move = da1.move:main",
             "detect = da1.detect:main",
             "algorithm = da1.algorithm:main"
