@@ -18,6 +18,9 @@ public:
 
     move_sub_ = create_subscription<std_msgs::msg::Float64MultiArray>( 
         "/PT/move", 10, std::bind(&Move::moveCallback, this, std::placeholders::_1));
+    timer_ = create_wall_timer(
+      std::chrono::milliseconds(100),
+      std::bind(&Move::readRpm, this));
 
     RCLCPP_INFO(get_logger(), "move started");
   }
@@ -40,18 +43,30 @@ private:
       static_cast<int>(msg->data[1]));
 
     auto [left_rpm, right_rpm] = motors_.getRpm();
+  }
 
-    RCLCPP_INFO(
-      get_logger(),
-      "RPM Left: %.4f | RPM Right: %.4f",
-      left_rpm,
-      right_rpm);
+  void readRpm()
+  {
+    try {
+      auto [left_rpm, right_rpm] = motors_.getRpm();
+
+      RCLCPP_INFO(
+        get_logger(),
+        "RPM Left: %.4f | RPM Right: %.4f",
+        left_rpm,
+        right_rpm);
+    }
+    catch (const std::exception & e) {
+      RCLCPP_WARN(get_logger(), "Get RPM failed: %s", e.what());
+    }
   }
 
   zlac8015d_hw::Controller motors_;
 
   rclcpp::Subscription<
     std_msgs::msg::Float64MultiArray>::SharedPtr move_sub_;
+    
+  rclcpp::TimerBase::SharedPtr timer_;
 };
 
 int main(int argc, char ** argv)
