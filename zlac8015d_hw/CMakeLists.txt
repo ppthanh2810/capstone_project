@@ -15,6 +15,8 @@ add_library(zlac8015d SHARED
   src/zlac8015d.cpp
 )
 
+target_compile_features(zlac8015d PUBLIC cxx_std_17)
+
 target_include_directories(zlac8015d PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -37,7 +39,7 @@ install(
   DESTINATION include
 )
 
-# Export to other ROS2 packages
+# Export
 ament_export_include_directories(include)
 ament_export_libraries(zlac8015d)
 

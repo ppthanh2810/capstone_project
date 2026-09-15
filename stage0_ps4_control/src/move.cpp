@@ -38,6 +38,14 @@ private:
     motors_.setRpm(
       static_cast<int>(msg->data[0]),
       static_cast<int>(msg->data[1]));
+
+    auto [left_rpm, right_rpm] = motors_.getRpm();
+
+    RCLCPP_INFO(
+      get_logger(),
+      "RPM Left: %.4f | RPM Right: %.4f",
+      left_rpm,
+      right_rpm);
   }
 
   zlac8015d_hw::Controller motors_;

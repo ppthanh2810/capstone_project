@@ -15,9 +15,11 @@ find_package(zlac8015d_hw REQUIRED)
 # Nodes
 add_executable(m_to_m src/m_to_m.cpp)
 ament_target_dependencies(m_to_m rclcpp std_msgs geometry_msgs)
+target_compile_features(m_to_m PUBLIC cxx_std_17)
 
 add_executable(move src/move.cpp)
 ament_target_dependencies(move rclcpp std_msgs zlac8015d_hw)
+target_compile_features(move PUBLIC cxx_std_17)
 
 # Install nodes
 install(
