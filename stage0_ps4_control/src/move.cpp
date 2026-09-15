@@ -3,7 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 
-#include "zlac8015d_hardware/zlac8015d.hpp"
+#include "zlac8015d_hw/zlac8015d.hpp"
 
 class Move : public rclcpp::Node
 {
