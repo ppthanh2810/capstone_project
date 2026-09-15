@@ -8,7 +8,7 @@
 class Move : public rclcpp::Node
 {
 public:
-  Move() : Node("move"), motors_("/dev/ttyUSB1")
+  Move() : Node("move"), motors_("/dev/ttyUSB0")
   {
     motors_.disableMotor();
     motors_.setAccelTime(500, 500);
