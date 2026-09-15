@@ -1,0 +1,31 @@
+bno055_node:
+  ros__parameters:
+
+    # I2C
+    device: "/dev/i2c-1"
+    address: 41              # 0x29
+
+    # ROS2
+    topic: "/imu/data"
+    frame_id: "imu_link"
+    publish_rate: 50.0       # Hz
+
+    # BNO055
+    operation_mode: 12       # 0x0C = NDOF
+    restore_calibration: true
+
+    # Calibration profile: registers 0x55 -> 0x6A
+    calibration:
+      [
+        242, 255,
+        252, 255,
+        255, 255,
+        149, 255,
+        41, 3,
+        137, 251,
+        254, 255,
+        254, 255,
+        0, 0,
+        232, 3,
+        215, 2
+      ]

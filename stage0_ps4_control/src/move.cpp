@@ -19,7 +19,7 @@ public:
     move_sub_ = create_subscription<std_msgs::msg::Float64MultiArray>( 
         "/PT/move", 10, std::bind(&Move::moveCallback, this, std::placeholders::_1));
     timer_ = create_wall_timer(
-      std::chrono::milliseconds(100),
+      std::chrono::seconds(2),
       std::bind(&Move::readRpm, this));
 
     RCLCPP_INFO(get_logger(), "move started");
@@ -41,8 +41,6 @@ private:
     motors_.setRpm(
       static_cast<int>(msg->data[0]),
       static_cast<int>(msg->data[1]));
-
-    auto [left_rpm, right_rpm] = motors_.getRpm();
   }
 
   void readRpm()
@@ -65,7 +63,7 @@ private:
 
   rclcpp::Subscription<
     std_msgs::msg::Float64MultiArray>::SharedPtr move_sub_;
-    
+
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
