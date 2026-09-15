@@ -17,7 +17,8 @@ add_executable(m_to_m src/m_to_m.cpp)
 ament_target_dependencies(m_to_m rclcpp std_msgs geometry_msgs)
 
 add_executable(move src/move.cpp)
-ament_target_dependencies(move rclcpp std_msgs zlac8015d_hw)
+ament_target_dependencies(move rclcpp std_msgs)
+target_link_libraries(move zlac8015d)
 
 # Install nodes
 install(
@@ -34,12 +35,5 @@ install(
   config
   DESTINATION share/${PROJECT_NAME}/
 )
-
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  set(ament_cmake_copyright_FOUND TRUE)
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
 
 ament_package()

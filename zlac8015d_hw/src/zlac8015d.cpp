@@ -7,7 +7,7 @@
 
 #include <modbus/modbus.h>
 
-namespace zlac8015d_hardware
+namespace zlac8015d_hw
 {
 
 Controller::Controller(
@@ -174,4 +174,4 @@ int16_t Controller::toSigned(uint16_t value)
   return static_cast<int16_t>(value);
 }
 
-}  // namespace zlac8015d_hardware
+}  // namespace zlac8015d_hw

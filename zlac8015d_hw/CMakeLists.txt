@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBMODBUS REQUIRED IMPORTED_TARGET libmodbus)
 
-# ZLAC8015D library
+# Library
 add_library(zlac8015d SHARED
   src/zlac8015d.cpp
 )
@@ -20,9 +20,7 @@ target_include_directories(zlac8015d PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_compile_features(zlac8015d PUBLIC cxx_std_17)
-
-target_link_libraries(zlac8015d
+target_link_libraries(zlac8015d PRIVATE
   PkgConfig::LIBMODBUS
 )
 
@@ -32,6 +30,7 @@ install(
   EXPORT export_zlac8015d
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 # Install header
@@ -40,6 +39,7 @@ install(
   DESTINATION include
 )
 
+# Export for other packages
 ament_export_targets(export_zlac8015d HAS_LIBRARY_TARGET)
 ament_export_include_directories(include)
 ament_export_libraries(zlac8015d)
