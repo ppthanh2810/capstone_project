@@ -17,7 +17,7 @@ add_executable(m_to_m src/m_to_m.cpp)
 ament_target_dependencies(m_to_m rclcpp std_msgs geometry_msgs)
 
 add_executable(move src/move.cpp)
-ament_target_dependencies(move rclcpp std_msgs)
+ament_target_dependencies(move rclcpp std_msgs zlac8015d_hw)
 
 # Install nodes
 install(

@@ -6,7 +6,7 @@
 
 struct _modbus;
 
-namespace zlac8015d_hardware
+namespace zlac8015d_hw
 {
 
 class Controller
