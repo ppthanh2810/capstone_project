@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(zlac8015d_hw REQUIRED)
 
 # Nodes
 add_executable(m_to_m src/m_to_m.cpp)

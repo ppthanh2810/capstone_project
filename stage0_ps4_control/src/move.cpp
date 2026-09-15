@@ -40,7 +40,7 @@ private:
       static_cast<int>(msg->data[1]));
   }
 
-  zlac8015d_hardware::Controller motors_;
+  zlac8015d_hw::Controller motors_;
 
   rclcpp::Subscription<
     std_msgs::msg::Float64MultiArray>::SharedPtr move_sub_;
