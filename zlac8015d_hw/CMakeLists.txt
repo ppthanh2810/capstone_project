@@ -20,27 +20,24 @@ target_include_directories(zlac8015d PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(zlac8015d PRIVATE
+target_link_libraries(zlac8015d
   PkgConfig::LIBMODBUS
 )
 
 # Install library
 install(
   TARGETS zlac8015d
-  EXPORT export_zlac8015d
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
 )
 
-# Install header
+# Install headers
 install(
   DIRECTORY include/
   DESTINATION include
 )
 
-# Export for other packages
-ament_export_targets(export_zlac8015d HAS_LIBRARY_TARGET)
+# Export to other ROS2 packages
 ament_export_include_directories(include)
 ament_export_libraries(zlac8015d)
 
