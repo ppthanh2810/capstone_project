@@ -4,7 +4,6 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
-#include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 
 using namespace std::chrono_literals;
@@ -14,16 +13,12 @@ class MtoM : public rclcpp::Node
 public:
   MtoM() : Node("m_to_m")
   {
-    motion_sub_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10, [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
+    motion_sub_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel_joy", 1, [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
         x_ = msg->linear.x;
         z_ = msg->angular.z;
       });
 
-    percent_sub_ = create_subscription<std_msgs::msg::Float32>("/PT/percent", 10, [this](const std_msgs::msg::Float32::SharedPtr msg) { 
-        percent_ = msg->data; 
-    });
-
-    move_pub_ = create_publisher<std_msgs::msg::Float64MultiArray>("/PT/move", 10);
+    move_pub_ = create_publisher<std_msgs::msg::Float64MultiArray>("/PT/move", 1);
 
     timer_ = create_wall_timer(100ms, std::bind(&MtoM::publishRpm, this));
 
@@ -33,7 +28,7 @@ public:
 private:
   void publishRpm()
   {
-    double x = (percent_ >= 50.0) ? 0.0 : x_;
+    double x = x_;
     double z = z_;
 
     double left, right;
@@ -62,10 +57,8 @@ private:
 
   double x_ = 0.0;
   double z_ = 0.0;
-  double percent_ = 0.0;
 
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr motion_sub_;
-  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr percent_sub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr move_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
 };

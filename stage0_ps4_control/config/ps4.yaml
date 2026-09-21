@@ -3,7 +3,7 @@ joy_teleop:
     move:
       type: topic
       interface_type: geometry_msgs/msg/Twist
-      topic_name: /cmd_vel
+      topic_name: /cmd_vel_joy
       deadman_buttons: [1]
       axis_mappings:
         linear-x:
