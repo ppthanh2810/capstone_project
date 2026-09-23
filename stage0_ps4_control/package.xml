@@ -1,17 +1,35 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+
 <package format="3">
   <name>stage0_ps4_control</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="pphuonthanh0805@gmail.com">thanhpham</maintainer>
-  <license>TODO: License declaration</license>
+
+  <description>
+    PS4 teleoperation, ZLAC8015D motor control and wheel odometry.
+  </description>
+
+  <maintainer email="pphuonthanh0805@gmail.com">
+    thanhpham
+  </maintainer>
+
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>tf2_ros</depend>
   <depend>zlac8015d_hw</depend>
+
+  <exec_depend>joy</exec_depend>
+  <exec_depend>joy_teleop</exec_depend>
+  <exec_depend>twist_mux</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

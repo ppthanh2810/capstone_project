@@ -38,18 +38,12 @@ def generate_launch_description():
         executable='twist_mux',
         name='twist_mux',
         parameters=[twist_mux_config],
-        remappings=[
-            ('/cmd_vel_out', '/cmd_vel'),
-        ],
     )
 
     m_to_m_node = Node(
         package='stage0_ps4_control',
         executable='m_to_m',
         name='m_to_m',
-        remappings=[
-            ('/cmd_vel_joy', '/cmd_vel'),
-        ],
     )
 
     move_node = Node(
@@ -59,10 +53,17 @@ def generate_launch_description():
         output='screen',
     )
 
+    zlac8015d_move_node = Node(
+        package='stage0_ps4_control',
+        executable='zlac8015d_move',
+        name='zlac8015d_move',
+    )
+
     return LaunchDescription([
         joy_node,
         joy_teleop_node,
         twist_mux_node,
-        m_to_m_node,
-        move_node,
+        # m_to_m_node,
+        # move_node,
+        zlac8015d_move_node,
     ])

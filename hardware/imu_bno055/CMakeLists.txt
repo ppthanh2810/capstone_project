@@ -14,6 +14,9 @@ find_package(sensor_msgs REQUIRED)
 add_executable(bno055_node src/bno055_node.cpp)
 ament_target_dependencies(bno055_node rclcpp sensor_msgs)
 
+add_executable(laptop_esp src/laptop_esp.cpp)
+ament_target_dependencies(laptop_esp rclcpp sensor_msgs)
+
 target_include_directories(bno055_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -25,6 +28,7 @@ target_compile_features(bno055_node PUBLIC cxx_std_17)
 install(
   TARGETS
   bno055_node
+  laptop_esp
   DESTINATION lib/${PROJECT_NAME}
 )
 

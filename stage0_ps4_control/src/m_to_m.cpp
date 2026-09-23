@@ -13,7 +13,7 @@ class MtoM : public rclcpp::Node
 public:
   MtoM() : Node("m_to_m")
   {
-    motion_sub_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel_joy", 1, [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
+    motion_sub_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel_out", 1, [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
         x_ = msg->linear.x;
         z_ = msg->angular.z;
       });
@@ -41,7 +41,7 @@ private:
       right = (x - wheel_distance_ / 2.0 * z) / wheel_radius_;
     }
 
-    constexpr double rpm_factor = 60.0 / (2.0 * 3.141592653589793);
+    constexpr double rpm_factor = 60.0 / (2.0 * 3.14159265358979323846);
 
     std_msgs::msg::Float64MultiArray msg;
     msg.data = {
