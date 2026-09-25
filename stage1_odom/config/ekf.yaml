@@ -1,0 +1,69 @@
+
+ekf_filter_node:
+  ros__parameters:
+
+    # ============================================================
+    # EKF CONFIGURATION
+    # ============================================================
+
+    frequency: 30.0
+    sensor_timeout: 0.2
+
+    two_d_mode: true
+
+    publish_tf: true
+    publish_acceleration: false
+
+    print_diagnostics: true
+
+    # ============================================================
+    # COORDINATE FRAMES
+    # ============================================================
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    # ============================================================
+    # WHEEL ODOMETRY
+    # ============================================================
+
+    odom0: /wheel_odom
+
+    odom0_config: [false, false, false,
+                   false, false, false,
+                   true,  true,  false,
+                   false, false, false,
+                   false, false, false]
+
+    odom0_queue_size: 10
+
+    odom0_differential: false
+    odom0_relative: false
+
+    # ============================================================
+    # IMU ODOMETRY
+    # ============================================================
+
+    odom1: /imu_odom
+
+    odom1_config: [false, false, false,
+                   false, false, true,
+                   false, false, false,
+                   false, false, true,
+                   false, false, false]
+
+    odom1_queue_size: 10
+
+    odom1_differential: false
+    odom1_relative: false
+
+    # ============================================================
+    # EKF OUTPUT
+    # ============================================================
+
+    use_control: false
+
+    transform_time_offset: 0.0
+    transform_timeout: 0.0

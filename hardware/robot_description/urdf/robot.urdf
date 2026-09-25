@@ -1,459 +1,351 @@
-<?xml version="1.0"?>
-<!--
- AMR ROS 2 TF/visualization model generated from robot_desciption.scad (2026-09-23).
- Original CAD: millimeters, +X forward, +Y left, +Z up, ground z=0.
- URDF: meters/radians. base_link is at chassis underside z=0.1135 m.
- All sensor/body joints are fixed; drive wheels have continuous joints.
- No map->odom or odom->base_footprint TF is defined by this model.
- Camera optical extrinsics and lidar scan-plane origin are uncalibrated placeholders.
- Caster housings simplified; real caster steering and wheel spins are not modeled.
--->
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="robot_description">
-  <link name="base_footprint"/>
+  <!--Minimal TF for visualization/navigation. Static body and wheels are drawn as base_link geometry; wheel rotation joints are omitted. Sensor and optical frame names/poses are preserved.-->
+  <link name="base_footprint" />
   <link name="base_link">
     <visual>
-      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
+      <origin xyz="0 0 0.0025" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.2" length="0.005"/>
+        <cylinder radius="0.2" length="0.005" />
       </geometry>
       <material name="chassis_gray">
-        <color rgba="0.44 0.46 0.49 1"/>
+        <color rgba="0.44 0.46 0.49 1" />
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
+      <origin xyz="0 0 0.0025" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.2" length="0.005"/>
+        <cylinder radius="0.2" length="0.005" />
       </geometry>
     </collision>
     <visual>
-      <origin xyz="-0.12 -0.1 0.055" rpy="0 0 0"/>
+      <origin xyz="-0.12 -0.1 0.055" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.006" length="0.1"/>
+        <cylinder radius="0.006" length="0.1" />
       </geometry>
       <material name="gold">
-        <color rgba="0.80 0.65 0.20 1"/>
+        <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
     <visual>
-      <origin xyz="-0.12 0.1 0.055" rpy="0 0 0"/>
+      <origin xyz="-0.12 0.1 0.055" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.006" length="0.1"/>
+        <cylinder radius="0.006" length="0.1" />
       </geometry>
       <material name="gold">
-        <color rgba="0.80 0.65 0.20 1"/>
+        <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
     <visual>
-      <origin xyz="0.12 -0.1 0.055" rpy="0 0 0"/>
+      <origin xyz="0.12 -0.1 0.055" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.006" length="0.1"/>
+        <cylinder radius="0.006" length="0.1" />
       </geometry>
       <material name="gold">
-        <color rgba="0.80 0.65 0.20 1"/>
+        <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
     <visual>
-      <origin xyz="0.12 0.1 0.055" rpy="0 0 0"/>
+      <origin xyz="0.12 0.1 0.055" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.006" length="0.1"/>
+        <cylinder radius="0.006" length="0.1" />
       </geometry>
       <material name="gold">
-        <color rgba="0.80 0.65 0.20 1"/>
+        <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
-  </link>
-  <joint name="base_footprint_joint" type="fixed">
-    <origin xyz="0 0 0.1135" rpy="0 0 0"/>
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
-  </joint>
-  <link name="upper_deck_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0.1075" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.2" length="0.005"/>
+        <cylinder radius="0.2" length="0.005" />
       </geometry>
       <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
+        <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0.1075" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.2" length="0.005"/>
+        <cylinder radius="0.2" length="0.005" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.11 0 0.115" rpy="0 0 1.5707963" />
+      <geometry>
+        <box size="0.17 0.063 0.01" />
+      </geometry>
+      <material name="white">
+        <color rgba="0.94 0.94 0.94 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0.17 0 0.11" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_description/meshes/camera_mount_photo.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.2115" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_description/meshes/lidar_plate.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="steel_blue">
+        <color rgba="0.28 0.49 0.75 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0.17 -0.06 0.16" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.006" length="0.1" />
+      </geometry>
+      <material name="steel_blue">
+        <color rgba="0.28 0.49 0.75 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0.17 0.06 0.16" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.006" length="0.1" />
+      </geometry>
+      <material name="steel_blue">
+        <color rgba="0.28 0.49 0.75 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0.1 -0.02" rpy="0 0 0" />
+      <geometry>
+        <box size="0.11 0.025 0.04" />
+      </geometry>
+      <material name="white">
+        <color rgba="0.94 0.94 0.94 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0.1175 -0.04" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_description/meshes/motor_plate.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0.17 -0.06" rpy="0 0 -3.14159261" />
+      <geometry>
+        <mesh filename="package://robot_description/meshes/drive_wheel.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="dark_black">
+        <color rgba="0.13 0.14 0.16 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0.17 -0.06" rpy="1.5707963 0 0" />
+      <geometry>
+        <cylinder radius="0.0535" length="0.0415" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 -0.1 -0.02" rpy="0 0 0" />
+      <geometry>
+        <box size="0.11 0.025 0.04" />
+      </geometry>
+      <material name="white">
+        <color rgba="0.94 0.94 0.94 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 -0.1175 -0.04" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_description/meshes/motor_plate.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 -0.17 -0.06" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_description/meshes/drive_wheel.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="dark_black">
+        <color rgba="0.13 0.14 0.16 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.17 -0.06" rpy="1.5707963 0 0" />
+      <geometry>
+        <cylinder radius="0.0535" length="0.0415" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.12 0 -0.0015" rpy="0 0 0" />
+      <geometry>
+        <box size="0.055 0.075 0.003" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0.12 0 -0.0085" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.02" length="0.007" />
+      </geometry>
+      <material name="gold">
+        <color rgba="0.80 0.65 0.20 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0.108 0 -0.0425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 0.035 0.048" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0.068 0 -0.076" rpy="1.5707963 0 0" />
+      <geometry>
+        <cylinder radius="0.0375" length="0.03" />
+      </geometry>
+      <material name="rubber">
+        <color rgba="0.20 0.20 0.22 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.068 0 -0.076" rpy="1.5707963 0 0" />
+      <geometry>
+        <cylinder radius="0.0375" length="0.03" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.12 0 -0.0015" rpy="0 0 -3.14159261" />
+      <geometry>
+        <box size="0.055 0.075 0.003" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="-0.12 0 -0.0085" rpy="0 0 -3.14159261" />
+      <geometry>
+        <cylinder radius="0.02" length="0.007" />
+      </geometry>
+      <material name="gold">
+        <color rgba="0.80 0.65 0.20 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="-0.108 5.5692248e-10 -0.0425" rpy="0 0 -3.14159261" />
+      <geometry>
+        <box size="0.05 0.035 0.048" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.76 0.79 0.82 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="-0.068 2.41333075e-09 -0.076" rpy="1.5707963 0 -3.14159261" />
+      <geometry>
+        <cylinder radius="0.0375" length="0.03" />
+      </geometry>
+      <material name="rubber">
+        <color rgba="0.20 0.20 0.22 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.068 2.41333075e-09 -0.076" rpy="1.5707963 0 -3.14159261" />
+      <geometry>
+        <cylinder radius="0.0375" length="0.03" />
       </geometry>
     </collision>
   </link>
-  <joint name="upper_deck_joint" type="fixed">
-    <origin xyz="0 0 0.1075" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="upper_deck_link"/>
-  </joint>
-  <link name="breadboard_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.17 0.063 0.01"/>
-      </geometry>
-      <material name="white">
-        <color rgba="0.94 0.94 0.94 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="breadboard_joint" type="fixed">
-    <origin xyz="0.11 0 0.115" rpy="0 0 1.5707963"/>
-    <parent link="base_link"/>
-    <child link="breadboard_link"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <origin xyz="0 0 0.1135" rpy="0 0 0" />
+    <parent link="base_footprint" />
+    <child link="base_link" />
   </joint>
   <link name="imu_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 1.5707963"/>
+      <origin xyz="0 0 0" rpy="0 0 1.5707963" />
       <geometry>
-        <box size="0.021 0.012 0.0016"/>
+        <box size="0.021 0.012 0.0016" />
       </geometry>
       <material name="imu_blue">
-        <color rgba="0.10 0.16 0.46 1"/>
+        <color rgba="0.10 0.16 0.46 1" />
       </material>
     </visual>
   </link>
   <joint name="imu_joint" type="fixed">
-    <origin xyz="0.11 0 0.1208" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="imu_link"/>
-  </joint>
-  <link name="camera_mount_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="package://robot_description/meshes/camera_mount_photo.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="camera_mount_joint" type="fixed">
-    <origin xyz="0.17 0 0.11" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="camera_mount_link"/>
+    <origin xyz="0.11 0 0.1208" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="imu_link" />
   </joint>
   <link name="camera_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://robot_description/meshes/camera_d435.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://robot_description/meshes/camera_d435.stl" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
+        <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.025 0.09 0.025"/>
+        <box size="0.025 0.09 0.025" />
       </geometry>
     </collision>
   </link>
   <joint name="camera_joint" type="fixed">
-    <origin xyz="0.17 0 0.1625" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="camera_link"/>
+    <origin xyz="0.17 0 0.1625" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="camera_link" />
   </joint>
-  <link name="camera_color_optical_frame"/>
+  <link name="camera_color_optical_frame" />
   <joint name="camera_color_optical_frame_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963"/>
-    <parent link="camera_link"/>
-    <child link="camera_color_optical_frame"/>
+    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963" />
+    <parent link="camera_link" />
+    <child link="camera_color_optical_frame" />
   </joint>
-  <link name="camera_depth_optical_frame"/>
+  <link name="camera_depth_optical_frame" />
   <joint name="camera_depth_optical_frame_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963"/>
-    <parent link="camera_link"/>
-    <child link="camera_depth_optical_frame"/>
-  </joint>
-  <link name="lidar_support_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="package://robot_description/meshes/lidar_plate.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="steel_blue">
-        <color rgba="0.28 0.49 0.75 1"/>
-      </material>
-    </visual>
-    <visual>
-      <origin xyz="0.17 -0.06 -0.0515" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.006" length="0.1"/>
-      </geometry>
-      <material name="steel_blue">
-        <color rgba="0.28 0.49 0.75 1"/>
-      </material>
-    </visual>
-    <visual>
-      <origin xyz="0.17 0.06 -0.0515" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.006" length="0.1"/>
-      </geometry>
-      <material name="steel_blue">
-        <color rgba="0.28 0.49 0.75 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="lidar_support_joint" type="fixed">
-    <origin xyz="0 0 0.2115" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="lidar_support_link"/>
+    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963" />
+    <parent link="camera_link" />
+    <child link="camera_depth_optical_frame" />
   </joint>
   <link name="lidar_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://robot_description/meshes/rplidar.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://robot_description/meshes/rplidar.stl" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="dark_black">
-        <color rgba="0.13 0.14 0.16 1"/>
+        <color rgba="0.13 0.14 0.16 1" />
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <cylinder radius="0.0278" length="0.0418"/>
+        <cylinder radius="0.0278" length="0.0418" />
       </geometry>
     </collision>
   </link>
   <joint name="lidar_joint" type="fixed">
-    <origin xyz="0.15 0 0.23365" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="lidar_link"/>
+    <origin xyz="0.15 0 0.23365" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="lidar_link" />
   </joint>
-  <link name="laser_frame"/>
+  <link name="laser_frame" />
   <joint name="laser_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <parent link="lidar_link"/>
-    <child link="laser_frame"/>
-  </joint>
-  <link name="left_motor_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.11 0.025 0.04"/>
-      </geometry>
-      <material name="white">
-        <color rgba="0.94 0.94 0.94 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="left_motor_joint" type="fixed">
-    <origin xyz="0 0.1 -0.02" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="left_motor_link"/>
-  </joint>
-  <link name="left_motor_plate_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="package://robot_description/meshes/motor_plate.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="left_motor_plate_joint" type="fixed">
-    <origin xyz="0 0.1175 -0.04" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="left_motor_plate_link"/>
-  </joint>
-  <link name="left_wheel_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 3.1415927"/>
-      <geometry>
-        <mesh filename="package://robot_description/meshes/drive_wheel.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="dark_black">
-        <color rgba="0.13 0.14 0.16 1"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
-      <geometry>
-        <cylinder radius="0.0535" length="0.0415"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="left_wheel_joint" type="continuous">
-    <origin xyz="0 0.17 -0.06" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="left_wheel_link"/>
-    <axis xyz="0 -1 0"/>
-  </joint>
-  <link name="right_motor_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.11 0.025 0.04"/>
-      </geometry>
-      <material name="white">
-        <color rgba="0.94 0.94 0.94 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="right_motor_joint" type="fixed">
-    <origin xyz="0 -0.1 -0.02" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="right_motor_link"/>
-  </joint>
-  <link name="right_motor_plate_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="package://robot_description/meshes/motor_plate.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="right_motor_plate_joint" type="fixed">
-    <origin xyz="0 -0.1175 -0.04" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="right_motor_plate_link"/>
-  </joint>
-  <link name="right_wheel_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="package://robot_description/meshes/drive_wheel.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="dark_black">
-        <color rgba="0.13 0.14 0.16 1"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
-      <geometry>
-        <cylinder radius="0.0535" length="0.0415"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="right_wheel_joint" type="continuous">
-    <origin xyz="0 -0.17 -0.06" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="right_wheel_link"/>
-    <axis xyz="0 -1 0"/>
-  </joint>
-  <link name="front_caster_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.055 0.075 0.003"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-    <visual>
-      <origin xyz="0 0 -0.007" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.007"/>
-      </geometry>
-      <material name="gold">
-        <color rgba="0.80 0.65 0.20 1"/>
-      </material>
-    </visual>
-    <visual>
-      <origin xyz="-0.012 0 -0.041" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.05 0.035 0.048"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="front_caster_joint" type="fixed">
-    <origin xyz="0.12 0 -0.0015" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="front_caster_link"/>
-  </joint>
-  <link name="front_caster_wheel_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
-      <geometry>
-        <cylinder radius="0.0375" length="0.03"/>
-      </geometry>
-      <material name="rubber">
-        <color rgba="0.20 0.20 0.22 1"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
-      <geometry>
-        <cylinder radius="0.0375" length="0.03"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="front_caster_wheel_joint" type="fixed">
-    <origin xyz="-0.052 0 -0.0745" rpy="0 0 0"/>
-    <parent link="front_caster_link"/>
-    <child link="front_caster_wheel_link"/>
-  </joint>
-  <link name="rear_caster_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.055 0.075 0.003"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-    <visual>
-      <origin xyz="0 0 -0.007" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.007"/>
-      </geometry>
-      <material name="gold">
-        <color rgba="0.80 0.65 0.20 1"/>
-      </material>
-    </visual>
-    <visual>
-      <origin xyz="-0.012 0 -0.041" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.05 0.035 0.048"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.76 0.79 0.82 1"/>
-      </material>
-    </visual>
-  </link>
-  <joint name="rear_caster_joint" type="fixed">
-    <origin xyz="-0.12 0 -0.0015" rpy="0 0 3.1415927"/>
-    <parent link="base_link"/>
-    <child link="rear_caster_link"/>
-  </joint>
-  <link name="rear_caster_wheel_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
-      <geometry>
-        <cylinder radius="0.0375" length="0.03"/>
-      </geometry>
-      <material name="rubber">
-        <color rgba="0.20 0.20 0.22 1"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
-      <geometry>
-        <cylinder radius="0.0375" length="0.03"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="rear_caster_wheel_joint" type="fixed">
-    <origin xyz="-0.052 0 -0.0745" rpy="0 0 0"/>
-    <parent link="rear_caster_link"/>
-    <child link="rear_caster_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="lidar_link" />
+    <child link="laser_frame" />
   </joint>
 </robot>

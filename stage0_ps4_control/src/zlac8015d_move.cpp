@@ -17,7 +17,7 @@ class zlac8015d_move : public rclcpp::Node
 public:
   zlac8015d_move()
   : Node("zlac8015d_move"),
-    motors_("/dev/ttyUSB2")
+    motors_("/dev/ttyUSB0")
   {
     wheel_radius_ = declare_parameter<double>("wheel_radius", 0.0535);
     wheel_distance_ = declare_parameter<double>("wheel_distance", 0.34);
@@ -29,16 +29,10 @@ public:
     motors_.setRpm(0, 0);
     motors_.enableMotor();
 
-    motion_sub_ = create_subscription<geometry_msgs::msg::Twist>(
-      "/cmd_vel_out", 1,
-      std::bind(
-        &zlac8015d_move::motionCallback,
-        this,
-        std::placeholders::_1));
+    motion_sub_ = create_subscription<geometry_msgs::msg::Twist>( "/cmd_vel_out", 1,
+      std::bind(&zlac8015d_move::motionCallback, this, std::placeholders::_1));
 
-    feedback_pub_ =
-      create_publisher<std_msgs::msg::Float64MultiArray>(
-        "/wheel_feedback", 10);
+    feedback_pub_ = create_publisher<std_msgs::msg::Float64MultiArray>("/wheel_feedback", 10);
 
     feedback_timer_ = create_wall_timer(50ms,std::bind(&zlac8015d_move::readFeedback, this));
 

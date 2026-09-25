@@ -20,7 +20,7 @@ public:
 
     wheel_distance_ = declare_parameter<double>("wheel_distance", 0.34);
 
-    publish_tf_ = declare_parameter<bool>("publish_tf", true);
+    publish_tf_ = declare_parameter<bool>("publish_tf", false);
 
     feedback_sub_ = create_subscription<std_msgs::msg::Float64MultiArray>("/wheel_feedback", 10,
         std::bind(
@@ -28,7 +28,7 @@ public:
           this,
           std::placeholders::_1));
 
-    odom_pub_ = create_publisher<nav_msgs::msg::Odometry>( "/odom", 10);
+    odom_pub_ = create_publisher<nav_msgs::msg::Odometry>( "/wheel_odom", 10);
 
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>( this);
 
