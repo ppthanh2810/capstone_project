@@ -5,7 +5,6 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
 
 
 def include_launch(package_name, launch_file, arguments=None):
@@ -22,7 +21,17 @@ def include_launch(package_name, launch_file, arguments=None):
 
 
 def generate_launch_description():
-    slam_share = Path(get_package_share_directory("slam_toolbox"))
+    stage2_share = Path(get_package_share_directory("stage2_slam"))
+
+    amcl_config = stage2_share / "config" / "amcl_params.yaml"
+
+    default_map = (
+        Path.home()
+        / "capstone_ws"
+        / "capstone_project"
+        / "maps"
+        / "map.yaml"
+    )
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -30,13 +39,20 @@ def generate_launch_description():
             default_value="/dev/ttyUSB2",
             description="Cổng USB của RPLidar C1",
         ),
+
+        DeclareLaunchArgument(
+            "map",
+            default_value=str(default_map),
+            description="Đường dẫn tới file bản đồ site_map.yaml",
+        ),
+
         DeclareLaunchArgument(
             "rviz",
             default_value="true",
             description="Có mở RViz2 hay không",
         ),
 
-        # C1 + URDF TF + bộ lọc /scan_filtered + RViz2.
+        # RPLidar C1 + robot_state_publisher + RViz2.
         include_launch(
             "stage2_slam",
             "scan.launch.py",
@@ -46,40 +62,31 @@ def generate_launch_description():
             },
         ),
 
-        # PS4 + twist_mux + động cơ phát /wheel_feedback.
+        # Tay PS4 + twist_mux + điều khiển động cơ.
+        # zlac8015d_move phát /wheel_feedback.
         include_launch(
             "stage0_ps4_control",
             "move_twist_mux.launch.py",
         ),
 
-        # Wheel odom + IMU odom + EKF phát odom -> base_footprint.
+        # Odometry bánh xe + IMU + EKF.
+        # EKF phát TF odom -> base_footprint.
         include_launch(
             "stage1_odom",
             "ekf.launch.py",
         ),
 
-        # SLAM chỉ dùng scan đã loại vùng phía sau.
-        Node(
-            package="slam_toolbox",
-            executable="async_slam_toolbox_node",
-            name="slam_toolbox",
-            output="screen",
-            parameters=[
-                str(
-                    slam_share
-                    / "config"
-                    / "mapper_params_online_async.yaml"
-                ),
-                {
-                    "use_sim_time": False,
-                    "scan_topic": "/scan_filtered",
-                    "map_frame": "map",
-                    "odom_frame": "odom",
-                    "base_frame": "base_footprint",
-                    "mode": "mapping",
-                    "min_laser_range": 0.10,
-                    "max_laser_range": 16.0,
-                },
-            ],
+        # Nạp site_map.yaml, chạy Map Server và AMCL.
+        # AMCL phát TF map -> odom sau khi đặt vị trí ban đầu.
+        include_launch(
+            "nav2_bringup",
+            "localization_launch.py",
+            {
+                "map": LaunchConfiguration("map"),
+                "params_file": str(amcl_config),
+                "use_sim_time": "false",
+                "autostart": "true",
+                "use_composition": "False",
+            },
         ),
     ])
