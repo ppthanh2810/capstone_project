@@ -129,23 +129,17 @@ private:
   void readFeedback()
   {
     try {
-      auto [left_rpm_raw, right_rpm_raw] =
-        motors_.getRpm();
+      auto [left_rpm_raw, right_rpm_raw] = motors_.getRpm();
 
-      auto [left_travelled_raw, right_travelled_raw] =
-        motors_.getWheelsTravelled();
+      auto [left_travelled_raw, right_travelled_raw] = motors_.getWheelsTravelled();
 
-      double left_rpm =
-        static_cast<double>(left_rpm_raw);
+      double left_rpm = static_cast<double>(left_rpm_raw);
 
-      double right_rpm =
-        -static_cast<double>(right_rpm_raw);
+      double right_rpm = -static_cast<double>(right_rpm_raw);
 
-      double left_travelled =
-        static_cast<double>(left_travelled_raw);
+      double left_travelled = static_cast<double>(left_travelled_raw);
 
-      double right_travelled =
-        -static_cast<double>(right_travelled_raw);
+      double right_travelled = -static_cast<double>(right_travelled_raw);
 
       if (!std::isfinite(left_rpm) ||
           !std::isfinite(right_rpm) ||

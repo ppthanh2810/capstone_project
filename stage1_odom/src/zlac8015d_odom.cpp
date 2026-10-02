@@ -146,9 +146,7 @@ private:
   // VELOCITY
   // ============================================================
 
-  void updateVelocity(
-    double left_rpm,
-    double right_rpm)
+  void updateVelocity(double left_rpm, double right_rpm)
   {
     double left_velocity = left_rpm * wheel_radius_ / rpm_factor_;
 
