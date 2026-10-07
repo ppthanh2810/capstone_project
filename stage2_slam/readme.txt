@@ -114,7 +114,19 @@
       / "map.yaml"
   )
   
+  --> map server và amcl
   
+  include_launch(
+    "nav2_bringup",
+    "localization_launch.py",
+    {
+        "map": LaunchConfiguration("map"),
+        "params_file": str(amcl_config),
+        "use_sim_time": "false",
+        "autostart": "true",
+        "use_composition": "False",
+    },
+)
   
  
   

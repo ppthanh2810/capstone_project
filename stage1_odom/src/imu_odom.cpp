@@ -272,7 +272,7 @@ private:
 
     odom.header.stamp = stamp;
     odom.header.frame_id = "odom";
-    odom.child_frame_id = "base_link";
+    odom.child_frame_id = "base_footprint";
 
     // Position - not measured
 

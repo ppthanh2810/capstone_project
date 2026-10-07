@@ -185,7 +185,7 @@ private:
     odom.header.stamp = stamp;
 
     odom.header.frame_id = "odom";
-    odom.child_frame_id = "base_link";
+    odom.child_frame_id = "base_footprint";
 
     // ==========================================================
     // POSITION
@@ -273,7 +273,7 @@ private:
     transform.header.stamp = stamp;
 
     transform.header.frame_id = "odom";
-    transform.child_frame_id = "base_link";
+    transform.child_frame_id = "base_footprint";
 
     // ==========================================================
     // TRANSLATION

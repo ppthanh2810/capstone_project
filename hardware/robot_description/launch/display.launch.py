@@ -1,7 +1,7 @@
 """Visualize AMR URDF and publish its TF tree (ROS 2 Humble).
 
-For real hardware pass publish_default_joint_states:=false and publish actual
-left_wheel_joint/right_wheel_joint positions on /joint_states instead.
+All URDF joints are fixed, so no /joint_states are required. On the real robot
+pass publish_default_joint_states:=false (joint_state_publisher is not needed).
 """
 
 from pathlib import Path
@@ -23,7 +23,7 @@ def generate_launch_description():
         DeclareLaunchArgument('rviz', default_value='true',
                               description='Start RViz2.'),
         DeclareLaunchArgument('publish_default_joint_states', default_value='true',
-                              description='Publish dummy wheel joint positions for TF demo only.'),
+                              description='Start joint_state_publisher (not needed: URDF has only fixed joints).'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         Node(
             package='robot_state_publisher',
