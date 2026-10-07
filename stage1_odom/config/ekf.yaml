@@ -8,13 +8,18 @@ ekf_filter_node:
     publish_acceleration: false
     print_diagnostics: true
 
-    # TF: odom -> base_footprint -> base_link -> laser_frame
+    # EKF chỉ phát TF odom -> base_footprint (publish_tf: true).
+    # base_footprint -> base_link -> laser_frame/imu_link do robot_state_publisher (URDF) phát.
+    # Không có map->odom ở stage1 (map_frame chỉ khai báo, slam/AMCL phát ở stage2).
     map_frame: map
     odom_frame: odom
     base_link_frame: base_footprint
     world_frame: odom
 
-    # Odometry từ encoder bánh xe: lấy vận tốc tiến và vận tốc quay.
+    # Odometry từ encoder bánh xe (frame body base_footprint): lấy vx và vy.
+    # vy = 0 là ràng buộc non-holonomic của xe vi sai (không trượt ngang), KHÔNG phải vận tốc quay.
+    # Vận tốc quay vyaw của bánh xe không fuse: hướng lấy từ IMU (ít bị trượt bánh).
+    # Không fuse x, y của bánh xe: EKF tự tích phân vx -> x, y theo yaw.
     odom0: /wheel_odom
     odom0_config: [false, false, false,
                    false, false, false,
@@ -25,7 +30,9 @@ ekf_filter_node:
     odom0_differential: false
     odom0_relative: false
 
-    # Odometry từ IMU: lấy yaw và vận tốc quay quanh trục Z.
+    # Odometry từ IMU (BNO055 NDOF): lấy yaw và vyaw (gyro z).
+    # Yaw của NDOF là hướng tuyệt đối theo từ trường. relative: true -> mẫu đầu tiên được coi là
+    # yaw = 0, nên frame odom trùng với hướng robot lúc khởi động (REP-105: odom liên tục, gốc tùy ý).
     odom1: /imu_odom
     odom1_config: [false, false, false,
                    false, false, true,
@@ -34,7 +41,7 @@ ekf_filter_node:
                    false, false, false]
     odom1_queue_size: 10
     odom1_differential: false
-    odom1_relative: false
+    odom1_relative: true
 
     use_control: false
     transform_time_offset: 0.0

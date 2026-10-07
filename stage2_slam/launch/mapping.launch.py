@@ -27,7 +27,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             "serial_port",
-            default_value="/dev/ttyUSB2",
+            default_value="/dev/ttyUSB1",
             description="Cổng USB của RPLidar C1",
         ),
         DeclareLaunchArgument(
@@ -79,6 +79,11 @@ def generate_launch_description():
                     "mode": "mapping",
                     "min_laser_range": 0.10,
                     "max_laser_range": 16.0,
+                    # Mặc định slam_toolbox: vẽ lại /map mỗi 5 s, chỉ thêm scan khi đi 0.5 m
+                    # hoặc quay 0.5 rad -> bản đồ cập nhật chậm với robot nhỏ, đi chậm.
+                    "map_update_interval": 1.0,
+                    "minimum_travel_distance": 0.2,
+                    "minimum_travel_heading": 0.2,
                 },
             ],
         ),

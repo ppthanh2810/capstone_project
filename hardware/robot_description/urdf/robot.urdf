@@ -344,7 +344,9 @@
   </joint>
   <link name="laser_frame" />
   <joint name="laser_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <!-- RPLIDAR C1: góc 0 của scan hướng về phía sau robot (đã kiểm tra thực tế) -> yaw pi.
+         Chỉ xoay frame dữ liệu scan; lidar_link (mesh) giữ đúng như CAD. -->
+    <origin xyz="0 0 0" rpy="0 0 3.14159265" />
     <parent link="lidar_link" />
     <child link="laser_frame" />
   </joint>

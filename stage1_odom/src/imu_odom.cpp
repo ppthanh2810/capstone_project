@@ -19,6 +19,7 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/magnetic_field.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "std_srvs/srv/empty.hpp"
 
 using namespace std::chrono_literals;
 
@@ -27,8 +28,13 @@ class ImuOdom : public rclcpp::Node
 public:
   ImuOdom() : Node("imu_odom")
   {
-    port_ = declare_parameter<std::string>("port", "/dev/ttyUSB1");
+    port_ = declare_parameter<std::string>("port", "/dev/ttyUSB0");
     frame_id_ = declare_parameter<std::string>("frame_id", "imu_link");
+
+    // true: yaw của /imu_odom tính tương đối so với mẫu hợp lệ đầu tiên (hướng lúc khởi động = 0).
+    // false (mặc định): yaw tuyệt đối của BNO055 NDOF (theo từ trường); EKF tự xử lý bằng odom1_relative.
+    // Chỉ áp dụng cho /imu_odom; /imu/data giữ orientation gốc của cảm biến.
+    zero_yaw_on_start_ = declare_parameter<bool>("zero_yaw_on_start", false);
 
     imu_pub_ = create_publisher<sensor_msgs::msg::Imu>(
       "/imu/data", rclcpp::SensorDataQoS());
@@ -38,6 +44,17 @@ public:
 
     odom_pub_ = create_publisher<nav_msgs::msg::Odometry>(
       "/imu_odom", 10);
+
+    // Đặt hướng hiện tại làm yaw = 0 (ví dụ sau khi gọi /reset_odom của wheel odom).
+    zero_yaw_service_ = create_service<std_srvs::srv::Empty>(
+      "/imu_odom/zero_yaw",
+      [this](
+        const std::shared_ptr<std_srvs::srv::Empty::Request>,
+        std::shared_ptr<std_srvs::srv::Empty::Response>) {
+        yaw_offset_initialized_ = false;
+        zero_yaw_on_start_ = true;
+        RCLCPP_INFO(get_logger(), "IMU yaw will be zeroed on next sample.");
+      });
 
     timer_ = create_wall_timer(5ms, [this] { readSerial(); });
 
@@ -260,9 +277,21 @@ private:
     // QUATERNION -> YAW
     // ========================================================
 
-    const double yaw = std::atan2(
+    const double raw_yaw = std::atan2(
       2.0 * (w*z + x*y),
       1.0 - 2.0 * (y*y + z*z));
+
+    if (zero_yaw_on_start_ && !yaw_offset_initialized_) {
+      yaw_offset_ = raw_yaw;
+      yaw_offset_initialized_ = true;
+      RCLCPP_INFO(
+        get_logger(), "IMU yaw zeroed | offset (absolute) = %.3f rad", yaw_offset_);
+    }
+
+    const double offset = zero_yaw_on_start_ ? yaw_offset_ : 0.0;
+    const double yaw = std::atan2(
+      std::sin(raw_yaw - offset),
+      std::cos(raw_yaw - offset));
 
     // ========================================================
     // PUBLISH IMU ODOMETRY
@@ -326,8 +355,9 @@ private:
 
     RCLCPP_INFO_THROTTLE(
       get_logger(), *get_clock(), 2000,
-      "IMU ODOM | Yaw: %.3f rad | Wz: %.3f rad/s",
+      "IMU ODOM | Yaw: %.3f rad (raw %.3f) | Wz: %.3f rad/s",
       yaw,
+      raw_yaw,
       odom.twist.twist.angular.z);
   }
 
@@ -418,6 +448,12 @@ private:
   // ============================================================
 
   std::string port_, frame_id_, buffer_;
+
+  bool zero_yaw_on_start_ = false;
+  bool yaw_offset_initialized_ = false;
+  double yaw_offset_ = 0.0;
+
+  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr zero_yaw_service_;
 
   int fd_ = -1;
   bool discard_ = false;

@@ -37,6 +37,7 @@ ament_target_dependencies(
   rclcpp
   sensor_msgs
   nav_msgs
+  std_srvs
 )
 target_compile_features(imu_odom PUBLIC cxx_std_17)
 
@@ -53,6 +54,7 @@ install(
   DIRECTORY
     launch
     config
+    rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

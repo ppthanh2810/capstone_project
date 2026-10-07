@@ -38,7 +38,7 @@ def generate_launch_description():
         executable="imu_odom",
         name="imu_odom",
         parameters=[{
-            "port": "/dev/ttyUSB1",
+            "port": "/dev/ttyUSB0",
             "frame_id": "imu_link"
         }]
     )

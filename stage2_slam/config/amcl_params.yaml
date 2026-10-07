@@ -12,6 +12,8 @@ amcl:
     tf_broadcast: true
     robot_model_type: "nav2_amcl::DifferentialMotionModel"
     laser_model_type: "likelihood_field"
+    # Dùng scan đã lọc (chỉ nửa phía trước robot): phía sau bị laptop che.
+    scan_topic: /scan_filtered
     min_particles: 500
     max_particles: 2000
     update_min_d: 0.05
