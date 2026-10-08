@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 class Move : public rclcpp::Node
 {
 public:
-  Move() : Node("move"), motors_("/dev/ttyUSB2")
+  Move() : Node("move"), motors_("/dev/ttyUSB0")
   {
     motors_.disableMotor();
     motors_.setAccelTime(500, 500);

@@ -1,13 +1,14 @@
 scan_to_scan_filter_chain:
   ros__parameters:
     # Giữ nửa PHÍA TRƯỚC robot, bỏ nửa phía sau.
-    # laser_frame xoay yaw = pi so với robot (URDF laser_joint: góc 0 của scan hướng ra sau robot), nên trong laser_frame:
-    #   phía trước robot = góc gần ±pi, phía sau robot = góc trong (-pi/2, pi/2).
-    # InPlace filter thay các tia NẰM TRONG [lower, upper] bằng NaN (giữ nguyên số tia, angle_min/max).
+    # /scan đã được scan_rotate xoay pi: laser_frame (= lidar_link) cùng hướng base_footprint,
+    # góc của /scan nằm trong [0, 2pi]: phía trước robot = gần 0 / 2pi, phía sau robot = gần pi.
+    # InPlace filter thay các tia NẰM TRONG (lower, upper) bằng NaN (giữ nguyên số tia, angle_min/max).
+    # lower/upper = pi -/+ 1.57 -> bỏ đúng vùng như trước khi xoay (±1.57 quanh hướng sau).
     filter1:
       name: front_angle
       type: laser_filters/LaserScanAngularBoundsFilterInPlace
       params:
-        lower_angle: -1.57
-        upper_angle: 1.57
+        lower_angle: 1.5715927
+        upper_angle: 4.7115927
         replace_with_nan: true

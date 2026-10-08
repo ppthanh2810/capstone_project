@@ -2,7 +2,7 @@
 kèm hướng từ IMU (/imu_odom).
 
 !!! Launch này BẬT MOTOR (motor:=true mặc định): zlac8015d_move ghi Modbus lúc khởi động
-(disable -> setMode(3) -> enable) trên /dev/ttyUSB2. Kê bánh khỏi mặt đất khi test lần đầu,
+(disable -> setMode(3) -> enable) trên /dev/ttyUSB0. Kê bánh khỏi mặt đất khi test lần đầu,
 để E-stop trong tầm tay. Chỉ xem dữ liệu, không bật motor: motor:=false.
 
 Chạy (không có EKF):
@@ -36,14 +36,14 @@ def generate_launch_description():
     stage0_share = Path(get_package_share_directory("stage0_ps4_control"))
     stage1_share = Path(get_package_share_directory("stage1_odom"))
 
-    rviz_config = stage1_share / "rviz" / "wheel_odom.rviz"
+    rviz_config = stage1_share / "rviz" / "odom.rviz"
 
     return LaunchDescription([
       
         DeclareLaunchArgument(
             "rviz",
             default_value="true",
-            description="Có mở RViz2 (wheel_odom.rviz) hay không",
+            description="Có mở RViz2 (odom.rviz) hay không",
         ),
         DeclareLaunchArgument(
             "motor",
@@ -57,7 +57,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "imu_port",
-            default_value="/dev/ttyUSB0",
+            default_value="/dev/ttyUSB1",
             description="Cổng USB-UART của ESP32 (IMU)",
         ),
 
@@ -87,9 +87,10 @@ def generate_launch_description():
                         str(robot_share / "launch" / "display.launch.py")
                     ),
                     launch_arguments={
-                        # Tắt RViz của robot_description: chỉ mở 1 RViz (wheel_odom.rviz).
+                        # Tắt RViz của robot_description: chỉ mở 1 RViz (odom.rviz).
                         "rviz": "false",
-                        "publish_default_joint_states": "true",
+                        # URDF chỉ có joint fixed -> không cần joint_state_publisher (như scan.launch.py).
+                        "publish_default_joint_states": "false",
                     }.items(),
                 ),
             ],

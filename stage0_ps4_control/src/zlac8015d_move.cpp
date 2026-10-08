@@ -17,7 +17,7 @@ class zlac8015d_move : public rclcpp::Node
 public:
   zlac8015d_move()
   : Node("zlac8015d_move"),
-    motors_("/dev/ttyUSB2")
+    motors_("/dev/ttyUSB0")
   {
     wheel_radius_ = declare_parameter<double>("wheel_radius", 0.0535);
     wheel_distance_ = declare_parameter<double>("wheel_distance", 0.34);

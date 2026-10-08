@@ -1,0 +1,213 @@
+# RViz stage2_slam/mapping: xây bản đồ bằng slam_toolbox.
+#   Map           : /map (slam_toolbox, Transient Local) + /map_updates.
+#   Scan Filtered : /scan_filtered - phải khớp với tường trên bản đồ.
+#   EKF Odom      : /odometry/filtered (frame odom) - tắt mặc định, bật khi cần so drift.
+# Fixed Frame = map: TF map -> odom do slam_toolbox phát, odom -> base_footprint do EKF.
+Panels:
+- Class: rviz_common/Displays
+  Help Height: 70
+  Name: Displays
+  Property Tree Widget:
+    Expanded:
+    - /Global Options1
+    Splitter Ratio: 0.5
+  Tree Height: 427
+- Class: rviz_common/Views
+  Expanded:
+  - /Current View1
+  Name: Views
+  Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ''
+  Displays:
+  - Class: rviz_default_plugins/Grid
+    Name: Grid 1m
+    Enabled: true
+    Value: true
+    Alpha: 0.3
+    Cell Size: 1.0
+    Color: 160; 160; 164
+    Line Style:
+      Line Width: 0.03
+      Value: Lines
+    Normal Cell Count: 0
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Plane: XY
+    Plane Cell Count: 50
+    Reference Frame: <Fixed Frame>
+  - Class: rviz_default_plugins/Map
+    Name: Map
+    Enabled: true
+    Value: true
+    Alpha: 0.7
+    Color Scheme: map
+    Draw Behind: false
+    Topic:
+      Depth: 1
+      Durability Policy: Transient Local
+      Filter size: 10
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /map
+    Update Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /map_updates
+    Use Timestamp: false
+  - Class: rviz_default_plugins/RobotModel
+    Name: RobotModel
+    Enabled: true
+    Value: true
+    Alpha: 1.0
+    Collision Enabled: false
+    Visual Enabled: true
+    Description File: ''
+    Description Source: Topic
+    Description Topic:
+      Depth: 5
+      Durability Policy: Transient Local
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /robot_description
+    Links:
+      All Links Enabled: true
+      Expand Joint Details: false
+      Expand Link Details: false
+      Expand Tree: false
+      Link Tree Style: Links in Alphabetic Order
+    Mass Properties:
+      Inertia: false
+      Mass: false
+    TF Prefix: ''
+    Update Interval: 0
+  - Class: rviz_default_plugins/TF
+    Name: TF
+    Enabled: true
+    Value: true
+    Frame Timeout: 15
+    Frames:
+      All Enabled: false
+      map:
+        Value: true
+      odom:
+        Value: true
+      base_footprint:
+        Value: true
+      laser_frame:
+        Value: true
+    Marker Scale: 0.5
+    Show Arrows: true
+    Show Axes: true
+    Show Names: true
+    Update Interval: 0
+  - Class: rviz_default_plugins/LaserScan
+    Name: Scan Filtered
+    Enabled: true
+    Value: true
+    Alpha: 1
+    Autocompute Intensity Bounds: true
+    Autocompute Value Bounds:
+      Max Value: 10
+      Min Value: -10
+      Value: true
+    Axis: Z
+    Channel Name: intensity
+    Color: 0; 255; 0
+    Color Transformer: FlatColor
+    Decay Time: 0
+    Invert Rainbow: false
+    Max Color: 255; 255; 255
+    Min Color: 0; 0; 0
+    Max Intensity: 4096
+    Min Intensity: 0
+    Position Transformer: XYZ
+    Selectable: true
+    Size (Pixels): 3
+    Size (m): 0.04
+    Style: Flat Squares
+    Topic:
+      Depth: 5
+      Durability Policy: Volatile
+      Filter size: 10
+      History Policy: Keep Last
+      Reliability Policy: Best Effort
+      Value: /scan_filtered
+    Use Fixed Frame: true
+    Use rainbow: true
+  - Class: rviz_default_plugins/Odometry
+    Name: EKF Odom
+    Enabled: false
+    Value: false
+    Angle Tolerance: 0.1
+    Position Tolerance: 0.02
+    Keep: 500
+    Covariance:
+      Value: false
+    Shape:
+      Value: Arrow
+      Alpha: 1
+      Color: 0; 170; 255
+      Head Length: 0.04
+      Head Radius: 0.03
+      Shaft Length: 0.08
+      Shaft Radius: 0.01
+      Axes Length: 1
+      Axes Radius: 0.1
+    Topic:
+      Depth: 10
+      Durability Policy: Volatile
+      Filter size: 10
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /odometry/filtered
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+  - Class: rviz_default_plugins/Interact
+    Hide Inactive Objects: true
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/Select
+  - Class: rviz_default_plugins/FocusCamera
+  - Class: rviz_default_plugins/Measure
+    Line color: 128; 128; 0
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Current View
+      Value: TopDownOrtho (rviz_default_plugins)
+      Scale: 50
+      Target Frame: <Fixed Frame>
+      Invert Z Axis: false
+      Near Clip Distance: 0.01
+      X: 0
+      Y: 0
+      Enable Stereo Rendering:
+        Value: false
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+    Saved: null
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 1016
+  Hide Left Dock: false
+  Hide Right Dock: false
+  Views:
+    collapsed: false
+  Width: 1850
+  X: 70
+  Y: 27

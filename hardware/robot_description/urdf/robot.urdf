@@ -1,8 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot name="robot_description">
   <!--Minimal TF for visualization/navigation. Static body and wheels are drawn as base_link geometry; wheel rotation joints are omitted. Sensor and optical frame names/poses are preserved.-->
+  <!-- Quy ước: +X trước, +Y trái, +Z lên (REP-103). Đơn vị m / rad.
+       Tọa độ trong comment: (x, y, z) theo base_link; [z_fp] = độ cao so với mặt đất (base_footprint).
+       base_link nằm cao 0.1135 m so với base_footprint. -->
+
+  <!-- ===== base_footprint: hình chiếu tâm robot xuống mặt đất (z = 0) ===== -->
   <link name="base_footprint" />
+
+  <!-- ===== base_link: tâm mặt dưới tầng đế dưới. Toàn bộ thân, motor, bánh, caster là visual của link này ===== -->
   <link name="base_link">
+    <!-- [Tầng dưới] Đế tròn Ø400 dày 5 mm: z 0 → 0.005 [z_fp 0.1135 → 0.1185] -->
     <visual>
       <origin xyz="0 0 0.0025" rpy="0 0 0" />
       <geometry>
@@ -18,6 +26,8 @@
         <cylinder radius="0.2" length="0.005" />
       </geometry>
     </collision>
+    <!-- [Trụ nối 2 tầng] 4 trụ Ø12 cao 100 mm tại (±0.12, ±0.10), z 0.005 → 0.105 -->
+    <!-- Trụ sau-phải (-0.12, -0.10) -->
     <visual>
       <origin xyz="-0.12 -0.1 0.055" rpy="0 0 0" />
       <geometry>
@@ -27,6 +37,7 @@
         <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
+    <!-- Trụ sau-trái (-0.12, +0.10) -->
     <visual>
       <origin xyz="-0.12 0.1 0.055" rpy="0 0 0" />
       <geometry>
@@ -36,6 +47,7 @@
         <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
+    <!-- Trụ trước-phải (+0.12, -0.10) -->
     <visual>
       <origin xyz="0.12 -0.1 0.055" rpy="0 0 0" />
       <geometry>
@@ -45,6 +57,7 @@
         <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
+    <!-- Trụ trước-trái (+0.12, +0.10) -->
     <visual>
       <origin xyz="0.12 0.1 0.055" rpy="0 0 0" />
       <geometry>
@@ -54,6 +67,7 @@
         <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
+    <!-- [Tầng trên] Đế tròn Ø400 dày 5 mm: z 0.105 → 0.110 [z_fp 0.2185 → 0.2235] -->
     <visual>
       <origin xyz="0 0 0.1075" rpy="0 0 0" />
       <geometry>
@@ -69,6 +83,7 @@
         <cylinder radius="0.2" length="0.005" />
       </geometry>
     </collision>
+    <!-- [Breadboard] 170×63×10 mm, xoay 90° (cạnh dài theo Y), tâm (0.11, 0, 0.115). IMU gắn trên mặt này -->
     <visual>
       <origin xyz="0.11 0 0.115" rpy="0 0 1.5707963" />
       <geometry>
@@ -78,6 +93,7 @@
         <color rgba="0.94 0.94 0.94 1" />
       </material>
     </visual>
+    <!-- [Giá camera] Đáy tại mặt tầng trên (0.17, 0, 0.11), cao 40 mm, đỡ RealSense D435 -->
     <visual>
       <origin xyz="0.17 0 0.11" rpy="0 0 0" />
       <geometry>
@@ -87,6 +103,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Tấm LiDAR] 90×170×3 mm, tâm dày z 0.2115 [z_fp 0.325], đỡ RPLIDAR C1 -->
     <visual>
       <origin xyz="0 0 0.2115" rpy="0 0 0" />
       <geometry>
@@ -96,6 +113,8 @@
         <color rgba="0.28 0.49 0.75 1" />
       </material>
     </visual>
+    <!-- [Trụ đỡ tấm LiDAR] 2 trụ Ø12 cao 100 mm tại (0.17, ±0.06), z 0.11 → 0.21 -->
+    <!-- Trụ LiDAR phải (0.17, -0.06) -->
     <visual>
       <origin xyz="0.17 -0.06 0.16" rpy="0 0 0" />
       <geometry>
@@ -105,6 +124,7 @@
         <color rgba="0.28 0.49 0.75 1" />
       </material>
     </visual>
+    <!-- Trụ LiDAR trái (0.17, +0.06) -->
     <visual>
       <origin xyz="0.17 0.06 0.16" rpy="0 0 0" />
       <geometry>
@@ -114,6 +134,9 @@
         <color rgba="0.28 0.49 0.75 1" />
       </material>
     </visual>
+
+    <!-- ========== BÊN TRÁI (+Y): motor + bánh chủ động trái ========== -->
+    <!-- [Motor trái] Khối 110×25×40 mm dưới tầng dưới, tâm (0, 0.10, -0.02) -->
     <visual>
       <origin xyz="0 0.1 -0.02" rpy="0 0 0" />
       <geometry>
@@ -123,6 +146,7 @@
         <color rgba="0.94 0.94 0.94 1" />
       </material>
     </visual>
+    <!-- [Tấm gá motor trái] tâm (0, 0.1175, -0.04) -->
     <visual>
       <origin xyz="0 0.1175 -0.04" rpy="0 0 0" />
       <geometry>
@@ -132,6 +156,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Bánh chủ động trái] Ø107 rộng 41.5 mm, tâm trục (0, +0.17, -0.06) [z_fp 0.0535 = bán kính bánh] -->
     <visual>
       <origin xyz="0 0.17 -0.06" rpy="0 0 -3.14159261" />
       <geometry>
@@ -147,6 +172,9 @@
         <cylinder radius="0.0535" length="0.0415" />
       </geometry>
     </collision>
+
+    <!-- ========== BÊN PHẢI (-Y): motor + bánh chủ động phải ========== -->
+    <!-- [Motor phải] Khối 110×25×40 mm, tâm (0, -0.10, -0.02) -->
     <visual>
       <origin xyz="0 -0.1 -0.02" rpy="0 0 0" />
       <geometry>
@@ -156,6 +184,7 @@
         <color rgba="0.94 0.94 0.94 1" />
       </material>
     </visual>
+    <!-- [Tấm gá motor phải] tâm (0, -0.1175, -0.04) -->
     <visual>
       <origin xyz="0 -0.1175 -0.04" rpy="0 0 0" />
       <geometry>
@@ -165,6 +194,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Bánh chủ động phải] Ø107 rộng 41.5 mm, tâm trục (0, -0.17, -0.06) [z_fp 0.0535]. Khoảng cách 2 bánh = 0.34 m -->
     <visual>
       <origin xyz="0 -0.17 -0.06" rpy="0 0 0" />
       <geometry>
@@ -180,6 +210,9 @@
         <cylinder radius="0.0535" length="0.0415" />
       </geometry>
     </collision>
+
+    <!-- ========== CASTER TRƯỚC (+X), gắn tại x = +0.12 ========== -->
+    <!-- [Caster trước - tấm gá] 55×75×3 mm, (0.12, 0, -0.0015) -->
     <visual>
       <origin xyz="0.12 0 -0.0015" rpy="0 0 0" />
       <geometry>
@@ -189,6 +222,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Caster trước - khớp xoay] (0.12, 0, -0.0085) -->
     <visual>
       <origin xyz="0.12 0 -0.0085" rpy="0 0 0" />
       <geometry>
@@ -198,6 +232,7 @@
         <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
+    <!-- [Caster trước - càng] (0.108, 0, -0.0425) -->
     <visual>
       <origin xyz="0.108 0 -0.0425" rpy="0 0 0" />
       <geometry>
@@ -207,6 +242,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Caster trước - bánh] Ø75 rộng 30 mm, tâm (0.068, 0, -0.076) [z_fp 0.0375, chạm đất z_fp 0] -->
     <visual>
       <origin xyz="0.068 0 -0.076" rpy="1.5707963 0 0" />
       <geometry>
@@ -222,6 +258,9 @@
         <cylinder radius="0.0375" length="0.03" />
       </geometry>
     </collision>
+
+    <!-- ========== CASTER SAU (-X), gắn tại x = -0.12 (đối xứng caster trước, xoay 180°) ========== -->
+    <!-- [Caster sau - tấm gá] (-0.12, 0, -0.0015) -->
     <visual>
       <origin xyz="-0.12 0 -0.0015" rpy="0 0 -3.14159261" />
       <geometry>
@@ -231,6 +270,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Caster sau - khớp xoay] (-0.12, 0, -0.0085) -->
     <visual>
       <origin xyz="-0.12 0 -0.0085" rpy="0 0 -3.14159261" />
       <geometry>
@@ -240,6 +280,7 @@
         <color rgba="0.80 0.65 0.20 1" />
       </material>
     </visual>
+    <!-- [Caster sau - càng] (-0.108, 0, -0.0425) -->
     <visual>
       <origin xyz="-0.108 5.5692248e-10 -0.0425" rpy="0 0 -3.14159261" />
       <geometry>
@@ -249,6 +290,7 @@
         <color rgba="0.76 0.79 0.82 1" />
       </material>
     </visual>
+    <!-- [Caster sau - bánh] Ø75, tâm (-0.068, 0, -0.076) [z_fp 0.0375, chạm đất z_fp 0] -->
     <visual>
       <origin xyz="-0.068 2.41333075e-09 -0.076" rpy="1.5707963 0 -3.14159261" />
       <geometry>
@@ -265,11 +307,16 @@
       </geometry>
     </collision>
   </link>
+
+  <!-- ===== TF: base_footprint → base_link, nâng 0.1135 m (chiều cao mặt dưới tầng đế) ===== -->
   <joint name="base_footprint_joint" type="fixed">
     <origin xyz="0 0 0.1135" rpy="0 0 0" />
     <parent link="base_footprint" />
     <child link="base_link" />
   </joint>
+
+  <!-- ===== IMU BNO055: trên breadboard. Frame tại (0.11, 0, 0.1208) theo base_link
+       = (0.11, 0, 0.2343) theo base_footprint, không xoay. Chỉ hình board xoay 90° ===== -->
   <link name="imu_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 1.5707963" />
@@ -286,6 +333,9 @@
     <parent link="base_link" />
     <child link="imu_link" />
   </joint>
+
+  <!-- ===== CAMERA RealSense D435: trên giá camera. camera_link tại (0.17, 0, 0.1625) theo base_link
+       = (0.17, 0, 0.276) theo base_footprint, không xoay (X trước). Vị trí = tâm model CAD, chưa hiệu chuẩn ===== -->
   <link name="camera_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
@@ -308,6 +358,7 @@
     <parent link="base_link" />
     <child link="camera_link" />
   </joint>
+  <!-- Optical frame (chuẩn ROS): Z trước, X phải, Y xuống → rpy (-π/2, 0, -π/2) so với camera_link -->
   <link name="camera_color_optical_frame" />
   <joint name="camera_color_optical_frame_joint" type="fixed">
     <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963" />
@@ -320,6 +371,11 @@
     <parent link="camera_link" />
     <child link="camera_depth_optical_frame" />
   </joint>
+
+  <!-- ===== LiDAR RPLIDAR C1: trên tấm LiDAR. lidar_link tại (0.15, 0, 0.23365) theo base_link
+       = (0.15, 0, 0.34715) theo base_footprint, không xoay: cùng hướng base_footprint (X trước, Y trái, Z lên).
+       Driver sllidar_ros2 phát /scan_raw với góc 0 hướng ra SAU robot (đã kiểm tra thực tế); node
+       stage2_slam/scan_rotate xoay dữ liệu pi -> /scan trong laser_frame, nên TF không cần yaw π. ===== -->
   <link name="lidar_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
@@ -342,11 +398,11 @@
     <parent link="base_link" />
     <child link="lidar_link" />
   </joint>
+  <!-- laser_frame: frame_id của /scan (do scan_rotate đặt), trùng hoàn toàn với lidar_link (identity).
+       slam_toolbox/AMCL/laser_filters tra TF theo frame_id của scan. -->
   <link name="laser_frame" />
   <joint name="laser_joint" type="fixed">
-    <!-- RPLIDAR C1: góc 0 của scan hướng về phía sau robot (đã kiểm tra thực tế) -> yaw pi.
-         Chỉ xoay frame dữ liệu scan; lidar_link (mesh) giữ đúng như CAD. -->
-    <origin xyz="0 0 0" rpy="0 0 3.14159265" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="lidar_link" />
     <child link="laser_frame" />
   </joint>

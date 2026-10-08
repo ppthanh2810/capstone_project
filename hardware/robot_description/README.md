@@ -43,7 +43,7 @@ map  --[slam_toolbox | AMCL]-->  odom  --[ekf_filter_node]-->  base_footprint
   |     +-- camera_color_optical_frame
   |     +-- camera_depth_optical_frame
   +-- lidar_link                   (lidar_joint, fixed)
-        +-- laser_frame            (laser_joint, fixed, yaw pi)
+        +-- laser_frame            (laser_joint, fixed, identity)
 ```
 
 All joints are **fixed**. Wheel rotation is not represented in TF.
@@ -57,7 +57,7 @@ All joints are **fixed**. Wheel rotation is not represented in TF.
 | `camera_link` | 0.170, 0, 0.2760 | identity |
 | `camera_*_optical_frame` | 0.170, 0, 0.2760 | rpy (-pi/2, 0, -pi/2) — REP-103 optical convention |
 | `lidar_link` | 0.150, 0, 0.34715 | identity (LiDAR model/mesh, as CAD) |
-| `laser_frame` | 0.150, 0, 0.34715 | yaw +pi (scan angle 0 of the RPLIDAR C1 points to the robot's rear; verified on the robot) |
+| `laser_frame` | 0.150, 0, 0.34715 | identity (same as `lidar_link`; `frame_id` of `/scan`, published by `stage2_slam/scan_rotate`) |
 
 Visual-only geometry in `base_link` (no frame): drive wheels centred at (0, ±0.170, 0.0535), caster wheels at (±0.068, 0, 0.0375) in `base_footprint`.
 
@@ -66,7 +66,7 @@ Wheel diameter = **107 mm**, main wheel track = **340 mm**, chassis diameter = *
 ## Assumptions / limits — calibrate before navigation
 
 - Camera optical frames follow standard ROS orientation (`rpy=-pi/2,0,-pi/2`) but are **coincident with the D435 model center**, because lens-specific extrinsics are not specified by CAD. They are placeholders, not calibrated depth/color intrinsics or inter-camera extrinsics.
-- The `laser_frame` origin coincides with the LiDAR CAD model origin; the yaw of pi on `laser_joint` was set from an on-robot check (scan appeared rotated 180 deg). Scan plane height and any residual yaw offset still need measurement.
+- The `laser_frame` origin coincides with the LiDAR CAD model origin; the sllidar_ros2 driver outputs angle 0 toward the robot's rear (on-robot check: scan appeared rotated 180 deg), so `stage2_slam/scan_rotate` rotates the data by pi (`/scan_raw` → `/scan`) instead of rotating the TF. Scan plane height and any residual yaw offset still need measurement.
 - OpenSCAD STL meshes preserve shape but **do not preserve the per-part OpenSCAD colors**. URDF uses one approximate material for each visual mesh.
 - Detailed caster CSG was too complex for this export; caster housings are simplified visual primitives with wheel position and tire diameter kept from CAD. Do not use this collision model to certify clearance.
 - This package is for TF and RViz visualization. The URDF has simple collision meshes/primitives and **no mass/inertia or drivetrain/dynamics/transmission/ros2_control configuration**. Do not treat it as a ready-to-simulate physics model.

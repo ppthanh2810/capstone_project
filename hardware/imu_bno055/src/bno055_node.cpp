@@ -12,7 +12,7 @@ class Bno055Node : public rclcpp::Node {
 public:
   Bno055Node() : Node("bno055_node")
   {
-    const auto port = declare_parameter<std::string>("port", "/dev/ttyUSB0");
+    const auto port = declare_parameter<std::string>("port", "/dev/ttyUSB1");
     frame_id_ = declare_parameter<std::string>("frame_id", "imu_link");
     serial_ = std::make_unique<imu_bno055::Bno055>(port);
     imu_pub_ = create_publisher<sensor_msgs::msg::Imu>("/imu/data", 10);

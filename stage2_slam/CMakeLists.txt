@@ -9,8 +9,17 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
-install(DIRECTORY launch config
+add_executable(scan_rotate src/scan_rotate.cpp)
+target_compile_features(scan_rotate PUBLIC cxx_std_17)
+ament_target_dependencies(scan_rotate rclcpp sensor_msgs)
+
+install(TARGETS scan_rotate
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY launch config rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
