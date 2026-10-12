@@ -12,12 +12,24 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>diagnostic_msgs</depend>
+  <depend>lifecycle_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
 
   <exec_depend>rviz2</exec_depend>
   <exec_depend>rviz_default_plugins</exec_depend>
   <!-- nav2_rviz_plugins/ParticleCloud trong rviz/localization.rviz (/particle_cloud của AMCL) -->
   <exec_depend>nav2_rviz_plugins</exec_depend>
+  <!-- localization.launch.py dùng launch_ros (Node, SetRemap) -->
+  <exec_depend>launch_ros</exec_depend>
 
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_test</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>nav2_bringup</test_depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

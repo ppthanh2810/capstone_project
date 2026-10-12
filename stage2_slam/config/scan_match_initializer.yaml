@@ -1,0 +1,60 @@
+# CSM initializer cho AMCL (chỉ chạy khi localization.launch.py csm:=true).
+# Ngưỡng validation được chọn trên tập TUNING tổng hợp (csm_benchmark seed=1) và kiểm tra trên tập
+# validation tổng hợp độc lập (seed 2/3/4). CHƯA hiệu chỉnh trên robot thật (NOT_VERIFIED).
+scan_match_initializer:
+  ros__parameters:
+    use_sim_time: false
+    global_frame: map
+    base_frame: base_footprint
+    odom_frame: odom
+    tf_timeout: 0.1
+    publish_initialpose: true      # false = dry run: chỉ publish /scan_match/candidate + status
+    require_amcl_active: true      # chỉ gửi /initialpose khi /amcl/get_state = active
+    amcl_state_service: /amcl/get_state
+    min_publish_interval: 1.0      # s, chống reset AMCL liên tục
+
+    score_field:
+      occupied_threshold: 65       # khớp occupied_thresh 0.65 của maps/map.yaml
+      sigma: 0.05                  # m
+      max_distance: 0.5            # m
+      unknown_score: 0.0
+
+    preprocess:
+      min_range: 0.10              # m, giống slam min_laser_range
+      max_range: 12.0              # m, tầm tin cậy C1
+      max_points: 400
+
+    search:
+      linear_window: 0.5           # m, ± quanh điểm click
+      angular_window: 0.349066     # rad, ±20 deg
+      linear_step: 0.025           # m
+      angular_step: 0.0            # 0 = tự tính theo tầm xa của scan
+      max_candidates: 4000000
+      time_budget: 3.0             # s cho mỗi scan
+
+    refine:
+      enabled: false               # benchmark tổng hợp: không cải thiện (xem RefineConfig)
+
+    validation:
+      min_valid_points: 60
+      min_score: 0.65
+      ambiguity_ratio: 0.90
+      peak_separation_linear: 0.25 # m
+      peak_separation_angular: 0.17  # rad
+      reject_at_window_boundary: true
+
+    covariance:                    # heuristic, KHÔNG phải covariance đã hiệu chuẩn thống kê
+      min_std_linear: 0.05
+      max_std_linear: 0.50
+      min_std_angular: 0.035
+      max_std_angular: 0.35
+
+    session:
+      num_scans: 3                 # số scan phải khớp và nhất quán (robot đứng yên)
+      scan_max_age: 0.5            # s
+      timeout: 5.0                 # s
+      max_motion_linear: 0.03      # m (theo TF odom)
+      max_motion_angular: 0.03     # rad
+      max_spread_linear: 0.05      # m
+      max_spread_angular: 0.035    # rad
+      max_tf_failures: 3

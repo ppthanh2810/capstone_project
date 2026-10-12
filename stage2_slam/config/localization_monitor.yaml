@@ -1,0 +1,35 @@
+# Localization monitor (chỉ chạy khi localization.launch.py monitor:=true). Chỉ công bố
+# /localization/status; không điều khiển robot. Ngưỡng là giá trị khởi đầu, CHƯA hiệu chỉnh trên robot
+# thật (NOT_VERIFIED).
+localization_monitor:
+  ros__parameters:
+    use_sim_time: false
+    global_frame: map
+    base_frame: base_footprint
+    odom_frame: odom
+    rate: 2.0                      # Hz
+    amcl_state_service: /amcl/get_state
+    score_field:
+      sigma: 0.05
+      max_distance: 0.5
+    preprocess:
+      max_range: 12.0
+      max_points: 400
+    min_valid_points: 60
+    initializing_grace: 3.0        # s sau /initialpose
+    scan_age_warn: 0.5
+    scan_age_lost: 2.0
+    odom_age_warn: 0.3
+    odom_age_lost: 1.0
+    tf_age_warn: 0.5
+    tf_age_lost: 2.0
+    std_xy_warn: 0.25
+    std_xy_lost: 1.0
+    std_yaw_warn: 0.17
+    std_yaw_lost: 0.5
+    consistency_warn: 0.55
+    consistency_lost: 0.30
+    consistency_lost_count: 5
+    jump_linear_warn: 0.30
+    jump_angular_warn: 0.26
+    jump_hold: 5.0
