@@ -19,12 +19,16 @@ find_package(nav2_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(diagnostic_msgs REQUIRED)
 
-# Bridge RViz Goal Pose -> ComputePathToPose -> /global_path (chỉ lập kế hoạch).
+# Bridge RViz Goal Pose -> ComputePathToPose -> /global_path; tùy chọn -> FollowPath (DWB) khi được kích hoạt.
 add_executable(goal_path_bridge src/goal_path_bridge.cpp)
 target_compile_features(goal_path_bridge PUBLIC cxx_std_17)
 ament_target_dependencies(goal_path_bridge
-  rclcpp rclcpp_action geometry_msgs nav_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs)
+  rclcpp rclcpp_action geometry_msgs nav_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs
+  std_msgs std_srvs diagnostic_msgs)
 
 install(TARGETS goal_path_bridge
   DESTINATION lib/${PROJECT_NAME}

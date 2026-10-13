@@ -1,5 +1,6 @@
-# Stage 3 — chỉ lập kế hoạch toàn cục (Nav2 Humble): planner_server + global_costmap + A*.
-# KHÔNG có controller/BT navigator/map_server/AMCL ở đây: /map và TF map -> odom -> base_footprint
+# Stage 3 (Nav2 Humble): planner_server + global_costmap + A* (luôn chạy)
+# + Stage 3.2: controller_server + local_costmap + DWB (chỉ khi planning.launch.py controller:=true).
+# KHÔNG có BT navigator/map_server/AMCL ở đây: /map và TF map -> odom -> base_footprint
 # đến từ Stage 2 (slam_toolbox HOẶC map_server + AMCL) và Stage 1 (EKF).
 
 planner_server:
@@ -66,6 +67,7 @@ lifecycle_manager_planning:
   ros__parameters:
     use_sim_time: false
     autostart: true
+    # controller:=false. planning.launch.py controller:=true ghi đè thành ["planner_server", "controller_server"].
     node_names: ["planner_server"]
     # 0.0: tắt bond. planner_server chỉ active khi có TF map -> base_footprint (AMCL cần initial pose),
     # nên không để lifecycle manager coi việc chờ TF là node chết.
@@ -85,5 +87,173 @@ goal_path_bridge:
     planner_id: GridBased
     # Thời gian chờ action server (planner_server đã active) cho mỗi goal.
     server_wait_timeout: 2.0
-    # TF map -> base_footprint cũ hơn giá trị này -> cảnh báo (pose có thể đã sai).
+    # TF map -> base_footprint cũ hơn giá trị này -> cảnh báo (pose có thể đã sai);
+    # với FollowPath thì từ chối gửi.
     tf_timeout: 0.5
+    # ---- Stage 3.2: A* path -> FollowPath (DWB). Chỉnh được khi chạy bằng `ros2 param set`.
+    follow_action_name: /follow_path
+    controller_id: FollowPath               # = controller_plugins của controller_server
+    goal_checker_id: general_goal_checker   # = goal_checker_plugins của controller_server
+    # false: chỉ gửi FollowPath khi gọi service /goal_path_bridge/follow (kích hoạt có chủ đích).
+    # Ghi đè bằng planning.launch.py auto_follow:=true.
+    auto_follow: false
+    max_path_age: 30.0          # s; đường cũ hơn -> từ chối, phải đặt lại Goal (<= 0: tắt kiểm tra)
+    max_start_distance: 0.5     # m; robot cách đường xa hơn -> đường lỗi thời, từ chối
+    follow_timeout: 120.0       # s; quá thời gian -> hủy FollowPath (<= 0: tắt)
+    # true: chỉ bám đường khi /localization/status (localization_monitor) = OK (LOCALIZED) và còn mới;
+    # mất LOCALIZED khi đang bám -> hủy. planning.launch.py đặt false khi mode:=mapping hoặc monitor:=false.
+    require_localized: true
+    localization_status_topic: /localization/status
+    localization_status_timeout: 2.0   # s (monitor publish 2 Hz)
+
+# ============================================================================================
+# Stage 3.2 — DWB local controller (chỉ chạy khi planning.launch.py controller:=true)
+# Đầu ra cmd_vel được planning.launch.py remap:
+#   navigation_enabled:=false (mặc định) -> /cmd_vel_dwb  (KHÔNG node nào nghe -> cách ly motor)
+#   navigation_enabled:=true             -> /cmd_vel_nav  (twist_mux prio 10 < PS4 prio 100 -> motor)
+# Giới hạn vận tốc/gia tốc dưới đây là GIÁ TRỊ KHỞI ĐẦU THẬN TRỌNG, CHƯA ĐO trên robot (NOT_VERIFIED).
+# Căn cứ hiện có: teleop PS4 tối đa 0.5 m/s, 0.6 rad/s (stage0 ps4.yaml); zlac8015d_move đặt
+# accel/decel time 1000 ms trong driver; watchdog 0.5 s; bánh r = 0.0535 m, track 0.34 m
+# (0.15 m/s ~ 27 RPM mỗi bánh). Phải đo lại trước khi tăng.
+# ============================================================================================
+controller_server:
+  ros__parameters:
+    use_sim_time: false
+    # 10 Hz: /wheel_feedback 20 Hz, EKF 30 Hz, LiDAR C1 ~10 Hz.
+    controller_frequency: 10.0
+    # Odometry đã fuse của EKF (Stage 1); DWB dùng vận tốc hiện tại để tính dynamic window.
+    odom_topic: /odometry/filtered
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.5      # robot vi sai: không có vy
+    min_theta_velocity_threshold: 0.001
+    # Cho phép DWB thất bại tối đa 0.3 s liên tiếp trước khi abort FollowPath (rồi phát vận tốc 0).
+    failure_tolerance: 0.3
+    progress_checker_plugin: "progress_checker"
+    goal_checker_plugins: ["general_goal_checker"]
+    controller_plugins: ["FollowPath"]
+
+    # Không di chuyển được >= 0.25 m trong 10 s -> abort (kẹt, bị chặn).
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.25
+      movement_time_allowance: 10.0
+
+    general_goal_checker:
+      plugin: "nav2_controller::SimpleGoalChecker"
+      stateful: true
+      xy_goal_tolerance: 0.15      # m, ~3 ô bản đồ; localization AMCL/CSM chưa đánh giá chính xác hơn
+      yaw_goal_tolerance: 0.25     # rad (~14 deg)
+
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: false
+      # ---- Động học (NOT_VERIFIED, chỉnh được) ----
+      # min_vel_x = 0: KHÔNG chạy lùi. LiDAR chỉ quan sát phía trước ±90° (phía sau bị laptop che),
+      # nên không được tự động lùi vào vùng không quan sát được.
+      min_vel_x: 0.0
+      max_vel_x: 0.15
+      min_vel_y: 0.0
+      max_vel_y: 0.0
+      max_vel_theta: 0.5
+      min_speed_xy: 0.0
+      max_speed_xy: 0.15
+      min_speed_theta: 0.0
+      acc_lim_x: 0.5
+      acc_lim_y: 0.0
+      acc_lim_theta: 1.0
+      decel_lim_x: -0.5
+      decel_lim_y: 0.0
+      decel_lim_theta: -1.0
+      # ---- Lấy mẫu / mô phỏng quỹ đạo ----
+      vx_samples: 20
+      vy_samples: 1
+      vtheta_samples: 20
+      sim_time: 1.7                # s nhìn trước (0.15 m/s -> ~0.26 m)
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      transform_tolerance: 0.3
+      xy_goal_tolerance: 0.15      # giống general_goal_checker
+      # Dưới ngưỡng này robot coi như đã dừng (RotateToGoal xoay tại chỗ ở đích).
+      # Phải < max_vel_x (mặc định Nav2 0.25 > 0.15 sẽ luôn coi là "đã dừng").
+      trans_stopped_velocity: 0.05
+      short_circuit_trajectory_evaluation: true
+      stateful: true
+      # Chỉ xét phần đường A* trong cửa sổ local costmap.
+      prune_plan: true
+      prune_distance: 1.5
+      forward_prune_distance: 1.5     # thực tế đường bị cắt ở mép local costmap (xem local_costmap.width)
+      shorten_transformed_plan: true
+      # ---- Critics: bám Global Path, tránh vật cản, giảm dao động, tiếp cận Goal ----
+      # Trọng số = mặc định Nav2 Humble (nav2_bringup), chưa tinh chỉnh cho robot này.
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      BaseObstacle.scale: 0.02        # tránh vật cản (ô lethal/nội tiếp trên local costmap -> loại quỹ đạo)
+      PathAlign.scale: 32.0           # hướng theo đường A*
+      PathAlign.forward_point_distance: 0.1
+      GoalAlign.scale: 24.0           # hướng về đích
+      GoalAlign.forward_point_distance: 0.1
+      PathDist.scale: 32.0            # bám sát đường A*
+      GoalDist.scale: 24.0            # tiến về đích
+      RotateToGoal.scale: 32.0        # xoay đúng hướng Goal Pose khi đã tới vị trí
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
+      # Oscillation: phạt quỹ đạo đổi chiều liên tục (dùng tham số mặc định của critic).
+
+# Local costmap (node con của controller_server): rolling window quanh robot trong frame odom.
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: odom
+      robot_base_frame: base_footprint
+      # Robot tròn Ø400 mm (giống global_costmap) + biên an toàn 0.10 m -> bán kính nội tiếp 0.30 m.
+      # Không padding: offline với vật cản chưa có trong bản đồ nằm trên đường A*, DWB lái sát tới khe hở
+      # 0.00 m (chạm). padding 0.05 -> 0.03 m; 0.10 -> 0.13 m (dừng an toàn, không chạm).
+      # Đánh đổi: DWB không đi qua khe < ~0.6 m (global_costmap vẫn cho A* qua khe >= 0.4 m) -> FollowPath
+      # abort và dừng ở khe hẹp. NOT_VERIFIED trên robot; chỉnh được.
+      robot_radius: 0.20
+      footprint_padding: 0.10
+      rolling_window: true
+      # 2 x 2 m (±1 m quanh robot). DWB lấy "đích cục bộ" (GoalDist/GoalAlign) = điểm cuối của đường A*
+      # còn nằm trong local costmap (forward_prune_distance KHÔNG giới hạn được điều này ở DWB 1.1.20),
+      # và GoalDist đo khoảng cách thẳng tới đích cục bộ. Cửa sổ 3 x 3 m: ở đầu tường, đích cục bộ nằm
+      # SAU tường -> GoalDist kéo về phía tường, PathDist kéo theo đường vòng -> robot đứng yên ->
+      # "Failed to make progress" (tái hiện offline). 2 x 2 m: đích cục bộ <= ~1 m, bám theo đường vòng.
+      # Ở 0.15 m/s, sim_time 1.7 s chỉ nhìn trước ~0.26 m nên ±1 m là đủ cho tránh vật cản.
+      width: 2
+      height: 2
+      resolution: 0.05
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      transform_tolerance: 0.3
+      track_unknown_space: false
+      always_send_full_costmap: true
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        footprint_clearing_enabled: true
+        combination_method: 1      # max
+        observation_sources: scan
+        scan:
+          # /scan_filtered: chỉ có nửa trước (±90°), nửa sau = NaN -> ObstacleLayer bỏ qua (không đánh dấu,
+          # không xóa). Vật cản đã đánh dấu rồi đi ra sau robot vẫn được giữ, không bị xóa.
+          topic: /scan_filtered
+          data_type: "LaserScan"
+          sensor_frame: ""         # dùng frame_id của scan (laser_frame, URDF)
+          marking: true
+          clearing: true
+          # false: tia inf (không có phản hồi, hoặc quá gần) KHÔNG dùng để xóa -> thận trọng.
+          inf_is_valid: false
+          obstacle_min_range: 0.0
+          obstacle_max_range: 2.5
+          raytrace_min_range: 0.0
+          raytrace_max_range: 3.0
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0   # laser_frame cao ~0.35 m so với base_footprint
+          # Scan cũ hơn 0.5 s -> costmap không "current" (LiDAR C1 ~10 Hz).
+          expected_update_rate: 0.5
+          observation_persistence: 0.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        inflation_radius: 0.45
+        cost_scaling_factor: 3.0

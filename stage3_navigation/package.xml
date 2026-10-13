@@ -3,7 +3,7 @@
 <package format="3">
   <name>stage3_navigation</name>
   <version>0.0.0</version>
-  <description>Stage 3: Nav2 global path planning (planner_server + NavFn A*) on Stage 2 map/localization. Planning only, no motion.</description>
+  <description>Stage 3: Nav2 global path planning (planner_server + NavFn A*) on Stage 2 map/localization, plus optional DWB local control (controller_server + local costmap, FollowPath). Velocity output is isolated from the motors unless navigation_enabled:=true.</description>
   <maintainer email="pphuonthanh0805@gmail.com">thanhpham</maintainer>
   <license>TODO: License declaration</license>
 
@@ -18,6 +18,9 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>diagnostic_msgs</depend>
 
   <!-- planning.launch.py -->
   <!-- include stage2_slam localization/mapping.launch.py (LiDAR, motor/teleop, EKF, AMCL/SLAM, CSM) -->
@@ -27,6 +30,11 @@
   <exec_depend>nav2_navfn_planner</exec_depend>
   <exec_depend>nav2_costmap_2d</exec_depend>
   <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <!-- Stage 3.2: controller_server + DWB (controller:=true) -->
+  <exec_depend>nav2_controller</exec_depend>
+  <exec_depend>dwb_core</exec_depend>
+  <exec_depend>dwb_plugins</exec_depend>
+  <exec_depend>dwb_critics</exec_depend>
   <exec_depend>rviz2</exec_depend>
   <exec_depend>rviz_default_plugins</exec_depend>
   <!-- nav2_rviz_plugins/ParticleCloud trong rviz/planning.rviz (/particle_cloud của AMCL) -->
