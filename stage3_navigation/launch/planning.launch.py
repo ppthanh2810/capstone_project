@@ -27,6 +27,11 @@ from launch_ros.parameter_descriptions import ParameterValue
 # stage2:=false: không include Stage 2 (không phần cứng) -> chỉ để kiểm thử offline, khi /map, TF
 # map -> odom -> base_footprint, /scan_filtered, /odometry/filtered do nguồn khác cung cấp.
 VALID_MODES = ("localization", "mapping")
+# Bộ điều khiển cục bộ (cả hai được nạp trong controller_server;
+# goal_path_bridge chọn bằng controller_id):
+#   custom   -> "CustomDWB"  = stage3_navigation::DwbController (tự viết, src/dwb_controller.cpp)
+#   nav2_dwb -> "FollowPath" = dwb_core::DWBLocalPlanner (Nav2)
+LOCAL_PLANNERS = {"custom": "CustomDWB", "nav2_dwb": "FollowPath"}
 
 
 def _is_true(context, name):
@@ -37,6 +42,10 @@ def _check_mode(context):
     mode = LaunchConfiguration("mode").perform(context)
     if mode not in VALID_MODES:
         raise RuntimeError(f"mode:={mode} không hợp lệ, chọn một trong {VALID_MODES}")
+    planner = LaunchConfiguration("local_planner").perform(context)
+    if planner not in LOCAL_PLANNERS:
+        raise RuntimeError(
+            f"local_planner:={planner} không hợp lệ, chọn một trong {tuple(LOCAL_PLANNERS)}")
     controller = _is_true(context, "controller")
     for flag in ("navigation_enabled", "auto_follow"):
         if _is_true(context, flag) and not controller:
@@ -49,8 +58,8 @@ def _check_mode(context):
                             "twist_mux -> MOTOR. Kê bánh / giữ E-stop. Dừng: ros2 service call "
                             "/goal_path_bridge/cancel std_srvs/srv/Trigger (giữ deadman PS4 chỉ "
                             "ghi đè tạm thời: thả ra là DWB chạy tiếp)")]
-    return [LogInfo(msg="[stage3] DWB test mode: vận tốc DWB -> /cmd_vel_dwb "
-                        "(cách ly, không tới motor)")]
+    return [LogInfo(msg=f"[stage3] local planner '{planner}' ({LOCAL_PLANNERS[planner]}), "
+                        "test mode: vận tốc -> /cmd_vel_dwb (cách ly, không tới motor)")]
 
 
 def include_stage2(launch_file, arguments, mode):
@@ -93,6 +102,12 @@ def generate_launch_description():
     cmd_vel_topic = PythonExpression([
         "'/cmd_vel_nav' if '", LaunchConfiguration("navigation_enabled"),
         "'.lower() == 'true' else '/cmd_vel_dwb'",
+    ])
+
+    # controller_id mà goal_path_bridge gửi trong FollowPath (chọn plugin của controller_server).
+    controller_id = PythonExpression([
+        "'FollowPath' if '", LaunchConfiguration("local_planner"),
+        "' == 'nav2_dwb' else 'CustomDWB'",
     ])
 
     # Chỉ đòi LOCALIZED khi có localization_monitor (mode:=localization monitor:=true).
@@ -149,6 +164,13 @@ def generate_launch_description():
             default_value="false",
             description="true: chạy controller_server (DWB) + local_costmap. "
                         "false: chỉ lập kế hoạch A*",
+        ),
+        DeclareLaunchArgument(
+            "local_planner",
+            default_value="custom",
+            description="custom: bộ điều khiển Dynamic Window tự viết "
+                        "(CustomDWB, dwb_controller.cpp). "
+                        "nav2_dwb: dwb_core::DWBLocalPlanner của Nav2 (FollowPath)",
         ),
         DeclareLaunchArgument(
             "navigation_enabled",
@@ -272,6 +294,7 @@ def generate_launch_description():
                     "auto_follow": ParameterValue(
                         LaunchConfiguration("auto_follow"), value_type=bool),
                     "require_localized": ParameterValue(require_localized, value_type=bool),
+                    "controller_id": controller_id,
                 },
             ],
             arguments=["--ros-args", "--log-level", log_level],

@@ -1,0 +1,11 @@
+<!-- Đăng ký plugin cho pluginlib: controller_server (nav2_controller) nạp class này khi YAML ghi
+     plugin: "stage3_navigation::DwbController". Thư viện: lib/libdwb_controller.so -->
+<library path="dwb_controller">
+  <class type="stage3_navigation::DwbController" base_class_type="nav2_core::Controller">
+    <description>
+      Self-written dynamic window (DWA) local controller for the capstone AMR: dynamic window from
+      acceleration limits, constant-(v, w) trajectory rollout, collision check on the local costmap,
+      weighted cost (path distance, carrot distance, heading, obstacle, speed), in-place rotation phases.
+    </description>
+  </class>
+</library>

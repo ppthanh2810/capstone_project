@@ -3,7 +3,7 @@
 <package format="3">
   <name>stage3_navigation</name>
   <version>0.0.0</version>
-  <description>Stage 3: Nav2 global path planning (planner_server + NavFn A*) on Stage 2 map/localization, plus optional DWB local control (controller_server + local costmap, FollowPath). Velocity output is isolated from the motors unless navigation_enabled:=true.</description>
+  <description>Stage 3: Nav2 global path planning (planner_server + NavFn A*) on Stage 2 map/localization, plus optional local control (Nav2 DWB or the self-written dynamic-window plugin stage3_navigation::DwbController) (controller_server + local costmap, FollowPath). Velocity output is isolated from the motors unless navigation_enabled:=true.</description>
   <maintainer email="pphuonthanh0805@gmail.com">thanhpham</maintainer>
   <license>TODO: License declaration</license>
 
@@ -22,13 +22,20 @@
   <depend>std_srvs</depend>
   <depend>diagnostic_msgs</depend>
 
+  <!-- dwb_controller: plugin nav2_core::Controller tự viết -->
+  <depend>rclcpp_lifecycle</depend>
+  <depend>nav2_core</depend>
+  <depend>nav2_costmap_2d</depend>
+  <depend>nav2_util</depend>
+  <depend>pluginlib</depend>
+  <depend>visualization_msgs</depend>
+
   <!-- planning.launch.py -->
   <!-- include stage2_slam localization/mapping.launch.py (LiDAR, motor/teleop, EKF, AMCL/SLAM, CSM) -->
   <exec_depend>stage2_slam</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>nav2_planner</exec_depend>
   <exec_depend>nav2_navfn_planner</exec_depend>
-  <exec_depend>nav2_costmap_2d</exec_depend>
   <exec_depend>nav2_lifecycle_manager</exec_depend>
   <!-- Stage 3.2: controller_server + DWB (controller:=true) -->
   <exec_depend>nav2_controller</exec_depend>
@@ -45,5 +52,6 @@
 
   <export>
     <build_type>ament_cmake</build_type>
+    <nav2_core plugin="${prefix}/dwb_controller_plugin.xml" />
   </export>
 </package>

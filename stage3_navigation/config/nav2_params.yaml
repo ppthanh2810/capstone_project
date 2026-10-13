@@ -130,7 +130,9 @@ controller_server:
     failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
     goal_checker_plugins: ["general_goal_checker"]
-    controller_plugins: ["FollowPath"]
+    # Hai bộ điều khiển cục bộ cùng được nạp; goal_path_bridge chọn bằng controller_id
+    # (planning.launch.py local_planner:=custom -> "CustomDWB", local_planner:=nav2_dwb -> "FollowPath").
+    controller_plugins: ["FollowPath", "CustomDWB"]
 
     # Không di chuyển được >= 0.25 m trong 10 s -> abort (kẹt, bị chặn).
     progress_checker:
@@ -197,6 +199,48 @@ controller_server:
       RotateToGoal.slowing_factor: 5.0
       RotateToGoal.lookahead_time: -1.0
       # Oscillation: phạt quỹ đạo đổi chiều liên tục (dùng tham số mặc định của critic).
+
+    # ==========================================================================================
+    # CustomDWB — bộ điều khiển Dynamic Window TỰ VIẾT (stage3_navigation/src/dwb_controller.cpp)
+    # Mọi tham số chỉnh được khi đang chạy:
+    #   ros2 param set /controller_server CustomDWB.<tên> <giá trị>
+    # Giới hạn động học = cùng giá trị khởi đầu thận trọng như FollowPath (DWB), NOT_VERIFIED trên robot.
+    # ==========================================================================================
+    CustomDWB:
+      plugin: "stage3_navigation::DwbController"
+      # ---- Giới hạn động học ----
+      max_vel_x: 0.15              # m/s
+      min_vel_x: 0.0               # 0 = không lùi (phía sau không có LiDAR); plugin từ chối giá trị < 0
+      max_vel_theta: 0.5           # rad/s
+      min_in_place_vel_theta: 0.1  # rad/s, |ω| tối thiểu khi xoay tại chỗ (thắng ma sát) - NOT_VERIFIED
+      acc_lim_x: 0.5               # m/s²
+      decel_lim_x: 0.5             # m/s² (giá trị dương)
+      acc_lim_theta: 1.0           # rad/s²
+      # ---- Lấy mẫu dynamic window + mô phỏng ----
+      vx_samples: 20
+      vtheta_samples: 21           # lẻ -> có ω = 0
+      sim_time: 1.7                # s (0.15 m/s -> nhìn trước ~0.26 m)
+      sim_granularity: 0.05        # s
+      # ---- Đường cục bộ + cà rốt ----
+      local_plan_length: 1.5       # m đường A* phía trước được xét (còn bị cắt ở mép local costmap)
+      carrot_distance: 0.6         # m, điểm dẫn hướng dọc đường A*
+      closest_search_distance: 1.0 # m, phạm vi tìm điểm gần nhất phía trước (chống nhảy đoạn)
+      # ---- Xoay tại chỗ ----
+      rotate_to_heading_angle: 0.8 # rad: lệch hướng tới cà rốt > ngưỡng -> xoay tại chỗ (thoát khi < 0.4)
+      rotate_gain: 1.5             # ω = gain * sai số góc
+      xy_goal_tolerance: 0.15      # m, = general_goal_checker
+      yaw_goal_tolerance: 0.25     # rad, = general_goal_checker
+      # ---- Trọng số hàm chi phí: tổng = Σ scale * thành phần (nhỏ hơn = tốt hơn) ----
+      path_distance_scale: 4.0     # x khoảng cách cuối quỹ đạo -> đường A* (m): bám đường
+      carrot_distance_scale: 2.0   # x khoảng cách cuối quỹ đạo -> cà rốt (m): tiến về đích
+      heading_scale: 1.0           # x lệch hướng tới cà rốt (0..1): hướng đầu đúng đường
+      obstacle_scale: 0.5          # x chi phí costmap lớn nhất dọc quỹ đạo (0..1): tránh xa vật cản
+      speed_scale: 0.3             # x (max_vel_x - v)/max_vel_x (0..1): khuyến khích đi nhanh
+      # ---- An toàn / hiển thị ----
+      unknown_is_obstacle: true
+      transform_tolerance: 0.3     # s
+      publish_trajectories: true   # /CustomDWB/trajectories (MarkerArray), /CustomDWB/local_path
+      trajectory_marker_stride: 4  # vẽ 1/4 số quỹ đạo ứng viên
 
 # Local costmap (node con của controller_server): rolling window quanh robot trong frame odom.
 local_costmap:
