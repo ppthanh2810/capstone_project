@@ -1,5 +1,5 @@
 # Stage 3 (Nav2 Humble): planner_server + global_costmap + A* (luôn chạy)
-# + Stage 3.2: controller_server + local_costmap + DWB (chỉ khi planning.launch.py controller:=true).
+# + Stage 3.2: controller_server + local_costmap + DWB (chỉ khi chạy navigation.launch.py).
 # KHÔNG có BT navigator/map_server/AMCL ở đây: /map và TF map -> odom -> base_footprint
 # đến từ Stage 2 (slam_toolbox HOẶC map_server + AMCL) và Stage 1 (EKF).
 
@@ -13,7 +13,7 @@ planner_server:
       plugin: "nav2_navfn_planner/NavfnPlanner"
       # A* thay vì Dijkstra (NavFn của Nav2).
       use_astar: true
-      # false: không lập đường qua ô unknown (an toàn). Ghi đè bằng planning.launch.py allow_unknown:=true
+      # false: không lập đường qua ô unknown (an toàn). Ghi đè bằng planning/navigation.launch.py allow_unknown:=true
       # (hữu ích khi mapping, bản đồ còn nhiều vùng chưa quét).
       allow_unknown: false
       # 0.0: đích phải nằm ở ô hợp lệ; đích trong vật cản / vùng inflation nội tiếp / unknown -> lỗi rõ ràng
@@ -67,10 +67,19 @@ lifecycle_manager_planning:
   ros__parameters:
     use_sim_time: false
     autostart: true
-    # controller:=false. planning.launch.py controller:=true ghi đè thành ["planner_server", "controller_server"].
     node_names: ["planner_server"]
     # 0.0: tắt bond. planner_server chỉ active khi có TF map -> base_footprint (AMCL cần initial pose),
     # nên không để lifecycle manager coi việc chờ TF là node chết.
+    bond_timeout: 0.0
+    attempt_respawn_reconnection: false
+
+# Riêng cho controller_server (navigation.launch.py, Stage 3.2).
+lifecycle_manager_navigation:
+  ros__parameters:
+    use_sim_time: false
+    autostart: true
+    node_names: ["controller_server"]
+    # 0.0: tắt bond, cùng lý do như lifecycle_manager_planning (local_costmap chờ TF odom -> base_footprint).
     bond_timeout: 0.0
     attempt_respawn_reconnection: false
 
@@ -95,20 +104,20 @@ goal_path_bridge:
     controller_id: FollowPath               # = controller_plugins của controller_server
     goal_checker_id: general_goal_checker   # = goal_checker_plugins của controller_server
     # false: chỉ gửi FollowPath khi gọi service /goal_path_bridge/follow (kích hoạt có chủ đích).
-    # Ghi đè bằng planning.launch.py auto_follow:=true.
+    # Ghi đè bằng navigation.launch.py auto_follow:=true (planning.launch.py luôn false).
     auto_follow: false
     max_path_age: 30.0          # s; đường cũ hơn -> từ chối, phải đặt lại Goal (<= 0: tắt kiểm tra)
     max_start_distance: 0.5     # m; robot cách đường xa hơn -> đường lỗi thời, từ chối
     follow_timeout: 120.0       # s; quá thời gian -> hủy FollowPath (<= 0: tắt)
     # true: chỉ bám đường khi /localization/status (localization_monitor) = OK (LOCALIZED) và còn mới;
-    # mất LOCALIZED khi đang bám -> hủy. planning.launch.py đặt false khi mode:=mapping hoặc monitor:=false.
+    # mất LOCALIZED khi đang bám -> hủy. navigation.launch.py đặt false khi mode:=mapping hoặc monitor:=false.
     require_localized: true
     localization_status_topic: /localization/status
     localization_status_timeout: 2.0   # s (monitor publish 2 Hz)
 
 # ============================================================================================
-# Stage 3.2 — DWB local controller (chỉ chạy khi planning.launch.py controller:=true)
-# Đầu ra cmd_vel được planning.launch.py remap:
+# Stage 3.2 — DWB local controller (chỉ chạy trong navigation.launch.py)
+# Đầu ra cmd_vel được navigation.launch.py remap:
 #   navigation_enabled:=false (mặc định) -> /cmd_vel_dwb  (KHÔNG node nào nghe -> cách ly motor)
 #   navigation_enabled:=true             -> /cmd_vel_nav  (twist_mux prio 10 < PS4 prio 100 -> motor)
 # Giới hạn vận tốc/gia tốc dưới đây là GIÁ TRỊ KHỞI ĐẦU THẬN TRỌNG, CHƯA ĐO trên robot (NOT_VERIFIED).
@@ -131,7 +140,7 @@ controller_server:
     progress_checker_plugin: "progress_checker"
     goal_checker_plugins: ["general_goal_checker"]
     # Hai bộ điều khiển cục bộ cùng được nạp; goal_path_bridge chọn bằng controller_id
-    # (planning.launch.py local_planner:=custom -> "CustomDWB", local_planner:=nav2_dwb -> "FollowPath").
+    # (navigation.launch.py local_planner:=custom -> "CustomDWB", local_planner:=nav2_dwb -> "FollowPath").
     controller_plugins: ["FollowPath", "CustomDWB"]
 
     # Không di chuyển được >= 0.25 m trong 10 s -> abort (kẹt, bị chặn).

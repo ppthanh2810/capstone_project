@@ -3,7 +3,7 @@
 // Stage 3.2 (tùy chọn): chuyển đường A* hợp lệ cuối cùng tới action FollowPath (controller_server, DWB)
 // CHỈ khi được kích hoạt có chủ đích: service ~/follow, hoặc auto_follow:=true.
 // Node này không bao giờ publish cmd_vel hay TF: vận tốc do controller_server phát, và topic đầu ra
-// của nó (cách ly /cmd_vel_dwb hay /cmd_vel_nav) do planning.launch.py quyết định.
+// của nó (cách ly /cmd_vel_dwb hay /cmd_vel_nav) do navigation.launch.py quyết định.
 //
 // Input : goal_pose (PoseStamped), map (kiểm tra có bản đồ), global_costmap/costmap (giải thích lỗi),
 //         localization/status (DiagnosticStatus của localization_monitor, khi require_localized),
@@ -319,8 +319,8 @@ private:
 
     if (!follow_client_->action_server_is_ready()) {
       return refuse(
-        "controller_server FollowPath action not available (run planning.launch.py "
-        "controller:=true and wait until controller_server is active)");
+        "controller_server FollowPath action not available (run navigation.launch.py "
+        "and wait until controller_server is active)");
     }
 
     FollowPath::Goal request;

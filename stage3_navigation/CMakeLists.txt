@@ -42,7 +42,7 @@ install(TARGETS goal_path_bridge
 )
 
 # Plugin nav2_core::Controller tự viết (Dynamic Window): libdwb_controller.so, nạp bởi controller_server
-# qua pluginlib (dwb_controller_plugin.xml). Chọn bằng planning.launch.py local_planner:=custom.
+# qua pluginlib (dwb_controller_plugin.xml). Chọn bằng navigation.launch.py local_planner:=custom.
 add_library(dwb_controller SHARED src/dwb_controller.cpp)
 target_compile_features(dwb_controller PUBLIC cxx_std_17)
 target_include_directories(dwb_controller PUBLIC

@@ -2,9 +2,9 @@ from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import (DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, LogInfo,
+from launch.actions import (DeclareLaunchArgument, GroupAction, IncludeLaunchDescription,
                             OpaqueFunction)
-from launch.conditions import IfCondition, UnlessCondition
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
@@ -18,48 +18,18 @@ from launch_ros.parameter_descriptions import ParameterValue
 # Mỗi mode chỉ include MỘT bringup Stage 2 -> chỉ một nguồn map -> odom, một motor driver, một EKF.
 # CẢNH BÁO: Stage 2 chạy zlac8015d_move (Modbus, motor) như mapping/localization.launch.py.
 # Stage 3 không publish TF.
-# Stage 3.2 (controller:=true): controller_server + local_costmap + DWB. Vận tốc DWB:
-#   navigation_enabled:=false (mặc định) -> /cmd_vel_dwb: KHÔNG node nào nghe,
-#                                           cách ly khỏi twist_mux/motor
-#   navigation_enabled:=true -> /cmd_vel_nav -> twist_mux (prio 10, PS4 prio 100 thắng) -> motor
-# DWB chỉ chạy khi goal_path_bridge gửi FollowPath: service /goal_path_bridge/follow
-# hoặc auto_follow:=true.
+# Chỉ lập kế hoạch toàn cục A*: KHÔNG có controller_server, KHÔNG có lệnh vận tốc.
+# Bộ điều khiển cục bộ (DWB, Stage 3.2) nằm ở navigation.launch.py (include file này).
 # stage2:=false: không include Stage 2 (không phần cứng) -> chỉ để kiểm thử offline, khi /map, TF
 # map -> odom -> base_footprint, /scan_filtered, /odometry/filtered do nguồn khác cung cấp.
 VALID_MODES = ("localization", "mapping")
-# Bộ điều khiển cục bộ (cả hai được nạp trong controller_server;
-# goal_path_bridge chọn bằng controller_id):
-#   custom   -> "CustomDWB"  = stage3_navigation::DwbController (tự viết, src/dwb_controller.cpp)
-#   nav2_dwb -> "FollowPath" = dwb_core::DWBLocalPlanner (Nav2)
-LOCAL_PLANNERS = {"custom": "CustomDWB", "nav2_dwb": "FollowPath"}
-
-
-def _is_true(context, name):
-    return LaunchConfiguration(name).perform(context).lower() == "true"
 
 
 def _check_mode(context):
     mode = LaunchConfiguration("mode").perform(context)
     if mode not in VALID_MODES:
         raise RuntimeError(f"mode:={mode} không hợp lệ, chọn một trong {VALID_MODES}")
-    planner = LaunchConfiguration("local_planner").perform(context)
-    if planner not in LOCAL_PLANNERS:
-        raise RuntimeError(
-            f"local_planner:={planner} không hợp lệ, chọn một trong {tuple(LOCAL_PLANNERS)}")
-    controller = _is_true(context, "controller")
-    for flag in ("navigation_enabled", "auto_follow"):
-        if _is_true(context, flag) and not controller:
-            raise RuntimeError(f"{flag}:=true cần controller:=true")
-    if not controller:
-        return [LogInfo(msg="[stage3] planning only: không có controller_server, "
-                            "không có lệnh vận tốc")]
-    if _is_true(context, "navigation_enabled"):
-        return [LogInfo(msg="[stage3] !!! navigation_enabled:=true: DWB -> /cmd_vel_nav -> "
-                            "twist_mux -> MOTOR. Kê bánh / giữ E-stop. Dừng: ros2 service call "
-                            "/goal_path_bridge/cancel std_srvs/srv/Trigger (giữ deadman PS4 chỉ "
-                            "ghi đè tạm thời: thả ra là DWB chạy tiếp)")]
-    return [LogInfo(msg=f"[stage3] local planner '{planner}' ({LOCAL_PLANNERS[planner]}), "
-                        "test mode: vận tốc -> /cmd_vel_dwb (cách ly, không tới motor)")]
+    return []
 
 
 def include_stage2(launch_file, arguments, mode):
@@ -96,24 +66,6 @@ def generate_launch_description():
     initialpose_topic = PythonExpression([
         "'/initialpose_guess' if '", LaunchConfiguration("mode"), "' == 'localization' and '",
         LaunchConfiguration("csm"), "'.lower() == 'true' else '/initialpose'",
-    ])
-
-    # Đầu ra vận tốc của controller_server (topic "cmd_vel" của nó).
-    cmd_vel_topic = PythonExpression([
-        "'/cmd_vel_nav' if '", LaunchConfiguration("navigation_enabled"),
-        "'.lower() == 'true' else '/cmd_vel_dwb'",
-    ])
-
-    # controller_id mà goal_path_bridge gửi trong FollowPath (chọn plugin của controller_server).
-    controller_id = PythonExpression([
-        "'FollowPath' if '", LaunchConfiguration("local_planner"),
-        "' == 'nav2_dwb' else 'CustomDWB'",
-    ])
-
-    # Chỉ đòi LOCALIZED khi có localization_monitor (mode:=localization monitor:=true).
-    require_localized = PythonExpression([
-        "'", LaunchConfiguration("mode"), "' == 'localization' and '",
-        LaunchConfiguration("monitor"), "'.lower() == 'true'",
     ])
 
     return LaunchDescription([
@@ -160,35 +112,16 @@ def generate_launch_description():
                         "false: chỉ qua vùng free",
         ),
         DeclareLaunchArgument(
-            "controller",
-            default_value="false",
-            description="true: chạy controller_server (DWB) + local_costmap. "
-                        "false: chỉ lập kế hoạch A*",
-        ),
-        DeclareLaunchArgument(
-            "local_planner",
-            default_value="custom",
-            description="custom: bộ điều khiển Dynamic Window tự viết "
-                        "(CustomDWB, dwb_controller.cpp). "
-                        "nav2_dwb: dwb_core::DWBLocalPlanner của Nav2 (FollowPath)",
-        ),
-        DeclareLaunchArgument(
-            "navigation_enabled",
-            default_value="false",
-            description="true: vận tốc DWB -> /cmd_vel_nav -> twist_mux -> MOTOR. "
-                        "false: -> /cmd_vel_dwb (cách ly). Cần controller:=true",
-        ),
-        DeclareLaunchArgument(
-            "auto_follow",
-            default_value="false",
-            description="true: gửi FollowPath ngay khi A* tìm được đường. "
-                        "false: chỉ khi gọi /goal_path_bridge/follow. Cần controller:=true",
-        ),
-        DeclareLaunchArgument(
             "stage2",
             default_value="true",
             description="false: KHÔNG include Stage 2 (không LiDAR/motor/EKF/localization). "
                         "Chỉ dùng cho kiểm thử offline với nguồn /map, TF, scan, odom khác",
+        ),
+        DeclareLaunchArgument(
+            "goal_path_bridge",
+            default_value="true",
+            description="false: không chạy goal_path_bridge ở đây (navigation.launch.py tự chạy "
+                        "bản có FollowPath). Dùng planning đơn lẻ: để true",
         ),
         DeclareLaunchArgument(
             "rviz",
@@ -245,23 +178,8 @@ def generate_launch_description():
             arguments=["--ros-args", "--log-level", log_level],
         ),
 
-        # ---- Stage 3.2: DWB local controller (controller:=true) ----
-        # controller_server (FollowPath = dwb_core::DWBLocalPlanner)
-        # + local_costmap (obstacle + inflation).
-        # Action: /follow_path. Không có BT navigator: FollowPath chỉ do goal_path_bridge gửi.
-        Node(
-            package="nav2_controller",
-            executable="controller_server",
-            name="controller_server",
-            output="screen",
-            parameters=[params_file],
-            remappings=[("cmd_vel", cmd_vel_topic)],
-            arguments=["--ros-args", "--log-level", log_level],
-            condition=IfCondition(LaunchConfiguration("controller")),
-        ),
-
-        # MỘT lifecycle manager cho Stage 3 (map_server/AMCL có lifecycle_manager_localization của
-        # nav2_bringup). Hai khai báo loại trừ nhau theo controller: chỉ một node được chạy.
+        # Lifecycle manager cho planner_server (map_server/AMCL: lifecycle_manager_localization
+        # của nav2_bringup; controller_server: lifecycle_manager_navigation, navigation.launch.py).
         Node(
             package="nav2_lifecycle_manager",
             executable="lifecycle_manager",
@@ -269,38 +187,23 @@ def generate_launch_description():
             output="screen",
             parameters=[params_file],
             arguments=["--ros-args", "--log-level", log_level],
-            condition=UnlessCondition(LaunchConfiguration("controller")),
-        ),
-        Node(
-            package="nav2_lifecycle_manager",
-            executable="lifecycle_manager",
-            name="lifecycle_manager_planning",
-            output="screen",
-            parameters=[params_file, {"node_names": ["planner_server", "controller_server"]}],
-            arguments=["--ros-args", "--log-level", log_level],
-            condition=IfCondition(LaunchConfiguration("controller")),
         ),
 
-        # /goal_pose (RViz Goal Pose) -> ComputePathToPose -> /global_path
-        # (+ FollowPath khi được kích hoạt). Không phát lệnh vận tốc.
+        # /goal_pose (RViz Goal Pose) -> ComputePathToPose -> /global_path.
+        # Không phát lệnh vận tốc.
+        # auto_follow false: ở đây không có controller_server, chỉ hiển thị đường A*.
         Node(
             package="stage3_navigation",
             executable="goal_path_bridge",
             name="goal_path_bridge",
             output="screen",
-            parameters=[
-                params_file,
-                {
-                    "auto_follow": ParameterValue(
-                        LaunchConfiguration("auto_follow"), value_type=bool),
-                    "require_localized": ParameterValue(require_localized, value_type=bool),
-                    "controller_id": controller_id,
-                },
-            ],
+            parameters=[params_file, {"auto_follow": False}],
             arguments=["--ros-args", "--log-level", log_level],
+            condition=IfCondition(LaunchConfiguration("goal_path_bridge")),
         ),
 
-        # RViz2 duy nhất: map, scan, AMCL, CSM, global/local costmap, Goal Pose, /global_path, DWB.
+        # RViz2 duy nhất: map, scan, AMCL, CSM, global costmap, Goal Pose, /global_path
+        # (+ local costmap / DWB khi chạy qua navigation.launch.py).
         Node(
             package="rviz2",
             executable="rviz2",
