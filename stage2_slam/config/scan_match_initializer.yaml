@@ -1,6 +1,6 @@
 # CSM initializer cho AMCL (chỉ chạy khi localization.launch.py csm:=true).
-# Ngưỡng validation được chọn trên tập TUNING tổng hợp (csm_benchmark seed=1) và kiểm tra trên tập
-# validation tổng hợp độc lập (seed 2/3/4). CHƯA hiệu chỉnh trên robot thật (NOT_VERIFIED).
+# Ngưỡng validation được chọn trên dữ liệu tổng hợp lúc phát triển (tập tuning riêng, kiểm tra trên tập
+# validation độc lập; công cụ benchmark đã bỏ khỏi repo). CHƯA hiệu chỉnh trên robot thật (NOT_VERIFIED).
 scan_match_initializer:
   ros__parameters:
     use_sim_time: false
@@ -12,6 +12,11 @@ scan_match_initializer:
     require_amcl_active: true      # chỉ gửi /initialpose khi /amcl/get_state = active
     amcl_state_service: /amcl/get_state
     min_publish_interval: 1.0      # s, chống reset AMCL liên tục
+
+    # CSM không được chặn AMCL (robot phải dùng được như csm:=false):
+    fallback:
+      forward_guess: true          # REJECTED/NO_SCAN/TF_ERROR/TIMEOUT/NO_MAP -> gửi nguyên pose RViz
+      publish_ambiguous: true      # AMBIGUOUS -> gửi pose CSM tốt nhất, covariance nới bao đỉnh cạnh tranh
 
     score_field:
       occupied_threshold: 65       # khớp occupied_thresh 0.65 của maps/map.yaml
@@ -41,6 +46,7 @@ scan_match_initializer:
       ambiguity_ratio: 0.90
       peak_separation_linear: 0.25 # m
       peak_separation_angular: 0.17  # rad
+      valley_ratio: 0.90           # đỉnh cạnh tranh phải bị ngăn bởi thung lũng < 0.9 * score của nó
       reject_at_window_boundary: true
 
     covariance:                    # heuristic, KHÔNG phải covariance đã hiệu chuẩn thống kê

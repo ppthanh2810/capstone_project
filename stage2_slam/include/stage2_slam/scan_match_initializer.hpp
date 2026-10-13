@@ -1,7 +1,7 @@
 // ScanMatchInitializer: bounded correlative scan matching (CSM) quanh pose người dùng chọn,
 // dùng để hiệu chỉnh /initialpose trước khi gửi cho AMCL.
 //
-// Phần lõi KHÔNG phụ thuộc ROS (dễ unit test). Node ROS 2 (scan_match_initializer_node) lo
+// Phần lõi KHÔNG phụ thuộc ROS. Node ROS 2 (scan_match_initializer_node) lo
 // subscribe /map, /scan_filtered, TF và publish kết quả.
 //
 // Quy ước:
@@ -181,6 +181,11 @@ struct ValidationConfig
   double ambiguity_ratio{0.90};       // cực đại cạnh tranh / tốt nhất vượt ngưỡng -> AMBIGUOUS
   double peak_separation_linear{0.25};   // m, cực đại cách xa hơn mới tính là "độc lập"
   double peak_separation_angular{0.17};  // rad (~10 deg)
+  // Cực đại cạnh tranh chỉ tính là đỉnh độc lập khi score nhỏ nhất trên đoạn thẳng (trong lưới ứng
+  // viên) nối nó với đỉnh tốt nhất < valley_ratio * score của nó (có "thung lũng" ngăn cách).
+  // Sườn/đỉnh dải của cùng một đỉnh (hành lang, tường dài) không phải nhập nhằng: độ bất định đó đã
+  // nằm trong covariance. Ứng viên trên biên cửa sổ bị bỏ qua (không kiểm chứng được là cực đại).
+  double valley_ratio{0.90};
   bool reject_at_window_boundary{true};
   double inlier_score{0.5};           // điểm có score >= ngưỡng này tính là inlier (chẩn đoán)
 };

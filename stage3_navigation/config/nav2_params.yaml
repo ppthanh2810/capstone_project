@@ -1,0 +1,89 @@
+# Stage 3 — chỉ lập kế hoạch toàn cục (Nav2 Humble): planner_server + global_costmap + A*.
+# KHÔNG có controller/BT navigator/map_server/AMCL ở đây: /map và TF map -> odom -> base_footprint
+# đến từ Stage 2 (slam_toolbox HOẶC map_server + AMCL) và Stage 1 (EKF).
+
+planner_server:
+  ros__parameters:
+    use_sim_time: false
+    # Chỉ lập kế hoạch theo yêu cầu (action ComputePathToPose), không tự replan.
+    expected_planner_frequency: 1.0
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      # A* thay vì Dijkstra (NavFn của Nav2).
+      use_astar: true
+      # false: không lập đường qua ô unknown (an toàn). Ghi đè bằng planning.launch.py allow_unknown:=true
+      # (hữu ích khi mapping, bản đồ còn nhiều vùng chưa quét).
+      allow_unknown: false
+      # 0.0: đích phải nằm ở ô hợp lệ; đích trong vật cản / vùng inflation nội tiếp / unknown -> lỗi rõ ràng
+      # thay vì âm thầm dời đích.
+      tolerance: 0.0
+      # false: hướng pose cuối = hướng Goal Pose chọn trên RViz.
+      use_final_approach_orientation: false
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: map
+      robot_base_frame: base_footprint
+      # Robot tròn Ø400 mm.
+      robot_radius: 0.20
+      # Cập nhật/công bố chậm là đủ: chỉ có lớp tĩnh (bản đồ) + inflation.
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      transform_tolerance: 0.5
+      # Kích thước/origin lấy theo /map (static layer). Với slam_toolbox, costmap tự đổi kích thước khi map lớn ra.
+      rolling_window: false
+      resolution: 0.05
+      # Giữ ô unknown (255) thay vì coi là free; NavFn quyết định theo allow_unknown.
+      track_unknown_space: true
+      # Đọc bởi StaticLayer (tham số cấp costmap): ô /map >= 100 -> lethal, -1 (255) -> unknown,
+      # còn lại free (trinary, giống mode trinary của maps/map.yaml).
+      lethal_cost_threshold: 100
+      unknown_cost_value: 255
+      trinary_costmap: true
+      always_send_full_costmap: true
+      plugins: ["static_layer", "inflation_layer"]
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_topic: /map
+        # map_server và slam_toolbox đều publish /map transient_local.
+        map_subscribe_transient_local: true
+        # slam_toolbox / map_server không publish /map_updates đáng tin -> nhận cả map mới mỗi lần.
+        subscribe_to_updates: false
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        # Khoảng an toàn: bán kính 0.20 m (nội tiếp, NavFn coi như vật cản) + vùng chi phí giảm dần tới 0.55 m
+        # -> đường ưu tiên đi cách tường, nhưng vẫn qua được khe >= 0.40 m.
+        inflation_radius: 0.55
+        cost_scaling_factor: 3.0
+        inflate_unknown: false
+        inflate_around_unknown: false
+
+# Riêng cho planner_server (không quản lý map_server/AMCL: chúng thuộc Stage 2).
+lifecycle_manager_planning:
+  ros__parameters:
+    use_sim_time: false
+    autostart: true
+    node_names: ["planner_server"]
+    # 0.0: tắt bond. planner_server chỉ active khi có TF map -> base_footprint (AMCL cần initial pose),
+    # nên không để lifecycle manager coi việc chờ TF là node chết.
+    bond_timeout: 0.0
+    attempt_respawn_reconnection: false
+
+goal_path_bridge:
+  ros__parameters:
+    use_sim_time: false
+    global_frame: map
+    robot_base_frame: base_footprint
+    goal_topic: /goal_pose
+    path_topic: /global_path
+    map_topic: /map
+    costmap_topic: /global_costmap/costmap
+    action_name: /compute_path_to_pose
+    planner_id: GridBased
+    # Thời gian chờ action server (planner_server đã active) cho mỗi goal.
+    server_wait_timeout: 2.0
+    # TF map -> base_footprint cũ hơn giá trị này -> cảnh báo (pose có thể đã sai).
+    tf_timeout: 0.5

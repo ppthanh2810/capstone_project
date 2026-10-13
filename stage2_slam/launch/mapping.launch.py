@@ -39,6 +39,11 @@ def generate_launch_description():
             description="Cổng USB của RPLidar C1",
         ),
         DeclareLaunchArgument(
+            "imu_port",
+            default_value="/dev/ttyUSB1",
+            description="Cổng USB-UART của ESP32 (IMU), truyền xuống ekf.launch.py",
+        ),
+        DeclareLaunchArgument(
             "rviz",
             default_value="true",
             description="Có mở RViz2 hay không",
@@ -66,7 +71,7 @@ def generate_launch_description():
         include_launch(
             "stage1_odom",
             "ekf.launch.py",
-            {"rviz": "false"},
+            {"rviz": "false", "imu_port": LaunchConfiguration("imu_port")},
         ),
 
         # SLAM chỉ dùng scan đã loại vùng phía sau.

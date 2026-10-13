@@ -1,0 +1,9 @@
+# Python bytecode / test cache (tự sinh)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# colcon (nếu build nhầm trong repo; workspace build ở ~/capstone_ws)
+build/
+install/
+log/

@@ -2,11 +2,20 @@ from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, OpaqueFunction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, SetRemap
+
+
+def _isolate_remaps(context):
+    # Humble: SetRemap append vào CHÍNH list "ros_remaps" của scope cha (GroupAction scoped chỉ copy
+    # nông dict). Khi file này được include dưới một SetRemap khác (localization.launch.py csm:=true),
+    # remap "scan" -> "/scan_raw" bị rò ra ngoài group -> laser_filters/RViz đọc /scan_raw (laser_raw).
+    # Tạo list riêng cho scope hiện tại trước khi SetRemap.
+    context.launch_configurations["ros_remaps"] = list(
+        context.launch_configurations.get("ros_remaps", []))
 
 
 def generate_launch_description():
@@ -59,6 +68,7 @@ def generate_launch_description():
         GroupAction(
             scoped=True,
             actions=[
+                OpaqueFunction(function=_isolate_remaps),
                 SetRemap(src="scan", dst="/scan_raw"),
                 IncludeLaunchDescription(
                     PythonLaunchDescriptionSource(str(c1_launch)),

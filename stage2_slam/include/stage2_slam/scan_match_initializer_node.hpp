@@ -46,7 +46,13 @@ private:
   void pollAmclState();
   void handleResult(const SessionResult & result);
   void publishStatus(
-    MatchStatus status, const std::string & reason, const SessionResult * result = nullptr);
+    MatchStatus status, const std::string & reason, const SessionResult * result = nullptr,
+    const std::string & sent = "none");
+  // Gửi /initialpose sau khi qua các cổng (dry run, AMCL active, giới hạn tần suất).
+  // Trả về "" nếu đã gửi, ngược lại là lý do không gửi.
+  std::string sendInitialPose(const geometry_msgs::msg::PoseWithCovarianceStamped & msg);
+  // Không gửi được pose CSM -> chuyển nguyên pose người dùng chọn cho AMCL (như csm:=false).
+  void fallbackToGuess(MatchStatus status, const std::string & reason, const SessionResult * result);
   std::optional<Pose2D> lookup2D(
     const std::string & target, const std::string & source, const rclcpp::Time & stamp,
     std::string & error);
@@ -59,6 +65,9 @@ private:
   bool publish_initialpose_{true};
   bool require_amcl_active_{true};
   double amcl_state_max_age_{3.0};
+  bool fallback_forward_guess_{true};
+  bool fallback_publish_ambiguous_{true};
+  std::optional<geometry_msgs::msg::PoseWithCovarianceStamped> last_guess_;
 
   std::shared_ptr<ScoreField> field_;
   std::string map_error_{"no map received"};

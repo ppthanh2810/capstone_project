@@ -53,6 +53,12 @@ def generate_launch_description():
         ),
 
         DeclareLaunchArgument(
+            "imu_port",
+            default_value="/dev/ttyUSB1",
+            description="Cổng USB-UART của ESP32 (IMU), truyền xuống ekf.launch.py",
+        ),
+
+        DeclareLaunchArgument(
             "map",
             default_value=str(default_map),
             description="Đường dẫn tới file bản đồ site_map.yaml",
@@ -110,7 +116,7 @@ def generate_launch_description():
         include_launch(
             "stage1_odom",
             "ekf.launch.py",
-            {"rviz": "false"},
+            {"rviz": "false", "imu_port": LaunchConfiguration("imu_port")},
         ),
 
         # Nạp site_map.yaml, chạy Map Server và AMCL.

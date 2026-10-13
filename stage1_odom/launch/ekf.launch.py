@@ -1,6 +1,6 @@
 """Stage1: wheel odom + IMU odom + EKF -> /odometry/filtered + TF odom -> base_footprint.
 
-Mở cổng serial IMU (/dev/ttyUSB1). Không chạy motor: /wheel_odom chỉ có dữ liệu khi
+Mở cổng serial IMU (imu_port, mặc định /dev/ttyUSB1). Không chạy motor: /wheel_odom chỉ có dữ liệu khi
 zlac8015d_move (stage0) đang phát /wheel_feedback.
 
 rviz:=true (mặc định) chạy thêm robot_state_publisher (URDF) + RViz odom.rviz
@@ -34,6 +34,12 @@ def generate_launch_description():
         description="Mở RViz2 (odom.rviz) + robot_state_publisher. false khi include từ stage2",
     )
 
+    imu_port_arg = DeclareLaunchArgument(
+        "imu_port",
+        default_value="/dev/ttyUSB1",
+        description="Cổng USB-UART của ESP32 (IMU)",
+    )
+
     # ============================================================
     # WHEEL ODOMETRY
     # ============================================================
@@ -58,7 +64,7 @@ def generate_launch_description():
         executable="imu_odom",
         name="imu_odom",
         parameters=[{
-            "port": "/dev/ttyUSB1",
+            "port": LaunchConfiguration("imu_port"),
             "frame_id": "imu_link"
         }]
     )
@@ -112,6 +118,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         rviz_arg,
+        imu_port_arg,
         wheel_odom,
         imu_odom,
         ekf,

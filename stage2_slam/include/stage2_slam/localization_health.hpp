@@ -1,4 +1,4 @@
-// Đánh giá chất lượng localization (không phụ thuộc ROS -> unit test được).
+// Đánh giá chất lượng localization (logic thuần, không phụ thuộc ROS; node: localization_monitor).
 //
 // Trạng thái: INITIALIZING, LOCALIZED, UNCERTAIN, LOST. Mỗi kết luận đi kèm danh sách lý do.
 // Không bao giờ kết luận LOCALIZED chỉ từ covariance: bắt buộc có scan-to-map consistency tốt,

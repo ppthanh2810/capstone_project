@@ -498,14 +498,25 @@ MatchResult matchScan(
   }
   r.inlier_fraction = inlierFraction(field, points, r.pose, vc.inlier_score);
 
-  // Cực đại cục bộ độc lập lớn nhất (cách đỉnh đủ xa).
-  float second = 0.0f;
-  int s_a = -1, s_ix = 0, s_iy = 0;
+  // Cực đại cục bộ độc lập lớn nhất: cách đỉnh đủ xa, không nằm trên biên cửa sổ và bị ngăn cách
+  // với đỉnh bởi một thung lũng (xem ValidationConfig::valley_ratio).
+  const bool full_circle = sc.angular_window >= kPi;
+  auto onBoundary = [&](int ai, int ix, int iy) {
+      return (nl > 0 && (ix == 0 || ix == n_l - 1 || iy == 0 || iy == n_l - 1)) ||
+             (!full_circle && na > 0 && (ai == 0 || ai == ny_a - 1));
+    };
+  struct Peak
+  {
+    float val;
+    int ai, ix, iy;
+  };
+  std::vector<Peak> peaks;
   for (int ai = 0; ai < ny_a; ++ai) {
     for (int ix = 0; ix < n_l; ++ix) {
       for (int iy = 0; iy < n_l; ++iy) {
         const float val = at(ai, ix, iy);
-        if (val <= second) {continue;}
+        if (val < vc.min_score * vc.ambiguity_ratio) {continue;}  // không thể gây AMBIGUOUS
+        if (onBoundary(ai, ix, iy)) {continue;}
         const Pose2D p = poseOf(ai, ix, iy);
         const double dl = std::hypot(p.x - r.coarse_pose.x, p.y - r.coarse_pose.y);
         const double da = std::abs(normalizeAngle(p.yaw - r.coarse_pose.yaw));
@@ -524,13 +535,41 @@ MatchResult matchScan(
             }
           }
         }
-        if (is_max) {
-          second = val;
-          s_a = ai;
-          s_ix = ix;
-          s_iy = iy;
-        }
+        if (is_max) {peaks.push_back({val, ai, ix, iy});}
       }
+    }
+  }
+  std::sort(
+    peaks.begin(), peaks.end(), [](const Peak & a, const Peak & b) {return a.val > b.val;});
+  // Đỉnh tham chiếu trên lưới: ô gần coarse_pose (trọng tâm vùng đỉnh) nhất.
+  const int b_a = std::clamp(
+    static_cast<int>(std::lround(normalizeAngle(r.coarse_pose.yaw - guess.yaw) / dtheta)) + na,
+    0, ny_a - 1);
+  const int b_ix = std::clamp(
+    static_cast<int>(std::lround((r.coarse_pose.x - guess.x) / sc.linear_step)) + nl, 0, n_l - 1);
+  const int b_iy = std::clamp(
+    static_cast<int>(std::lround((r.coarse_pose.y - guess.y) / sc.linear_step)) + nl, 0, n_l - 1);
+  float second = 0.0f;
+  int s_a = -1, s_ix = 0, s_iy = 0;
+  constexpr std::size_t kMaxPeaksChecked = 64;
+  for (std::size_t k = 0; k < peaks.size() && k < kMaxPeaksChecked; ++k) {
+    const Peak & pk = peaks[k];
+    const int steps = std::max(
+      {std::abs(pk.ai - b_a), std::abs(pk.ix - b_ix), std::abs(pk.iy - b_iy), 1});
+    float valley = pk.val;
+    for (int t = 1; t < steps; ++t) {
+      const double f = static_cast<double>(t) / steps;
+      const int a2 = static_cast<int>(std::lround(b_a + f * (pk.ai - b_a)));
+      const int x2 = static_cast<int>(std::lround(b_ix + f * (pk.ix - b_ix)));
+      const int y2 = static_cast<int>(std::lround(b_iy + f * (pk.iy - b_iy)));
+      valley = std::min(valley, at(a2, x2, y2));
+    }
+    if (valley < static_cast<float>(vc.valley_ratio) * pk.val) {
+      second = pk.val;
+      s_a = pk.ai;
+      s_ix = pk.ix;
+      s_iy = pk.iy;
+      break;
     }
   }
   if (s_a >= 0) {
@@ -578,7 +617,6 @@ MatchResult matchScan(
     }
   }
 
-  const bool full_circle = sc.angular_window >= kPi;
   r.at_window_boundary = best_ix == 0 || best_ix == n_l - 1 || best_iy == 0 || best_iy == n_l - 1 ||
     (!full_circle && (best_a == 0 || best_a == ny_a - 1));
 

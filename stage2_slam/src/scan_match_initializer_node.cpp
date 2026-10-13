@@ -1,5 +1,6 @@
 #include "stage2_slam/scan_match_initializer_node.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <sstream>
@@ -55,6 +56,11 @@ ScanMatchInitializerNode::ScanMatchInitializerNode(const rclcpp::NodeOptions & o
   require_amcl_active_ = declare_parameter<bool>("require_amcl_active", true);
   amcl_state_max_age_ = declare_parameter<double>("amcl_state_max_age", 3.0);
   const auto amcl_service = declare_parameter<std::string>("amcl_state_service", "/amcl/get_state");
+  // CSM chỉ là bước tinh chỉnh, không được chặn AMCL: khi không có pose CSM tin cậy thì gửi nguyên
+  // pose người dùng chọn (giống csm:=false); khi AMBIGUOUS gửi pose CSM tốt nhất với covariance
+  // nới rộng bao cả đỉnh cạnh tranh để AMCL tự phân giải.
+  fallback_forward_guess_ = declare_parameter<bool>("fallback.forward_guess", true);
+  fallback_publish_ambiguous_ = declare_parameter<bool>("fallback.publish_ambiguous", true);
 
   auto & m = matcher_cfg_;
   m.score_field.occupied_threshold =
@@ -86,6 +92,8 @@ ScanMatchInitializerNode::ScanMatchInitializerNode(const rclcpp::NodeOptions & o
     "validation.peak_separation_linear", m.validation.peak_separation_linear);
   m.validation.peak_separation_angular = declare_parameter<double>(
     "validation.peak_separation_angular", m.validation.peak_separation_angular);
+  m.validation.valley_ratio =
+    declare_parameter<double>("validation.valley_ratio", m.validation.valley_ratio);
   m.validation.reject_at_window_boundary = declare_parameter<bool>(
     "validation.reject_at_window_boundary", m.validation.reject_at_window_boundary);
   m.covariance.min_std_linear =
@@ -143,10 +151,12 @@ ScanMatchInitializerNode::ScanMatchInitializerNode(const rclcpp::NodeOptions & o
   RCLCPP_INFO(
     get_logger(),
     "scan_match_initializer ready | window +-%.2f m / +-%.1f deg | min_score %.2f | "
-    "ambiguity_ratio %.2f | num_scans %zu | publish_initialpose %s | require_amcl_active %s",
+    "ambiguity_ratio %.2f | num_scans %zu | publish_initialpose %s | require_amcl_active %s | "
+    "fallback forward_guess %s, publish_ambiguous %s",
     m.search.linear_window, m.search.angular_window * 180.0 / M_PI, m.validation.min_score,
     m.validation.ambiguity_ratio, s.num_scans, publish_initialpose_ ? "true" : "false",
-    require_amcl_active_ ? "true" : "false");
+    require_amcl_active_ ? "true" : "false", fallback_forward_guess_ ? "true" : "false",
+    fallback_publish_ambiguous_ ? "true" : "false");
 }
 
 void ScanMatchInitializerNode::onMap(const nav_msgs::msg::OccupancyGrid::SharedPtr msg)
@@ -195,9 +205,10 @@ void ScanMatchInitializerNode::onGuess(
     publishStatus(MatchStatus::INVALID_INPUT, "guess pose is not finite");
     return;
   }
+  last_guess_ = *msg;
   if (!field_) {
     session_.reset();
-    publishStatus(MatchStatus::NO_MAP, map_error_);
+    fallbackToGuess(MatchStatus::NO_MAP, map_error_, nullptr);
     return;
   }
   if (session_) {
@@ -273,73 +284,121 @@ void ScanMatchInitializerNode::pollAmclState()
     });
 }
 
+std::string ScanMatchInitializerNode::sendInitialPose(
+  const geometry_msgs::msg::PoseWithCovarianceStamped & msg)
+{
+  const rclcpp::Time t_now = now();
+  if (!publish_initialpose_) {
+    return "dry run: publish_initialpose=false";
+  }
+  if (require_amcl_active_ &&
+    (!amcl_active_.value_or(false) || (t_now - amcl_state_time_).seconds() > amcl_state_max_age_))
+  {
+    return "AMCL lifecycle state is not active (or unknown)";
+  }
+  if (published_once_ && (t_now - last_publish_time_).seconds() < min_publish_interval_) {
+    return "rate limited (min_publish_interval)";
+  }
+  initialpose_pub_->publish(msg);
+  last_publish_time_ = t_now;
+  published_once_ = true;
+  return "";
+}
+
+void ScanMatchInitializerNode::fallbackToGuess(
+  MatchStatus status, const std::string & reason, const SessionResult * result)
+{
+  if (!fallback_forward_guess_ || !last_guess_ || status == MatchStatus::INVALID_INPUT) {
+    RCLCPP_WARN(get_logger(), "%s: %s (/initialpose not sent)", toString(status), reason.c_str());
+    publishStatus(status, reason, result);
+    return;
+  }
+  const std::string blocked = sendInitialPose(*last_guess_);
+  if (!blocked.empty()) {
+    RCLCPP_WARN(
+      get_logger(), "%s: %s; fallback not sent: %s", toString(status), reason.c_str(),
+      blocked.c_str());
+    publishStatus(status, reason + "; fallback not sent: " + blocked, result);
+    return;
+  }
+  const auto & p = last_guess_->pose.pose;
+  RCLCPP_WARN(
+    get_logger(), "%s: %s -> FALLBACK: forwarded user guess (%.3f, %.3f, %.1f deg) to /initialpose",
+    toString(status), reason.c_str(), p.position.x, p.position.y,
+    yawFromQuaternion(p.orientation.x, p.orientation.y, p.orientation.z, p.orientation.w) *
+    180.0 / M_PI);
+  publishStatus(status, reason + " -> fallback: user guess sent", result, "user_guess");
+}
+
 void ScanMatchInitializerNode::handleResult(const SessionResult & result)
 {
   session_.reset();
   const MatchResult & m = result.final_match;
   const bool has_pose = !result.matches.empty();
 
-  if (has_pose) {
-    geometry_msgs::msg::PoseWithCovarianceStamped cand;
-    cand.header.frame_id = global_frame_;
-    cand.header.stamp = rclcpp::Time(static_cast<int64_t>(result.stamp * 1e9), RCL_ROS_TIME);
-    cand.pose.pose.position.x = m.pose.x;
-    cand.pose.pose.position.y = m.pose.y;
-    cand.pose.pose.orientation.z = std::sin(m.pose.yaw / 2.0);
-    cand.pose.pose.orientation.w = std::cos(m.pose.yaw / 2.0);
-    // (x, y, yaw) -> chỉ số 6x6 (x=0, y=1, yaw=5).
-    const int idx[3] = {0, 1, 5};
+  if (!has_pose) {
+    fallbackToGuess(result.status, result.reason, &result);
+    return;
+  }
+
+  geometry_msgs::msg::PoseWithCovarianceStamped cand;
+  cand.header.frame_id = global_frame_;
+  cand.header.stamp = rclcpp::Time(static_cast<int64_t>(result.stamp * 1e9), RCL_ROS_TIME);
+  cand.pose.pose.position.x = m.pose.x;
+  cand.pose.pose.position.y = m.pose.y;
+  cand.pose.pose.orientation.z = std::sin(m.pose.yaw / 2.0);
+  cand.pose.pose.orientation.w = std::cos(m.pose.yaw / 2.0);
+  // (x, y, yaw) -> chỉ số 6x6 (x=0, y=1, yaw=5).
+  const int idx[3] = {0, 1, 5};
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      cand.pose.covariance[idx[i] * 6 + idx[j]] = m.covariance[i * 3 + j];
+    }
+  }
+  candidate_pub_->publish(cand);
+
+  const bool ambiguous_ok = result.status == MatchStatus::AMBIGUOUS && fallback_publish_ambiguous_;
+  if (!result.publish && !ambiguous_ok) {
+    fallbackToGuess(result.status, result.reason, &result);
+    return;
+  }
+
+  std::string sent = "csm_pose";
+  if (ambiguous_ok) {
+    // Nới covariance để 1 sigma bao cả đỉnh cạnh tranh: AMCL rải hạt trên cả hai giả thuyết.
+    const double d[3] = {m.second_pose.x - m.pose.x, m.second_pose.y - m.pose.y,
+      normalizeAngle(m.second_pose.yaw - m.pose.yaw)};
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
-        cand.pose.covariance[idx[i] * 6 + idx[j]] = m.covariance[i * 3 + j];
+        double & c = cand.pose.covariance[idx[i] * 6 + idx[j]];
+        c = (i == j) ? std::max(c, d[i] * d[i]) : 0.0;
       }
     }
-    candidate_pub_->publish(cand);
+    sent = "csm_pose_inflated";
+  }
 
-    if (result.publish) {
-      const rclcpp::Time t_now = now();
-      if (!publish_initialpose_) {
-        publishStatus(result.status, "dry run: publish_initialpose=false", &result);
-        return;
-      }
-      if (require_amcl_active_ &&
-        (!amcl_active_.value_or(false) ||
-        (t_now - amcl_state_time_).seconds() > amcl_state_max_age_))
-      {
-        publishStatus(
-          MatchStatus::AMCL_INACTIVE, "AMCL lifecycle state is not active (or unknown); "
-          "/initialpose not sent", &result);
-        return;
-      }
-      if (published_once_ && (t_now - last_publish_time_).seconds() < min_publish_interval_) {
-        publishStatus(
-          MatchStatus::REJECTED, "rate limited (min_publish_interval); /initialpose not sent",
-          &result);
-        return;
-      }
-      initialpose_pub_->publish(cand);
-      last_publish_time_ = t_now;
-      published_once_ = true;
-      RCLCPP_INFO(
-        get_logger(),
-        "ACCEPTED -> /initialpose (%.3f, %.3f, %.1f deg) | correction %.3f m, %.1f deg | "
-        "score %.3f (guess %.3f) | ambiguity %.2f",
-        m.pose.x, m.pose.y, m.pose.yaw * 180.0 / M_PI,
-        std::hypot(m.pose.x - m.guess.x, m.pose.y - m.guess.y),
-        normalizeAngle(m.pose.yaw - m.guess.yaw) * 180.0 / M_PI, m.score, m.guess_score,
-        m.ambiguity);
-    }
-  }
-  if (!result.publish) {
+  const std::string blocked = sendInitialPose(cand);
+  if (!blocked.empty()) {
     RCLCPP_WARN(
-      get_logger(), "%s: %s (/initialpose not sent)", toString(result.status),
-      result.reason.c_str());
+      get_logger(), "%s: %s; /initialpose not sent: %s", toString(result.status),
+      result.reason.c_str(), blocked.c_str());
+    publishStatus(result.status, result.reason + "; /initialpose not sent: " + blocked, &result);
+    return;
   }
-  publishStatus(result.status, result.reason, &result);
+  RCLCPP_INFO(
+    get_logger(),
+    "%s -> /initialpose %s (%.3f, %.3f, %.1f deg) | correction %.3f m, %.1f deg | "
+    "score %.3f (guess %.3f) | ambiguity %.2f",
+    toString(result.status), sent.c_str(), m.pose.x, m.pose.y, m.pose.yaw * 180.0 / M_PI,
+    std::hypot(m.pose.x - m.guess.x, m.pose.y - m.guess.y),
+    normalizeAngle(m.pose.yaw - m.guess.yaw) * 180.0 / M_PI, m.score, m.guess_score,
+    m.ambiguity);
+  publishStatus(result.status, result.reason, &result, sent);
 }
 
 void ScanMatchInitializerNode::publishStatus(
-  MatchStatus status, const std::string & reason, const SessionResult * result)
+  MatchStatus status, const std::string & reason, const SessionResult * result,
+  const std::string & sent)
 {
   DiagnosticStatus d;
   d.name = "scan_match_initializer";
@@ -365,6 +424,7 @@ void ScanMatchInitializerNode::publishStatus(
       return ss.str();
     };
   kv("reason", reason);
+  kv("sent", sent);  // none | csm_pose | csm_pose_inflated | user_guess
   if (result && !result->matches.empty()) {
     const auto & m = result->final_match;
     kv("guess_x", num(m.guess.x));
