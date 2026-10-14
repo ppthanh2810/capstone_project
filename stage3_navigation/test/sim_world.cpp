@@ -488,6 +488,14 @@ std::vector<Scenario> standardScenarios()
     s.path = polyline({{0, 0, 0}, {2, 0, 0}}, M_PI);
     add(s);
   }
+  {
+    Scenario s;   // lần chạy robot 2026-10-14: hướng 69.5°, đường A* 1.35 m về hướng -66° (lệch ~135°)
+    s.name = "turn_135";
+    const double yaw = std::atan2(-1.23, 0.55);
+    s.path = polyline({{0, 0, 0}, {0.55, -1.23, 0}}, yaw);
+    s.start.theta = yaw + 2.36;
+    add(s);
+  }
   return v;
 }
 

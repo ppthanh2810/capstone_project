@@ -43,7 +43,9 @@ ParamRefs refs(DwbParams & p)
     {"decel_lim_x", &p.decel_lim_x}, {"acc_lim_theta", &p.acc_lim_theta},
     {"decel_lim_theta", &p.decel_lim_theta}, {"sim_time", &p.sim_time},
     {"sim_granularity", &p.sim_granularity}, {"control_latency", &p.control_latency},
-    {"stopping_margin", &p.stopping_margin}, {"local_plan_length", &p.local_plan_length},
+    {"stopping_margin", &p.stopping_margin}, {"max_feedback_gap_x", &p.max_feedback_gap_x},
+    {"max_feedback_gap_theta", &p.max_feedback_gap_theta},
+    {"local_plan_length", &p.local_plan_length},
     {"carrot_distance", &p.carrot_distance},
     {"closest_search_distance", &p.closest_search_distance},
     {"max_path_deviation", &p.max_path_deviation},
@@ -65,7 +67,7 @@ ParamRefs refs(DwbParams & p)
     {"trajectory_marker_stride", &p.trajectory_marker_stride}};
   r.b = {{"unknown_is_obstacle", &p.unknown_is_obstacle},
     {"publish_trajectories", &p.publish_trajectories}};
-  r.s = {{"collision_check", &p.collision_check}};
+  r.s = {{"collision_check", &p.collision_check}, {"velocity_reference", &p.velocity_reference}};
   return r;
 }
 
@@ -306,7 +308,8 @@ geometry_msgs::msg::TwistStamped DwbController::computeVelocityCommands(
   const rclcpp::Time now = clock_->now();
 
   // Thời gian giữa hai lần gọi: chỉ để thống kê + chọn lệnh trước. KHÔNG dùng để nới dynamic window (khoảng
-  // trễ dài không được phép thành bước nhảy vận tốc lớn: cửa sổ luôn tính từ vận tốc ĐO được với dt danh nghĩa).
+  // trễ dài không được phép thành bước nhảy vận tốc lớn: cửa sổ dùng dt danh nghĩa; gốc = lệnh trước kẹp quanh
+  // vận tốc đo, hoặc vận tốc đo nếu lệnh trước không còn đại diện — xem referenceVelocity).
   if (have_last_compute_) {
     const double gap = std::chrono::duration<double>(t_start - last_compute_).count();
     if (gap > 1.5 * dt) {
@@ -714,6 +717,11 @@ void DwbController::publishState(
     kv("v_cmd", fmt(out->cmd.v, 4));
     kv("w_cmd", fmt(out->cmd.w, 4));
     kv("dist_to_goal", fmt(out->dist_to_goal, 3));
+    kv("v_meas", fmt(out->measured.v, 4));
+    kv("w_meas", fmt(out->measured.w, 4));
+    kv("v_ref", fmt(out->reference.v, 4));
+    kv("w_ref", fmt(out->reference.w, 4));
+    kv("heading_error", fmt(out->heading_error, 4));
     kv("n_candidates", std::to_string(out->n_candidates));
     kv("n_valid", std::to_string(out->n_valid));
     kv("n_forward_valid", std::to_string(out->n_forward_valid));

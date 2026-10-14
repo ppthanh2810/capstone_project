@@ -103,7 +103,9 @@ std::string validateParams(const DwbParams & p)
     {"decel_lim_x", p.decel_lim_x}, {"acc_lim_theta", p.acc_lim_theta},
     {"decel_lim_theta", p.decel_lim_theta}, {"sim_time", p.sim_time},
     {"sim_granularity", p.sim_granularity}, {"control_latency", p.control_latency},
-    {"stopping_margin", p.stopping_margin}, {"local_plan_length", p.local_plan_length},
+    {"stopping_margin", p.stopping_margin}, {"max_feedback_gap_x", p.max_feedback_gap_x},
+    {"max_feedback_gap_theta", p.max_feedback_gap_theta},
+    {"local_plan_length", p.local_plan_length},
     {"carrot_distance", p.carrot_distance}, {"closest_search_distance", p.closest_search_distance},
     {"max_path_deviation", p.max_path_deviation},
     {"rotate_to_heading_angle", p.rotate_to_heading_angle}, {"rotate_gain", p.rotate_gain},
@@ -162,6 +164,14 @@ std::string validateParams(const DwbParams & p)
   }
   if (p.stopping_margin < 0.0 || p.stopping_margin > 0.5) {
     return "need 0 <= stopping_margin <= 0.5 m";
+  }
+  if (p.velocity_reference != "command" && p.velocity_reference != "measured") {
+    return "velocity_reference must be one of: command, measured";
+  }
+  if (!(p.max_feedback_gap_x > 0.0 && p.max_feedback_gap_x <= 1.0) ||
+    !(p.max_feedback_gap_theta > 0.0 && p.max_feedback_gap_theta <= 3.0))
+  {
+    return "need 0 < max_feedback_gap_x <= 1.0 m/s and 0 < max_feedback_gap_theta <= 3.0 rad/s";
   }
   if (!(p.local_plan_length > 0.0) || !(p.carrot_distance > 0.0) ||
     p.carrot_distance > p.local_plan_length || !(p.closest_search_distance > 0.0) ||
@@ -269,6 +279,24 @@ DynamicWindow computeWindow(
     dw.w = Range{w, w};
   }
   return dw;
+}
+
+Velocity2D referenceVelocity(const DwbParams & p, const ControlInput & in)
+{
+  // Với phản hồi trễ τ (driver ramp + lọc odometry), cửa sổ tính từ vận tốc ĐO chỉ cho lệnh nhích acc·dt mỗi τ
+  // -> gia tốc/phanh thực ~acc·dt/τ (log robot 2026-10-14: ~0.12 rad/s² thay vì 1.0, xoay lố ~0.95 rad).
+  // Tính từ lệnh trước thì lệnh đổi đúng acc/decel_lim. Kẹp quanh vận tốc đo: khi robot không theo lệnh
+  // (PS4 chiếm twist_mux, bánh kẹt) gốc không trôi xa thực tế.
+  if (p.velocity_reference == "measured") {
+    return in.velocity;
+  }
+  return Velocity2D{
+    std::clamp(
+      in.prev_cmd.v, in.velocity.v - p.max_feedback_gap_x,
+      in.velocity.v + p.max_feedback_gap_x),
+    std::clamp(
+      in.prev_cmd.w, in.velocity.w - p.max_feedback_gap_theta,
+      in.velocity.w + p.max_feedback_gap_theta)};
 }
 
 std::vector<double> sampleAxis(double lo, double hi, int n)
@@ -758,9 +786,20 @@ ControlOutput DwaCore::rotate(
     dir = rotate_dir_;
   }
   rotate_dir_ = dir;
-  double mag = std::min(p.rotate_gain * std::fabs(error), p.max_vel_theta);
-  mag = std::clamp(mag, p.min_in_place_vel_theta, p.max_vel_theta);
-  const double w = stepToward(in.velocity.w, dir * mag, p.acc_lim_theta, p.decel_lim_theta, in.dt);
+  out.heading_error = error;
+  // Góc còn lại sau phần quay đã "trong đường ống" (lệnh trước còn hiệu lực thêm control_latency), rồi giới
+  // hạn ω để phanh kịp với decel_lim_theta: ω <= sqrt(2·decel·còn lại). Không có giới hạn này robot thoát pha
+  // xoay ở max_vel_theta và quay lố qua đích.
+  const double ref_w = out.reference.w;
+  const double remaining =
+    std::fabs(error) - std::max(0.0, dir * ref_w) * (p.control_latency + 0.5 * in.dt);
+  double mag = 0.0;
+  if (remaining > 0.0) {
+    mag = std::min(
+      {p.rotate_gain * remaining, std::sqrt(2.0 * p.decel_lim_theta * remaining), p.max_vel_theta});
+    mag = std::max(mag, p.min_in_place_vel_theta);
+  }
+  const double w = stepToward(ref_w, dir * mag, p.acc_lim_theta, p.decel_lim_theta, in.dt);
   return checkedCommand(p, in, cm, w, phase, std::move(out));
 }
 
@@ -770,7 +809,7 @@ ControlOutput DwaCore::checkedCommand(
 {
   // Tịnh tiến giảm dần về 0 theo decel_lim_x; không vượt max (speed limit) theo chính sách overspeed.
   const double v = std::clamp(
-    stepToward(in.velocity.v, 0.0, p.acc_lim_x, p.decel_lim_x, in.dt), 0.0, in.max_vel_x_eff);
+    stepToward(out.reference.v, 0.0, p.acc_lim_x, p.decel_lim_x, in.dt), 0.0, in.max_vel_x_eff);
 
   // Lệnh xoay / giữ ở đích vẫn có thể còn v > 0 (đang giảm tốc) -> kiểm tra như một chuyển động cong thật:
   // trễ + một chu kỳ + đuôi phanh. Chỉ kiểm tra ô tâm hiện tại là KHÔNG đủ.
@@ -806,6 +845,8 @@ ControlOutput DwaCore::compute(
   ControlOutput out;
   out.dist_to_goal = std::hypot(in.goal.x - in.robot.x, in.goal.y - in.robot.y);
   out.carrot = in.goal;
+  out.measured = in.velocity;
+  out.reference = referenceVelocity(p, in);
 
   // (0) Pose hiện tại phải hợp lệ trên costmap: nếu không, không có chuyển động nào được coi là an toàn.
   unsigned char c0 = 0;
@@ -846,7 +887,7 @@ ControlOutput DwaCore::compute(
     if (out.dist_to_goal <= xy_enter) {
       // Đúng vị trí + hướng: giảm (v, ω) về 0 theo giới hạn (vẫn kiểm tra va chạm vì v có thể còn > 0);
       // GoalChecker của controller_server kết thúc action.
-      const double w = stepToward(in.velocity.w, 0.0, p.acc_lim_theta, p.decel_lim_theta, in.dt);
+      const double w = stepToward(out.reference.w, 0.0, p.acc_lim_theta, p.decel_lim_theta, in.dt);
       return checkedCommand(p, in, cm, w, Phase::ROTATE_TO_GOAL, out);
     }
     goal_latched_ = false;   // đúng hướng nhưng trôi ra khỏi ngưỡng vào: tiếp cận lại
@@ -872,7 +913,7 @@ ControlOutput DwaCore::compute(
   rotate_dir_ = 0;
 
   // (3) FOLLOW_PATH: dynamic window -> lấy mẫu -> mô phỏng -> loại cứng -> chấm điểm mềm.
-  out.window = computeWindow(p, in.max_vel_x_eff, in.velocity, in.dt);
+  out.window = computeWindow(p, in.max_vel_x_eff, out.reference, in.dt);
   const std::vector<double> vs = sampleAxis(out.window.v.lo, out.window.v.hi, p.vx_samples);
   const std::vector<double> ws = sampleAxis(out.window.w.lo, out.window.w.hi, p.vtheta_samples);
   const double half_cell = 0.5 * cm.resolution();

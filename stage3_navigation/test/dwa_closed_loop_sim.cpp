@@ -3,7 +3,7 @@
 // =====================================================================================================
 //
 //   ros2 run stage3_navigation dwa_closed_loop_sim --out <dir> [--runs 5] [--scenarios a,b]
-//        [--robot nominal|sluggish] [--set key=value ...] [--trace]
+//        [--robot nominal|sluggish|laggy] [--set key=value ...] [--trace]
 //
 // Ghi: <dir>/runs.csv (mỗi lần chạy một dòng), <dir>/summary.json, <dir>/params.yaml (tham số đã dùng),
 // <dir>/traces/<scenario>_<seed>.csv (khi --trace). Mô hình + giới hạn: test/sim_world.hpp.
@@ -50,11 +50,17 @@ bool setParam(DwbParams & p, const std::string & kv)
     {"carrot_distance_scale", &p.carrot_distance_scale}, {"heading_scale", &p.heading_scale},
     {"obstacle_scale", &p.obstacle_scale}, {"speed_scale", &p.speed_scale},
     {"oscillation_scale", &p.oscillation_scale}, {"carrot_distance", &p.carrot_distance},
-    {"rotate_to_heading_angle", &p.rotate_to_heading_angle}};
+    {"rotate_to_heading_angle", &p.rotate_to_heading_angle},
+    {"max_feedback_gap_x", &p.max_feedback_gap_x},
+    {"max_feedback_gap_theta", &p.max_feedback_gap_theta}};
   std::map<std::string, int *> i{{"vx_samples", &p.vx_samples},
     {"vtheta_samples", &p.vtheta_samples}};
   if (d.count(k)) {
     *d[k] = std::stod(v);
+    return true;
+  }
+  if (k == "velocity_reference") {
+    p.velocity_reference = v;
     return true;
   }
   if (i.count(k)) {
@@ -109,7 +115,8 @@ int main(int argc, char ** argv)
     } else if (s == "--trace") {
       trace = true;
     } else {
-      std::cerr << "usage: dwa_closed_loop_sim --out DIR [--runs N] [--robot nominal|sluggish] "
+      std::cerr <<
+        "usage: dwa_closed_loop_sim --out DIR [--runs N] [--robot nominal|sluggish|laggy] "
         "[--scenarios a,b] [--set key=value] [--trace]\n";
       return 2;
     }
@@ -125,6 +132,11 @@ int main(int argc, char ** argv)
     robot.acc_x = robot.decel_x = 0.3;
     robot.acc_theta = robot.decel_theta = 0.6;
     robot.latency = 0.2;
+    robot.odom_vel_noise = 0.005;
+  } else if (robot_name == "laggy") {
+    // Trễ lệnh -> bánh ~0.7 s như ước lượng từ log robot 2026-10-14 (ω tăng ~0.12 rad/s² khi cửa sổ tính từ
+    // vận tốc đo). Gia tốc giữ như giả định.
+    robot.latency = 0.7;
     robot.odom_vel_noise = 0.005;
   } else if (robot_name == "nominal") {
     robot.odom_vel_noise = 0.002;

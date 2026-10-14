@@ -84,6 +84,9 @@ public:
     declare_parameter<double>("follow_timeout", 120.0);
     declare_parameter<bool>("require_localized", true);
     declare_parameter<double>("localization_status_timeout", 2.0);
+    // Đang bám đường: WARN (UNCERTAIN / INITIALIZING) chỉ hủy khi kéo dài liên tục quá mức này;
+    // ERROR (LOST) và status cũ vẫn hủy ngay. Bắt đầu bám đường vẫn đòi OK.
+    declare_parameter<double>("localization_uncertain_grace", 2.0);
     const auto status_topic =
       declare_parameter<std::string>("localization_status_topic", "/localization/status");
 
@@ -117,6 +120,11 @@ public:
       [this](DiagnosticStatus::ConstSharedPtr msg) {
         loc_status_ = msg;
         loc_status_time_ = now();
+        if (msg->level != DiagnosticStatus::WARN) {
+          loc_warn_since_.reset();
+        } else if (!loc_warn_since_) {
+          loc_warn_since_ = loc_status_time_;
+        }
       });
 
     goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -426,6 +434,24 @@ private:
     }
     std::string reason;
     if (!localizationOk(reason)) {
+      // Robot 2026-10-14: scan-to-map consistency tụt dưới ngưỡng 0.5-1 s khi đang quay/đi rồi về LOCALIZED;
+      // hủy ngay làm 6/8 lượt FollowPath dừng giữa đường. WARN ngắn được bỏ qua, LOST / status cũ thì không.
+      const double grace = get_parameter("localization_uncertain_grace").as_double();
+      const bool fresh = loc_status_ &&
+        (now() - loc_status_time_).seconds() <=
+        get_parameter("localization_status_timeout").as_double();
+      if (fresh && loc_status_->level == DiagnosticStatus::WARN && loc_warn_since_) {
+        const double warn_for = (now() - *loc_warn_since_).seconds();
+        if (warn_for <= grace) {
+          RCLCPP_WARN_THROTTLE(
+            get_logger(), *get_clock(), 1000,
+            "following despite %s (%.1f s <= localization_uncertain_grace %.1f s)",
+            reason.c_str(), warn_for, grace);
+          return;
+        }
+        reason += " for " + fmt1(warn_for) + " s (> localization_uncertain_grace " + fmt1(grace) +
+          " s)";
+      }
       cancelFollow(reason);
     }
   }
@@ -565,6 +591,7 @@ private:
   FollowHandle::SharedPtr follow_handle_;
   DiagnosticStatus::ConstSharedPtr loc_status_;
   rclcpp::Time loc_status_time_;
+  std::optional<rclcpp::Time> loc_warn_since_;   // đầu chuỗi WARN liên tục hiện tại
 
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;

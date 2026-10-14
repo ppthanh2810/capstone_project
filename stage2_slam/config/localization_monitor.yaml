@@ -27,7 +27,7 @@ localization_monitor:
     std_xy_lost: 1.0
     std_yaw_warn: 0.17
     std_yaw_lost: 0.5
-    consistency_warn: 0.55
+    consistency_warn: 0.45          # 0.55 -> 0.45 (2026-10-14): robot dao động 0.46-0.535 khi quay/đi rồi hồi lại
     consistency_lost: 0.30
     consistency_lost_count: 5
     jump_linear_warn: 0.30

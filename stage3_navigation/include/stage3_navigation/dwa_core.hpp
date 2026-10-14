@@ -79,6 +79,13 @@ struct DwbParams
   double control_latency{0.1};          // s, trễ lệnh -> bánh (SYNTHETIC, chưa đo trên robot)
   double stopping_margin{0.05};         // m, khoảng trống thêm phía trước sau khi phanh dừng hẳn
 
+  // ---- Vận tốc gốc của dynamic window (xem referenceVelocity) ----
+  // "command": tính từ lệnh trước, kẹp trong ± max_feedback_gap_* quanh vận tốc đo (mặc định).
+  // "measured": tính từ vận tốc đo (hành vi cũ; với phản hồi trễ τ, gia tốc thực chỉ còn ~acc·dt/τ -> xoay lố).
+  std::string velocity_reference{"command"};
+  double max_feedback_gap_x{0.15};      // m/s
+  double max_feedback_gap_theta{0.5};   // rad/s
+
   // ---- Đường cục bộ + cà rốt ----
   double local_plan_length{1.5};        // m
   double carrot_distance{0.6};          // m
@@ -337,6 +344,10 @@ struct ControlInput
   double now_s{0.0};
 };
 
+// Vận tốc gốc cho dynamic window và các bước acc/decel của pha xoay/dừng (xem velocity_reference).
+// Mô phỏng quỹ đạo vẫn bắt đầu từ vận tốc ĐO (an toàn không phụ thuộc lựa chọn này).
+Velocity2D referenceVelocity(const DwbParams & p, const ControlInput & in);
+
 struct ControlOutput
 {
   bool ok{false};
@@ -353,6 +364,9 @@ struct ControlOutput
   int n_forward_valid{0};               // ứng viên hợp lệ có v > 0 (0 = chỉ còn đứng yên/xoay: chờ, không tiến)
   int n_reject[5]{0, 0, 0, 0, 0};       // theo Reject
   double dist_to_goal{0.0};
+  Velocity2D measured;                  // in.velocity (chẩn đoán)
+  Velocity2D reference;                 // referenceVelocity() (chẩn đoán)
+  double heading_error{0.0};            // rad, sai số của pha xoay (0 khi FOLLOW_PATH)
 };
 
 class DwaCore

@@ -114,6 +114,9 @@ goal_path_bridge:
     require_localized: true
     localization_status_topic: /localization/status
     localization_status_timeout: 2.0   # s (monitor publish 2 Hz)
+    # Đang bám đường: UNCERTAIN/INITIALIZING liên tục <= mức này được bỏ qua (LOST, status cũ -> hủy ngay).
+    # Robot 2026-10-14: UNCERTAIN chập chờn 0.5-1 s khi quay/đi làm 6/8 lượt bị hủy. Bắt đầu vẫn đòi LOCALIZED.
+    localization_uncertain_grace: 2.0  # s
 
 # ============================================================================================
 # Stage 3.2 — DWB local controller (chỉ chạy trong navigation.launch.py)
@@ -238,8 +241,18 @@ controller_server:
       # ---- Mô hình an toàn (quỹ đạo phải phanh dừng được trước vật cản) ----
       # Mỗi ứng viên được mô phỏng: [0, latency) theo lệnh trước -> chuyển tiếp có giới hạn gia tốc -> giữ lệnh;
       # cộng đuôi phanh từ latency + dt (decel_lim_x / decel_lim_theta) + stopping_margin phía trước.
-      control_latency: 0.1         # s, trễ lệnh -> bánh. SYNTHETIC (chưa đo): cần đo trên robot
+      control_latency: 0.2         # s, trễ lệnh -> /odometry/filtered ĐO trên robot 2026-10-14 (bag rot_debug,
+                                   # scripts/analyze_cmd_lag.py, driver accel/decel 200 ms; một lượt xoay)
       stopping_margin: 0.05        # m, biên bất định thêm sau khi dừng hẳn
+      # ---- Gốc của dynamic window ----
+      # command: cửa sổ + bước acc/decel tính từ LỆNH TRƯỚC, kẹp trong ± max_feedback_gap_* quanh vận tốc đo.
+      # measured: tính từ vận tốc đo (hành vi cũ). Robot 2026-10-14: phản hồi trễ ~0.7-0.8 s -> gia tốc/phanh
+      # góc thực ~0.12 rad/s² -> xoay lố ~50° -> ROTATE_TO_PATH lại -> "Failed to make progress".
+      # Mô phỏng (robot laggy, trễ 0.7 s): measured 17 lần chạy sai kỳ vọng, command 0. Mô phỏng quỹ đạo vẫn
+      # bắt đầu từ vận tốc đo. Pha xoay giới hạn ω <= sqrt(2·decel_lim_theta·góc còn lại sau control_latency).
+      velocity_reference: "command"
+      max_feedback_gap_x: 0.15     # m/s, |gốc - v đo| tối đa (PS4 chiếm twist_mux / bánh kẹt -> bám vận tốc đo)
+      max_feedback_gap_theta: 0.5  # rad/s
       # ---- Đường cục bộ + cà rốt ----
       local_plan_length: 1.5       # m đường A* phía trước được xét (còn bị cắt ở mép local costmap)
       carrot_distance: 0.6         # m, điểm dẫn hướng dọc đường A*

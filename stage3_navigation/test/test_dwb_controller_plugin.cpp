@@ -357,6 +357,10 @@ TEST_F(PluginFixture, SpeedLimitHumbleContract)
   ctrl_->setSpeedLimit(-1.0, false);   // không hợp lệ: bỏ qua, giữ 50 %
   EXPECT_LE(v_at(), 0.075 + 1e-9);
   ctrl_->setSpeedLimit(nav2_costmap_2d::NO_SPEED_LIMIT, true);   // 0.0 = BỎ giới hạn (không phải dừng)
+  // Gốc dynamic window = lệnh trước (0.075): tăng lại theo acc_lim_x (0.5 m/s² x 0.1 s), không nhảy.
+  const double v1 = v_at();
+  EXPECT_GT(v1, 0.075);
+  EXPECT_LE(v1, 0.075 + 0.05 + 1e-9);
   EXPECT_NEAR(v_at(), 0.15, 1e-9);
 }
 

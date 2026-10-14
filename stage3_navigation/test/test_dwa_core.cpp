@@ -636,7 +636,8 @@ INSTANTIATE_TEST_SUITE_P(
   ::testing::Values(
     "straight", "l_turn", "s_curve", "self_intersect", "duplicates", "single_pose", "goal_near",
     "corridor_ok", "corridor_narrow", "obstacle_bypass", "blocked_wall", "obstacle_near_path",
-    "symmetric_obstacle", "start_backwards", "overspeed_start", "overspeed_wall", "goal_yaw_pi"));
+    "symmetric_obstacle", "start_backwards", "overspeed_start", "overspeed_wall", "goal_yaw_pi",
+    "turn_135"));
 
 TEST(ClosedLoopExtra, SluggishRobotStillDoesNotCollide)
 {
@@ -651,5 +652,60 @@ TEST(ClosedLoopExtra, SluggishRobotStillDoesNotCollide)
   {
     const sim::RunMetrics m = sim::runScenario(p, sim::findScenario(name), robot, 7);
     EXPECT_EQ(m.collisions, 0) << name << " " << m.result << " clearance " << m.min_clearance;
+  }
+}
+
+namespace
+{
+// Số lần quay lại ROTATE_TO_PATH sau khi đã thoát pha xoay (= xoay lố qua ngưỡng vào).
+int rotateReentries(const std::vector<sim::TraceRow> & trace)
+{
+  int n = 0;
+  bool left_rotation = false;
+  for (std::size_t k = 1; k < trace.size(); ++k) {
+    if (trace[k - 1].phase == "ROTATE_TO_PATH" && trace[k].phase != "ROTATE_TO_PATH") {
+      left_rotation = true;
+    } else if (left_rotation && trace[k].phase == "ROTATE_TO_PATH" &&
+      trace[k - 1].phase != "ROTATE_TO_PATH")
+    {
+      ++n;
+    }
+  }
+  return n;
+}
+}  // namespace
+
+TEST(ClosedLoopExtra, LaggyRobotTurnsWithoutOvershoot)
+{
+  // Tái hiện log robot 2026-10-14: lệch ~135°, trễ lệnh -> bánh ~0.7 s. Cửa sổ tính từ vận tốc ĐO: gia tốc thực
+  // ~acc·dt/τ, xoay lố > rotate_to_heading_angle, quay lại ROTATE_TO_PATH, progress checker abort.
+  sim::RobotModel robot;
+  robot.latency = 0.7;
+  robot.odom_vel_noise = 0.002;
+  const sim::Scenario sc = sim::findScenario("turn_135");
+
+  DwbParams old_p;
+  old_p.velocity_reference = "measured";
+  std::vector<sim::TraceRow> old_trace;
+  const sim::RunMetrics old_m =
+    sim::runScenario(old_p, sc, robot, 1, sim::CostmapSpec{}, &old_trace);
+  EXPECT_GE(
+    rotateReentries(old_trace),
+    1) << "old behaviour no longer reproduced: " << old_m.result;
+
+  for (const double latency : {0.1, 0.7}) {   // controller giả định sai (0.1) và đúng (0.7)
+    DwbParams p;
+    p.control_latency = latency;
+    for (std::uint32_t seed = 1; seed <= 3; ++seed) {
+      std::vector<sim::TraceRow> trace;
+      const sim::RunMetrics m = sim::runScenario(p, sc, robot, seed, sim::CostmapSpec{}, &trace);
+      SCOPED_TRACE(
+        "control_latency " + std::to_string(latency) + " seed " + std::to_string(seed) + ": " +
+        m.result);
+      EXPECT_TRUE(m.success);
+      EXPECT_EQ(m.collisions, 0);
+      EXPECT_EQ(m.limit_violations, 0);
+      EXPECT_EQ(rotateReentries(trace), 0);
+    }
   }
 }

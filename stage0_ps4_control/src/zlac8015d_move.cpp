@@ -4,6 +4,7 @@
 #include <exception>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 
 #include "geometry_msgs/msg/twist.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -21,10 +22,18 @@ public:
   {
     wheel_radius_ = declare_parameter<double>("wheel_radius", 0.0535);
     wheel_distance_ = declare_parameter<double>("wheel_distance", 0.34);
+    // Thời gian tăng/giảm tốc của driver (thanh ghi 0x2080..0x2083, ms). Trước 2026-10-14 cố định 500 ms;
+    // log robot cho thấy phản hồi vận tốc trễ ~0.7-0.8 s khi DWB điều khiển -> giảm còn 200 ms.
+    // Áp dụng cho cả teleop PS4. NOT_VERIFIED trên robot (độ giật / trượt bánh).
+    const int accel_time_ms = static_cast<int>(declare_parameter<int>("accel_time_ms", 200));
+    const int decel_time_ms = static_cast<int>(declare_parameter<int>("decel_time_ms", 200));
+    if (accel_time_ms < 50 || accel_time_ms > 2000 || decel_time_ms < 50 || decel_time_ms > 2000) {
+      throw std::invalid_argument("accel_time_ms and decel_time_ms must be in [50, 2000] ms");
+    }
 
     motors_.disableMotor();
-    motors_.setAccelTime(500, 500);
-    motors_.setDecelTime(500, 500);
+    motors_.setAccelTime(accel_time_ms, accel_time_ms);
+    motors_.setDecelTime(decel_time_ms, decel_time_ms);
     motors_.setMode(3);
     motors_.setRpm(0, 0);
     motors_.enableMotor();
@@ -40,7 +49,9 @@ public:
 
     last_command_time_ = now();
 
-    RCLCPP_INFO(get_logger(), "zlac8015d_move started");
+    RCLCPP_INFO(
+      get_logger(), "zlac8015d_move started | accel %d ms, decel %d ms", accel_time_ms,
+      decel_time_ms);
   }
 
   ~zlac8015d_move()
