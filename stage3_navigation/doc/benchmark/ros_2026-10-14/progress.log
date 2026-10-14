@@ -1,0 +1,218 @@
+[1/180] straight custom #1: succeeded clr=inf ok=True
+[2/180] straight custom #2: succeeded clr=inf ok=True
+[3/180] straight custom #3: succeeded clr=inf ok=True
+[4/180] straight custom #0: succeeded clr=inf ok=True
+[5/180] straight custom #4: succeeded clr=inf ok=True
+[6/180] straight nav2_dwb #0: succeeded clr=inf ok=True
+[7/180] straight nav2_dwb #2: succeeded clr=inf ok=True
+[8/180] straight nav2_dwb #1: succeeded clr=inf ok=True
+[9/180] straight nav2_dwb #3: succeeded clr=inf ok=True
+[10/180] straight nav2_dwb #4: succeeded clr=inf ok=True
+[11/180] straight nav2_dwb_la #0: succeeded clr=inf ok=True
+[12/180] straight nav2_dwb_la #1: succeeded clr=inf ok=True
+[13/180] straight nav2_dwb_la #2: succeeded clr=inf ok=True
+[14/180] straight nav2_dwb_la #3: succeeded clr=inf ok=True
+[15/180] straight nav2_dwb_la #4: succeeded clr=inf ok=True
+[16/180] l_turn custom #0: succeeded clr=inf ok=True
+[17/180] l_turn custom #1: succeeded clr=inf ok=True
+[18/180] l_turn custom #2: succeeded clr=inf ok=True
+[19/180] l_turn custom #3: succeeded clr=inf ok=True
+[20/180] l_turn custom #4: succeeded clr=inf ok=True
+[21/180] l_turn nav2_dwb #0: succeeded clr=inf ok=True
+[22/180] l_turn nav2_dwb #1: succeeded clr=inf ok=True
+[23/180] l_turn nav2_dwb #2: succeeded clr=inf ok=True
+[24/180] l_turn nav2_dwb #3: succeeded clr=inf ok=True
+[25/180] l_turn nav2_dwb #4: succeeded clr=inf ok=True
+[26/180] l_turn nav2_dwb_la #0: succeeded clr=inf ok=True
+[27/180] l_turn nav2_dwb_la #1: succeeded clr=inf ok=True
+[28/180] l_turn nav2_dwb_la #2: succeeded clr=inf ok=True
+[29/180] l_turn nav2_dwb_la #3: succeeded clr=inf ok=True
+[30/180] l_turn nav2_dwb_la #4: succeeded clr=inf ok=True
+[31/180] s_curve custom #0: succeeded clr=inf ok=True
+[32/180] s_curve custom #1: succeeded clr=inf ok=True
+[33/180] s_curve custom #2: succeeded clr=inf ok=True
+[34/180] s_curve custom #3: succeeded clr=inf ok=True
+[35/180] s_curve custom #4: succeeded clr=inf ok=True
+[36/180] s_curve nav2_dwb #0: succeeded clr=inf ok=True
+[37/180] s_curve nav2_dwb #1: succeeded clr=inf ok=True
+[38/180] s_curve nav2_dwb #2: succeeded clr=inf ok=True
+[39/180] s_curve nav2_dwb #3: succeeded clr=inf ok=True
+[40/180] s_curve nav2_dwb #4: succeeded clr=inf ok=True
+[41/180] s_curve nav2_dwb_la #0: succeeded clr=inf ok=True
+[42/180] s_curve nav2_dwb_la #1: succeeded clr=inf ok=True
+[43/180] s_curve nav2_dwb_la #2: succeeded clr=inf ok=True
+[44/180] s_curve nav2_dwb_la #3: succeeded clr=inf ok=True
+[45/180] corridor_ok custom #0: succeeded clr=0.3 ok=True
+[46/180] s_curve nav2_dwb_la #4: succeeded clr=inf ok=True
+[47/180] corridor_ok custom #1: succeeded clr=0.3 ok=True
+[48/180] corridor_ok custom #2: succeeded clr=0.2995 ok=True
+[49/180] corridor_ok custom #3: succeeded clr=0.2976 ok=True
+[50/180] corridor_ok custom #4: succeeded clr=0.3 ok=True
+[51/180] corridor_ok nav2_dwb #0: succeeded clr=0.3 ok=True
+[52/180] corridor_ok nav2_dwb #1: succeeded clr=0.3 ok=True
+[53/180] corridor_ok nav2_dwb #2: succeeded clr=0.3 ok=True
+[54/180] corridor_ok nav2_dwb #3: succeeded clr=0.3 ok=True
+[55/180] corridor_ok nav2_dwb #4: succeeded clr=0.2915 ok=True
+[56/180] corridor_ok nav2_dwb_la #0: succeeded clr=0.3 ok=True
+[57/180] corridor_ok nav2_dwb_la #1: succeeded clr=0.3 ok=True
+[58/180] corridor_ok nav2_dwb_la #3: succeeded clr=0.2952 ok=True
+[59/180] corridor_ok nav2_dwb_la #2: succeeded clr=0.3 ok=True
+[60/180] corridor_ok nav2_dwb_la #4: succeeded clr=0.3 ok=True
+[61/180] obstacle_near_path custom #0: succeeded clr=0.1602 ok=True
+[62/180] obstacle_near_path custom #1: succeeded clr=0.1602 ok=True
+[63/180] obstacle_near_path custom #2: succeeded clr=0.1601 ok=True
+[64/180] obstacle_near_path custom #3: succeeded clr=0.1603 ok=True
+[65/180] obstacle_near_path custom #4: succeeded clr=0.1602 ok=True
+[66/180] obstacle_near_path nav2_dwb #0: succeeded clr=0.16 ok=True
+[67/180] obstacle_near_path nav2_dwb #1: succeeded clr=0.1565 ok=True
+[68/180] obstacle_near_path nav2_dwb #2: succeeded clr=0.1572 ok=True
+[69/180] obstacle_near_path nav2_dwb #3: succeeded clr=0.16 ok=True
+[70/180] obstacle_near_path nav2_dwb #4: succeeded clr=0.16 ok=True
+[71/180] obstacle_near_path nav2_dwb_la #0: succeeded clr=0.1588 ok=True
+[72/180] obstacle_near_path nav2_dwb_la #1: succeeded clr=0.1588 ok=True
+[73/180] obstacle_near_path nav2_dwb_la #2: succeeded clr=0.159 ok=True
+[74/180] obstacle_near_path nav2_dwb_la #4: aborted clr=0.2472 ok=False
+[75/180] obstacle_near_path nav2_dwb_la #3: succeeded clr=0.1595 ok=True
+[76/180] blocked_wall custom #0: aborted clr=0.0994 ok=True
+[77/180] blocked_wall custom #2: aborted clr=0.0994 ok=True
+[78/180] blocked_wall custom #1: aborted clr=0.0995 ok=True
+[79/180] blocked_wall custom #3: aborted clr=0.0996 ok=True
+[80/180] blocked_wall custom #4: aborted clr=0.1 ok=True
+[81/180] blocked_wall nav2_dwb #0: aborted clr=0.0473 ok=True
+[82/180] blocked_wall nav2_dwb #1: aborted clr=0.0473 ok=True
+[83/180] blocked_wall nav2_dwb #2: aborted clr=0.0468 ok=True
+[84/180] blocked_wall nav2_dwb #3: aborted clr=0.0987 ok=True
+[85/180] blocked_wall nav2_dwb #4: aborted clr=0.0985 ok=True
+[86/180] blocked_wall nav2_dwb_la #0: aborted clr=0.0996 ok=True
+[87/180] blocked_wall nav2_dwb_la #2: aborted clr=0.2631 ok=True
+[88/180] blocked_wall nav2_dwb_la #1: aborted clr=0.0994 ok=True
+[89/180] blocked_wall nav2_dwb_la #3: aborted clr=0.0994 ok=True
+[90/180] start_backwards custom #0: succeeded clr=inf ok=True
+[91/180] start_backwards custom #1: succeeded clr=inf ok=True
+[92/180] blocked_wall nav2_dwb_la #4: aborted clr=0.0996 ok=True
+[93/180] start_backwards custom #2: succeeded clr=inf ok=True
+[94/180] start_backwards custom #3: succeeded clr=inf ok=True
+[95/180] start_backwards custom #4: succeeded clr=inf ok=True
+[96/180] start_backwards nav2_dwb #0: succeeded clr=inf ok=True
+[97/180] start_backwards nav2_dwb #1: succeeded clr=inf ok=True
+[98/180] start_backwards nav2_dwb #2: succeeded clr=inf ok=True
+[99/180] start_backwards nav2_dwb #3: succeeded clr=inf ok=True
+[100/180] start_backwards nav2_dwb #4: succeeded clr=inf ok=True
+[101/180] start_backwards nav2_dwb_la #0: aborted clr=inf ok=False
+[102/180] start_backwards nav2_dwb_la #1: aborted clr=inf ok=False
+[103/180] start_backwards nav2_dwb_la #2: aborted clr=inf ok=False
+[104/180] start_backwards nav2_dwb_la #3: aborted clr=inf ok=False
+[105/180] start_backwards nav2_dwb_la #4: aborted clr=inf ok=False
+[106/180] goal_yaw_pi custom #0: succeeded clr=inf ok=True
+[107/180] goal_yaw_pi custom #1: succeeded clr=inf ok=True
+[108/180] goal_yaw_pi custom #2: succeeded clr=inf ok=True
+[109/180] goal_yaw_pi custom #3: succeeded clr=inf ok=True
+[110/180] goal_yaw_pi custom #4: succeeded clr=inf ok=True
+[111/180] goal_yaw_pi nav2_dwb #0: succeeded clr=inf ok=True
+[112/180] goal_yaw_pi nav2_dwb #1: succeeded clr=inf ok=True
+[113/180] goal_yaw_pi nav2_dwb #2: succeeded clr=inf ok=True
+[114/180] goal_yaw_pi nav2_dwb #3: succeeded clr=inf ok=True
+[115/180] goal_yaw_pi nav2_dwb #4: succeeded clr=inf ok=True
+[116/180] goal_yaw_pi nav2_dwb_la #0: succeeded clr=inf ok=True
+[117/180] goal_yaw_pi nav2_dwb_la #1: succeeded clr=inf ok=True
+[118/180] goal_yaw_pi nav2_dwb_la #2: succeeded clr=inf ok=True
+[119/180] goal_yaw_pi nav2_dwb_la #3: succeeded clr=inf ok=True
+[120/180] goal_yaw_pi nav2_dwb_la #4: succeeded clr=inf ok=True
+[121/180] overspeed_start custom #0: succeeded clr=inf ok=True
+[122/180] overspeed_start custom #1: succeeded clr=inf ok=True
+[123/180] overspeed_start custom #2: succeeded clr=inf ok=True
+[124/180] overspeed_start custom #3: succeeded clr=inf ok=True
+[125/180] overspeed_start custom #4: succeeded clr=inf ok=True
+[126/180] overspeed_start nav2_dwb #0: succeeded clr=inf ok=True
+[127/180] overspeed_start nav2_dwb #1: succeeded clr=inf ok=True
+[128/180] overspeed_start nav2_dwb #2: succeeded clr=inf ok=True
+[129/180] overspeed_start nav2_dwb #3: succeeded clr=inf ok=True
+[130/180] overspeed_start nav2_dwb #4: succeeded clr=inf ok=True
+[131/180] overspeed_start nav2_dwb_la #0: succeeded clr=inf ok=True
+[132/180] overspeed_start nav2_dwb_la #1: succeeded clr=inf ok=True
+[133/180] cancel_midway custom #0: canceled clr=inf ok=True
+[134/180] overspeed_start nav2_dwb_la #2: succeeded clr=inf ok=True
+[135/180] cancel_midway custom #1: canceled clr=inf ok=True
+[136/180] overspeed_start nav2_dwb_la #3: succeeded clr=inf ok=True
+[137/180] cancel_midway custom #2: canceled clr=inf ok=True
+[138/180] overspeed_start nav2_dwb_la #4: succeeded clr=inf ok=True
+[139/180] cancel_midway custom #3: canceled clr=inf ok=True
+[140/180] cancel_midway custom #4: canceled clr=inf ok=True
+[141/180] cancel_midway nav2_dwb #0: canceled clr=inf ok=True
+[142/180] cancel_midway nav2_dwb #1: canceled clr=inf ok=True
+[143/180] cancel_midway nav2_dwb #2: canceled clr=inf ok=True
+[144/180] cancel_midway nav2_dwb #3: canceled clr=inf ok=True
+[145/180] cancel_midway nav2_dwb #4: canceled clr=inf ok=True
+[146/180] cancel_midway nav2_dwb_la #0: canceled clr=inf ok=True
+[147/180] cancel_midway nav2_dwb_la #1: canceled clr=inf ok=True
+[148/180] cancel_midway nav2_dwb_la #2: canceled clr=inf ok=True
+[149/180] cancel_midway nav2_dwb_la #3: canceled clr=inf ok=True
+[150/180] cancel_midway nav2_dwb_la #4: canceled clr=inf ok=True
+[151/180] stale_odom custom #0: aborted clr=inf ok=True
+[152/180] stale_odom custom #1: aborted clr=inf ok=True
+[153/180] stale_odom custom #2: aborted clr=inf ok=True
+[154/180] stale_odom custom #3: aborted clr=inf ok=True
+[155/180] stale_odom custom #4: aborted clr=inf ok=True
+[156/180] stale_odom nav2_dwb #0: succeeded clr=inf ok=False
+[157/180] stale_odom nav2_dwb #1: succeeded clr=inf ok=False
+[158/180] stale_odom nav2_dwb #2: succeeded clr=inf ok=False
+[159/180] stale_odom nav2_dwb #3: succeeded clr=inf ok=False
+[160/180] stale_odom nav2_dwb #4: succeeded clr=inf ok=False
+[161/180] stale_odom nav2_dwb_la #0: succeeded clr=inf ok=False
+[162/180] stale_odom nav2_dwb_la #1: succeeded clr=inf ok=False
+[163/180] stale_odom nav2_dwb_la #2: succeeded clr=inf ok=False
+[164/180] stale_odom nav2_dwb_la #4: succeeded clr=inf ok=False
+[165/180] stale_odom nav2_dwb_la #3: succeeded clr=inf ok=False
+[166/180] stale_scan custom #0: hung (no action result, cancel not processed) clr=inf ok=True
+[167/180] stale_scan custom #1: hung (no action result, cancel not processed) clr=inf ok=True
+[168/180] stale_scan custom #2: hung (no action result, cancel not processed) clr=inf ok=True
+[169/180] stale_scan custom #3: hung (no action result, cancel not processed) clr=inf ok=True
+[170/180] stale_scan custom #4: hung (no action result, cancel not processed) clr=inf ok=True
+[171/180] stale_scan nav2_dwb #0: hung (no action result, cancel not processed) clr=inf ok=True
+[172/180] stale_scan nav2_dwb #1: hung (no action result, cancel not processed) clr=inf ok=True
+[173/180] stale_scan nav2_dwb #2: hung (no action result, cancel not processed) clr=inf ok=True
+[174/180] stale_scan nav2_dwb #3: hung (no action result, cancel not processed) clr=inf ok=True
+[175/180] stale_scan nav2_dwb #4: hung (no action result, cancel not processed) clr=inf ok=True
+[176/180] stale_scan nav2_dwb_la #0: hung (no action result, cancel not processed) clr=inf ok=True
+[177/180] stale_scan nav2_dwb_la #1: hung (no action result, cancel not processed) clr=inf ok=True
+[178/180] stale_scan nav2_dwb_la #2: hung (no action result, cancel not processed) clr=inf ok=True
+[179/180] stale_scan nav2_dwb_la #3: hung (no action result, cancel not processed) clr=inf ok=True
+[180/180] stale_scan nav2_dwb_la #4: hung (no action result, cancel not processed) clr=inf ok=True
+| scenario | profile | ok/exp | succeeded | statuses | coll | min clr m | t s | ct rms m | ct max m | ω flips | stop after event s | stop dist m | compute p99/max ms | cmd period p99 ms |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| blocked_wall | custom | 5/5 | 0 | aborted | 0 | 0.099 | 20.7 | 0.000 | 0.000 | 0.0 | 0.05 | 0.000 | 2.77/5.39 | 102 |
+| blocked_wall | nav2_dwb | 5/5 | 0 | aborted | 0 | 0.047 | 26.8 | 0.003 | 0.008 | 0.0 | 0.13 | 0.000 | n/a/n/a | 102 |
+| blocked_wall | nav2_dwb_la | 5/5 | 0 | aborted | 0 | 0.099 | 26.9 | 0.000 | 0.001 | 0.0 | 0.10 | 0.000 | n/a/n/a | 101 |
+| cancel_midway | custom | 5/5 | 0 | canceled | 0 | n/a | 4.1 | 0.000 | 0.000 | 0.0 | 0.46 | 0.046 | 3.01/3.15 | 102 |
+| cancel_midway | nav2_dwb | 5/5 | 0 | canceled | 0 | n/a | 4.0 | 0.000 | 0.003 | 0.0 | 0.41 | 0.038 | n/a/n/a | 101 |
+| cancel_midway | nav2_dwb_la | 5/5 | 0 | canceled | 0 | n/a | 4.1 | 0.000 | 0.002 | 0.0 | 0.46 | 0.041 | n/a/n/a | 101 |
+| corridor_ok | custom | 5/5 | 5 | succeeded | 0 | 0.298 | 26.3 | 0.000 | 0.002 | 0.0 | n/a | n/a | 3.06/5.59 | 102 |
+| corridor_ok | nav2_dwb | 5/5 | 5 | succeeded | 0 | 0.291 | 34.3 | 0.001 | 0.009 | 1.6 | n/a | n/a | n/a/n/a | 101 |
+| corridor_ok | nav2_dwb_la | 5/5 | 5 | succeeded | 0 | 0.295 | 34.3 | 0.001 | 0.006 | 2.2 | n/a | n/a | n/a/n/a | 101 |
+| goal_yaw_pi | custom | 5/5 | 5 | succeeded | 0 | n/a | 19.4 | 0.000 | 0.000 | 0.0 | n/a | n/a | 2.88/3.60 | 102 |
+| goal_yaw_pi | nav2_dwb | 5/5 | 5 | succeeded | 0 | n/a | 20.7 | 0.004 | 0.009 | 0.0 | n/a | n/a | n/a/n/a | 102 |
+| goal_yaw_pi | nav2_dwb_la | 5/5 | 5 | succeeded | 0 | n/a | 21.6 | 0.005 | 0.010 | 3.0 | n/a | n/a | n/a/n/a | 102 |
+| l_turn | custom | 5/5 | 5 | succeeded | 0 | n/a | 24.9 | 0.027 | 0.133 | 0.0 | n/a | n/a | 3.07/3.53 | 101 |
+| l_turn | nav2_dwb | 5/5 | 5 | succeeded | 0 | n/a | 27.1 | 0.020 | 0.112 | 0.0 | n/a | n/a | n/a/n/a | 101 |
+| l_turn | nav2_dwb_la | 5/5 | 5 | succeeded | 0 | n/a | 29.2 | 0.012 | 0.077 | 2.2 | n/a | n/a | n/a/n/a | 102 |
+| obstacle_near_path | custom | 5/5 | 5 | succeeded | 0 | 0.160 | 26.2 | 0.000 | 0.000 | 0.0 | n/a | n/a | 3.01/7.02 | 101 |
+| obstacle_near_path | nav2_dwb | 5/5 | 5 | succeeded | 0 | 0.157 | 29.3 | 0.004 | 0.008 | 1.4 | n/a | n/a | n/a/n/a | 102 |
+| obstacle_near_path | nav2_dwb_la | 4/5 | 4 | aborted, succeeded | 0 | 0.159 | 32.2 | 0.002 | 0.019 | 2.4 | 0.05 | 0.000 | n/a/n/a | 101 |
+| overspeed_start | custom | 5/5 | 5 | succeeded | 0 | n/a | 31.3 | 0.000 | 0.000 | 0.0 | n/a | n/a | 3.08/4.11 | 102 |
+| overspeed_start | nav2_dwb | 5/5 | 5 | succeeded | 0 | n/a | 33.9 | 0.005 | 0.014 | 0.0 | n/a | n/a | n/a/n/a | 101 |
+| overspeed_start | nav2_dwb_la | 5/5 | 5 | succeeded | 0 | n/a | 34.4 | 0.001 | 0.006 | 0.4 | n/a | n/a | n/a/n/a | 102 |
+| s_curve | custom | 5/5 | 5 | succeeded | 0 | n/a | 36.9 | 0.039 | 0.078 | 3.0 | n/a | n/a | 3.61/6.46 | 102 |
+| s_curve | nav2_dwb | 5/5 | 5 | succeeded | 0 | n/a | 39.2 | 0.025 | 0.055 | 3.4 | n/a | n/a | n/a/n/a | 101 |
+| s_curve | nav2_dwb_la | 5/5 | 5 | succeeded | 0 | n/a | 40.1 | 0.024 | 0.056 | 3.0 | n/a | n/a | n/a/n/a | 101 |
+| stale_odom | custom | 5/5 | 0 | aborted | 0 | n/a | 4.8 | 0.000 | 0.000 | 0.0 | 0.91 | 0.113 | 3.12/3.13 | 101 |
+| stale_odom | nav2_dwb | 0/5 | 5 | succeeded | 0 | n/a | 21.1 | 0.004 | 0.009 | 0.0 | 17.35 | 2.345 | n/a/n/a | 101 |
+| stale_odom | nav2_dwb_la | 0/5 | 5 | succeeded | 0 | n/a | 21.7 | 0.001 | 0.005 | 0.4 | 17.98 | 2.399 | n/a/n/a | 101 |
+| stale_scan | custom | 5/5 | 0 | hung (no action result, cancel not processed) | 0 | n/a | 35.0 | 0.000 | 0.000 | 0.0 | 1.51 | 0.202 | 3.11/3.11 | 101 |
+| stale_scan | nav2_dwb | 5/5 | 0 | hung (no action result, cancel not processed) | 0 | n/a | 35.0 | 0.002 | 0.006 | 0.0 | 1.51 | 0.194 | n/a/n/a | 101 |
+| stale_scan | nav2_dwb_la | 5/5 | 0 | hung (no action result, cancel not processed) | 0 | n/a | 35.0 | 0.001 | 0.002 | 0.0 | 1.51 | 0.191 | n/a/n/a | 101 |
+| start_backwards | custom | 5/5 | 5 | succeeded | 0 | n/a | 22.3 | 0.004 | 0.015 | 0.0 | n/a | n/a | 3.19/3.85 | 102 |
+| start_backwards | nav2_dwb | 5/5 | 5 | succeeded | 0 | n/a | 23.2 | 0.029 | 0.085 | 1.0 | n/a | n/a | n/a/n/a | 101 |
+| start_backwards | nav2_dwb_la | 0/5 | 0 | aborted | 0 | n/a | 10.0 | 0.000 | 0.000 | 0.0 | 0.05 | 0.000 | n/a/n/a | 101 |
+| straight | custom | 5/5 | 5 | succeeded | 0 | n/a | 19.6 | 0.000 | 0.000 | 0.0 | n/a | n/a | 2.33/2.52 | 101 |
+| straight | nav2_dwb | 5/5 | 5 | succeeded | 0 | n/a | 21.2 | 0.002 | 0.008 | 0.0 | n/a | n/a | n/a/n/a | 101 |
+| straight | nav2_dwb_la | 5/5 | 5 | succeeded | 0 | n/a | 21.8 | 0.001 | 0.007 | 2.4 | n/a | n/a | n/a/n/a | 101 |

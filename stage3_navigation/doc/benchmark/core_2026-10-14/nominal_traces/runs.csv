@@ -1,0 +1,18 @@
+scenario,robot,seed,expect_success,success,result,time_s,collisions,min_clearance_m,cross_track_rms_m,cross_track_max_m,w_sign_flips,limit_violations,nonfinite_cmds,cmd_rate_exceed,blocked_cycles,final_xy_error_m,final_yaw_error_rad,stop_latency_s,stop_distance_m,path_length_m,n_cycles,compute_p50_ms,compute_p95_ms,compute_p99_ms,compute_max_ms,missed_deadlines
+straight,nominal,1000,1,1,succeeded,19.50,0,inf,0.0078,0.0258,0,0,0,0,0,0.1257,0.0005,-1.000,-1.0000,2.865,196,1.337,1.585,1.765,2.193,0
+l_turn,nominal,1000,1,1,succeeded,24.80,0,inf,0.0280,0.1294,0,0,0,0,0,0.1293,0.0013,-1.000,-1.0000,3.664,249,1.460,1.626,1.749,1.767,0
+s_curve,nominal,1000,1,1,succeeded,36.90,0,inf,0.0408,0.0805,4,0,0,0,0,0.1130,0.0971,-1.000,-1.0000,5.213,370,1.492,1.612,1.745,1.928,0
+self_intersect,nominal,1000,1,1,succeeded,49.00,0,inf,0.0380,0.1334,0,0,0,0,0,0.1250,0.0013,-1.000,-1.0000,7.290,491,1.488,1.714,1.827,2.270,0
+duplicates,nominal,1000,1,1,succeeded,12.90,0,inf,0.0000,0.0000,0,0,0,1,0,0.1254,0.0000,-1.000,-1.0000,1.875,130,1.322,2.064,2.098,2.120,0
+single_pose,nominal,1000,1,1,succeeded,4.10,0,inf,0.4571,0.6708,0,0,0,1,0,0.1276,0.1670,-1.000,-1.0000,0.558,42,1.427,2.314,2.319,2.322,0
+goal_near,nominal,1000,1,1,succeeded,3.20,0,inf,0.0000,0.0000,0,0,0,1,0,0.0800,0.1012,-1.000,-1.0000,0.000,33,0.025,0.026,0.046,0.055,0
+corridor_ok,nominal,1000,1,1,succeeded,26.10,0,0.2986,0.0068,0.0258,0,0,0,0,0,0.1309,0.0002,-1.000,-1.0000,3.860,262,1.453,2.530,6.333,10.199,0
+corridor_narrow,nominal,1000,0,0,aborted: Failed to make progress,15.50,0,0.1359,0.0000,0.0000,0,0,0,1,0,2.4998,0.0000,-1.000,-1.0000,1.000,155,1.234,1.557,1.696,1.798,0
+obstacle_bypass,nominal,1000,0,0,aborted: Failed to make progress,21.80,0,0.1515,0.0074,0.0258,0,0,0,0,0,2.4515,0.0006,-1.000,-1.0000,1.540,218,1.334,1.687,1.781,1.876,0
+blocked_wall,nominal,1000,0,0,aborted: Failed to make progress,20.80,0,0.1503,0.0000,0.0000,0,0,0,1,0,2.3503,0.0000,-1.000,-1.0000,1.650,208,1.246,1.425,1.532,1.662,0
+obstacle_near_path,nominal,1000,1,1,succeeded,26.20,0,0.1601,0.0002,0.0003,0,0,0,1,0,0.1278,0.0005,-1.000,-1.0000,3.872,263,1.346,1.525,1.710,1.995,0
+symmetric_obstacle,nominal,1000,0,0,aborted: Failed to make progress,18.90,0,0.1516,0.0000,0.0000,0,0,0,1,0,2.5516,0.0000,-1.000,-1.0000,1.448,189,1.257,1.502,1.695,1.863,0
+start_backwards,nominal,1000,1,1,succeeded,22.30,0,inf,0.0043,0.0146,0,0,0,2,0,0.1269,0.0009,-1.000,-1.0000,2.374,224,1.350,2.955,5.755,5.794,0
+overspeed_start,nominal,1000,1,1,succeeded,31.50,0,inf,0.0000,0.0000,0,0,0,0,0,0.1258,0.0000,-1.000,-1.0000,4.874,316,2.334,3.243,5.974,6.017,0
+overspeed_wall,nominal,1000,0,0,aborted: Failed to make progress,15.80,0,0.1505,0.0000,0.0000,0,0,0,0,0,3.7505,0.0000,-1.000,-1.0000,1.250,158,1.111,1.886,2.265,2.344,0
+goal_yaw_pi,nominal,1000,1,1,succeeded,19.40,0,inf,0.0000,0.0001,0,0,0,1,0,0.1149,0.0932,-1.000,-1.0000,1.885,195,1.272,1.391,1.505,1.966,0

@@ -1,0 +1,22 @@
+# CustomDWB parameters used by dwa_closed_loop_sim (defaults from dwa_core.hpp + overrides)
+robot_model: sluggish
+robot: {acc_x: 0.3, decel_x: 0.3, acc_theta: 0.6, decel_theta: 0.6, latency: 0.2, odom_vel_noise: 0.005, radius: 0.2}
+overrides: []
+max_vel_x: 0.15
+max_vel_theta: 0.5
+acc_lim_x: 0.5
+decel_lim_x: 0.5
+acc_lim_theta: 1
+decel_lim_theta: 1
+vx_samples: 20
+vtheta_samples: 21
+sim_time: 1.7
+sim_granularity: 0.05
+control_latency: 0.1
+stopping_margin: 0.05
+path_distance_scale: 4
+carrot_distance_scale: 2
+heading_scale: 1
+obstacle_scale: 0.5
+speed_scale: 0.3
+oscillation_scale: 1

@@ -1,30 +1,19 @@
 // =====================================================================================================
-// dwb_controller.cpp — Cài đặt bộ điều khiển Dynamic Window tự viết (xem tổng quan ở dwb_controller.hpp)
-// =====================================================================================================
-//
-// Ký hiệu dùng trong chú thích:
-//   v  : vận tốc tịnh tiến (m/s, trục x của base_footprint)      ω : vận tốc góc (rad/s, quanh trục z)
-//   v0, ω0 : vận tốc hiện tại (từ /odometry/filtered)            dt : chu kỳ điều khiển = 1 / controller_frequency
-//   costmap : local costmap (frame odom, rolling 2 x 2 m) do controller_server quản lý
-//
-// Giá trị ô costmap (nav2_costmap_2d):
-//   0 = trống, 1..252 = gần vật cản (inflation, càng lớn càng gần), 253 = INSCRIBED (tâm robot ở đây thì
-//   thân robot chạm vật cản), 254 = LETHAL (chính ô vật cản), 255 = NO_INFORMATION (chưa biết).
-// Robot tròn => chỉ cần xét ô dưới TÂM robot: cost >= 253 nghĩa là va chạm (bán kính nội tiếp đã gồm
-// footprint_padding của local costmap).
+// dwb_controller.cpp — Lớp vỏ ROS của CustomDWB (thuật toán ở dwa_core.cpp; tổng quan ở dwb_controller.hpp)
 // =====================================================================================================
 
 #include "stage3_navigation/dwb_controller.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
-#include <map>
+#include <iomanip>
+#include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "nav2_core/exceptions.hpp"
-#include "nav2_costmap_2d/cost_values.hpp"
+#include "nav2_costmap_2d/costmap_filters/filter_values.hpp"
 #include "nav2_util/node_utils.hpp"
 #include "pluginlib/class_list_macros.hpp"
 #include "tf2/exceptions.h"
@@ -34,9 +23,78 @@
 namespace stage3_navigation
 {
 
-using nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE;
-using nav2_costmap_2d::MAX_NON_OBSTACLE;
-using nav2_costmap_2d::NO_INFORMATION;
+namespace
+{
+// Bảng tên tham số -> trường của DwbParams (dùng chung cho declare và callback đổi tham số).
+struct ParamRefs
+{
+  std::vector<std::pair<std::string, double *>> d;
+  std::vector<std::pair<std::string, int *>> i;
+  std::vector<std::pair<std::string, bool *>> b;
+  std::vector<std::pair<std::string, std::string *>> s;
+};
+
+ParamRefs refs(DwbParams & p)
+{
+  ParamRefs r;
+  r.d = {
+    {"max_vel_x", &p.max_vel_x}, {"min_vel_x", &p.min_vel_x}, {"max_vel_theta", &p.max_vel_theta},
+    {"min_in_place_vel_theta", &p.min_in_place_vel_theta}, {"acc_lim_x", &p.acc_lim_x},
+    {"decel_lim_x", &p.decel_lim_x}, {"acc_lim_theta", &p.acc_lim_theta},
+    {"decel_lim_theta", &p.decel_lim_theta}, {"sim_time", &p.sim_time},
+    {"sim_granularity", &p.sim_granularity}, {"control_latency", &p.control_latency},
+    {"stopping_margin", &p.stopping_margin}, {"local_plan_length", &p.local_plan_length},
+    {"carrot_distance", &p.carrot_distance},
+    {"closest_search_distance", &p.closest_search_distance},
+    {"max_path_deviation", &p.max_path_deviation},
+    {"rotate_to_heading_angle", &p.rotate_to_heading_angle}, {"rotate_gain", &p.rotate_gain},
+    {"xy_goal_tolerance", &p.xy_goal_tolerance}, {"yaw_goal_tolerance", &p.yaw_goal_tolerance},
+    {"goal_tolerance_fraction", &p.goal_tolerance_fraction},
+    {"goal_latch_release_margin", &p.goal_latch_release_margin},
+    {"path_distance_scale", &p.path_distance_scale},
+    {"carrot_distance_scale", &p.carrot_distance_scale}, {"heading_scale", &p.heading_scale},
+    {"obstacle_scale", &p.obstacle_scale}, {"speed_scale", &p.speed_scale},
+    {"oscillation_scale", &p.oscillation_scale},
+    {"oscillation_reset_dist", &p.oscillation_reset_dist},
+    {"oscillation_reset_angle", &p.oscillation_reset_angle},
+    {"oscillation_reset_time", &p.oscillation_reset_time},
+    {"transform_tolerance", &p.transform_tolerance}, {"max_tf_age", &p.max_tf_age},
+    {"max_pose_age", &p.max_pose_age}, {"odom_timeout", &p.odom_timeout},
+    {"debug_publish_rate", &p.debug_publish_rate}};
+  r.i = {{"vx_samples", &p.vx_samples}, {"vtheta_samples", &p.vtheta_samples},
+    {"trajectory_marker_stride", &p.trajectory_marker_stride}};
+  r.b = {{"unknown_is_obstacle", &p.unknown_is_obstacle},
+    {"publish_trajectories", &p.publish_trajectories}};
+  r.s = {{"collision_check", &p.collision_check}};
+  return r;
+}
+
+bool finitePose(const geometry_msgs::msg::Pose & p)
+{
+  return std::isfinite(p.position.x) && std::isfinite(p.position.y) &&
+         std::isfinite(p.orientation.x) && std::isfinite(p.orientation.y) &&
+         std::isfinite(p.orientation.z) && std::isfinite(p.orientation.w);
+}
+
+// Yaw từ quaternion; false nếu quaternion không hữu hạn hoặc chuẩn ~ 0 (không chuẩn hóa được).
+bool yawOf(const geometry_msgs::msg::Quaternion & q, double & yaw)
+{
+  const double n = std::sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+  if (!std::isfinite(n) || n < 1e-6) {
+    return false;
+  }
+  tf2::Quaternion tq(q.x / n, q.y / n, q.z / n, q.w / n);
+  yaw = tf2::getYaw(tq);
+  return std::isfinite(yaw);
+}
+
+std::string fmt(double x, int prec = 3)
+{
+  std::ostringstream ss;
+  ss << std::fixed << std::setprecision(prec) << x;
+  return ss.str();
+}
+}  // namespace
 
 // =====================================================================================================
 // VÒNG ĐỜI PLUGIN
@@ -50,7 +108,7 @@ void DwbController::configure(
   node_ = parent;
   auto node = node_.lock();
   if (!node) {
-    throw nav2_core::PlannerException("DwbController: parent node expired");
+    throw std::runtime_error("DwbController: parent node expired");
   }
   name_ = name;
   tf_ = tf;
@@ -59,72 +117,173 @@ void DwbController::configure(
   logger_ = node->get_logger();
   clock_ = node->get_clock();
 
-  declareAndLoadParams();
+  declareAndLoadParams();   // YAML sai -> runtime_error -> configure của controller_server thất bại
 
-  // controller_frequency do controller_server khai báo -> dùng để tính dt của dynamic window.
+  // controller_frequency do controller_server khai báo -> dt danh nghĩa của dynamic window.
   if (node->has_parameter("controller_frequency")) {
     controller_frequency_ = node->get_parameter("controller_frequency").as_double();
   }
+  if (!(controller_frequency_ > 0.0) || !std::isfinite(controller_frequency_)) {
+    throw std::runtime_error("DwbController: controller_frequency must be > 0");
+  }
+  // controller_server Humble khai báo odom_topic SAU khi configure plugin (OdomSubscriber trong on_configure),
+  // nên has_parameter() lúc này là false. Khai báo giống OdomSubscriber (mặc định "odom"; giá trị YAML
+  // /odometry/filtered được áp dụng khi khai báo) để watchdog nghe đúng topic mà server dùng.
+  nav2_util::declare_parameter_if_not_declared(
+    node, "odom_topic",
+    rclcpp::ParameterValue(odom_topic_));
+  odom_topic_ = node->get_parameter("odom_topic").as_string();
 
-  // Publisher để xem trên RViz (tên tương đối -> /local_plan, /<plugin>/local_path, /<plugin>/trajectories).
+  // Watchdog odometry: chỉ ghi thời điểm nhận (thời gian ROS của node), không dùng nội dung.
+  odom_sub_ = node->create_subscription<nav_msgs::msg::Odometry>(
+    odom_topic_, rclcpp::QoS(10),
+    [this](nav_msgs::msg::Odometry::ConstSharedPtr) {
+      std::lock_guard<std::mutex> lk(odom_mutex_);
+      last_odom_rx_ = clock_->now();
+      have_odom_ = true;
+    });
+
+  // Publisher hiển thị (tên tương đối -> /local_plan, /<plugin>/local_path, /<plugin>/trajectories,
+  // /<plugin>/state). Không publisher nào thuộc đường lệnh motor.
   local_plan_pub_ = node->create_publisher<nav_msgs::msg::Path>("local_plan", 1);
   local_path_pub_ = node->create_publisher<nav_msgs::msg::Path>(name_ + "/local_path", 1);
   markers_pub_ =
     node->create_publisher<visualization_msgs::msg::MarkerArray>(name_ + "/trajectories", 1);
+  state_pub_ =
+    node->create_publisher<diagnostic_msgs::msg::DiagnosticStatus>(name_ + "/state", 10);
 
-  // Cho phép chỉnh tham số khi đang chạy: ros2 param set /controller_server CustomDWB.<tên> <giá trị>
   param_cb_ = node->add_on_set_parameters_callback(
     std::bind(&DwbController::onParamChange, this, std::placeholders::_1));
 
   RCLCPP_INFO(
     logger_, "[%s] DwbController (self-written dynamic window) configured: max_vel_x %.2f, "
-    "max_vel_theta %.2f, samples %dx%d, sim_time %.2f s, dt %.3f s", name_.c_str(),
-    params_.max_vel_x, params_.max_vel_theta, params_.vx_samples, params_.vtheta_samples,
-    params_.sim_time, 1.0 / controller_frequency_);
+    "max_vel_theta %.2f, samples %dx%d, sim_time %.2f s, dt %.3f s, latency %.3f s, odom '%s'",
+    name_.c_str(), params_.max_vel_x, params_.max_vel_theta, params_.vx_samples,
+    params_.vtheta_samples, params_.sim_time, 1.0 / controller_frequency_, params_.control_latency,
+    odom_topic_.c_str());
 }
 
 void DwbController::cleanup()
 {
+  std::lock_guard<std::mutex> lk(state_mutex_);
   local_plan_pub_.reset();
   local_path_pub_.reset();
   markers_pub_.reset();
+  state_pub_.reset();
   param_cb_.reset();
-  global_plan_.poses.clear();
+  odom_sub_.reset();
+  tracker_.clear();
+  plan_frame_.clear();
+  resetState();
 }
 
 void DwbController::activate()
 {
+  std::lock_guard<std::mutex> lk(state_mutex_);
   local_plan_pub_->on_activate();
   local_path_pub_->on_activate();
   markers_pub_->on_activate();
+  state_pub_->on_activate();
+  resetState();
+  compute_ms_max_ = 0.0;
+  cycles_ = over_budget_ = missed_deadline_ = 0;
+
+  // Chính sách va chạm + vùng chưa quan sát: in rõ để người vận hành biết giả định đang dùng.
+  DwbParams p;
+  {
+    std::lock_guard<std::mutex> plk(params_mutex_);
+    p = params_;
+  }
+  std::string mode;
+  makeCollisionModel(p, mode);
+  const auto layered = costmap_ros_->getLayeredCostmap();
+  RCLCPP_INFO(
+    logger_, "[%s] collision check: %s (inscribed %.3f m, circumscribed %.3f m)", name_.c_str(),
+    mode.c_str(), layered->getInscribedRadius(), layered->getCircumscribedRadius());
+  if (p.unknown_is_obstacle && !layered->isTrackingUnknown()) {
+    RCLCPP_WARN(
+      logger_, "[%s] unknown_is_obstacle is true but the local costmap has track_unknown_space: false "
+      "-> unobserved cells (e.g. the rear half without LiDAR) are FREE, not unknown. "
+      "Forward-only motion is the actual protection.",
+      name_.c_str());
+  }
 }
 
 void DwbController::deactivate()
 {
+  std::lock_guard<std::mutex> lk(state_mutex_);
+  clearDebug();   // xóa marker/đường cũ trên RViz trước khi publisher ngừng
   local_plan_pub_->on_deactivate();
   local_path_pub_->on_deactivate();
   markers_pub_->on_deactivate();
+  state_pub_->on_deactivate();
+  resetState();
+}
+
+void DwbController::resetState()
+{
+  core_.reset();
+  tracker_.resetProgress();
+  last_cmd_ = Velocity2D{};
+  have_last_cmd_ = false;
+  have_last_compute_ = false;
+  have_last_debug_ = false;
+  last_phase_ = Phase::IDLE;
+  last_track_ = PathTracker::Result{};
 }
 
 void DwbController::setPlan(const nav_msgs::msg::Path & path)
 {
-  // Đường mới (FollowPath mới): bắt đầu lại từ đầu đường, bỏ trạng thái các pha xoay.
-  global_plan_ = path;
-  closest_index_ = 0;
-  goal_rotation_latched_ = false;
-  rotating_to_path_ = false;
+  std::lock_guard<std::mutex> lk(state_mutex_);
+  // Path mới / goal thay thế: bỏ toàn bộ trạng thái theo plan (tiến trình, latch đích, xoay, dao động).
+  core_.reset();
+  last_phase_ = Phase::IDLE;
+  plan_frame_.clear();
+  if (path.header.frame_id.empty()) {
+    tracker_.clear();
+    throw nav2_core::PlannerException("DwbController: plan has an empty frame_id");
+  }
+  std::vector<Pose2D> pts;
+  pts.reserve(path.poses.size());
+  for (const auto & ps : path.poses) {
+    pts.push_back(Pose2D{ps.pose.position.x, ps.pose.position.y, 0.0});
+  }
+  if (!path.poses.empty()) {
+    double yaw = 0.0;
+    if (!yawOf(path.poses.back().pose.orientation, yaw)) {
+      tracker_.clear();
+      throw nav2_core::PlannerException(
+              "DwbController: plan goal orientation is not a valid quaternion");
+    }
+    pts.back().theta = yaw;
+  }
+  const std::string reason = tracker_.setPlan(pts);
+  if (!reason.empty()) {
+    throw nav2_core::PlannerException("DwbController: " + reason);
+  }
+  plan_frame_ = path.header.frame_id;
+  RCLCPP_INFO(
+    logger_, "[%s] new plan: %zu poses (%zu after merging duplicates), %.2f m, frame '%s'",
+    name_.c_str(), path.poses.size(), tracker_.size(), tracker_.length(), plan_frame_.c_str());
 }
 
 void DwbController::setSpeedLimit(const double & speed_limit, const bool & percentage)
 {
-  // Nav2 gửi 0 (hoặc NO_SPEED_LIMIT) khi bỏ giới hạn.
   std::lock_guard<std::mutex> lock(params_mutex_);
-  if (speed_limit <= 0.0 || (percentage && speed_limit >= 100.0)) {
-    speed_limit_x_ = 0.0;
+  if (!std::isfinite(speed_limit) || speed_limit < 0.0) {
+    RCLCPP_WARN(
+      logger_, "[%s] ignoring invalid speed limit %f (keeping the previous limit)", name_.c_str(),
+      speed_limit);
+    return;
+  }
+  if (speed_limit == nav2_costmap_2d::NO_SPEED_LIMIT || (percentage && speed_limit >= 100.0)) {
+    limit_mode_ = LimitMode::NONE;   // Humble: NO_SPEED_LIMIT (0.0) = bỏ giới hạn, về max_vel_x danh nghĩa
   } else if (percentage) {
-    speed_limit_x_ = params_.max_vel_x * speed_limit / 100.0;
+    limit_mode_ = LimitMode::PERCENT;
+    limit_value_ = speed_limit;
   } else {
-    speed_limit_x_ = speed_limit;
+    limit_mode_ = LimitMode::ABSOLUTE;
+    limit_value_ = speed_limit;
   }
 }
 
@@ -135,393 +294,266 @@ void DwbController::setSpeedLimit(const double & speed_limit, const bool & perce
 geometry_msgs::msg::TwistStamped DwbController::computeVelocityCommands(
   const geometry_msgs::msg::PoseStamped & pose,
   const geometry_msgs::msg::Twist & velocity,
-  nav2_core::GoalChecker * /*goal_checker: controller_server tự kiểm tra đã tới đích*/)
+  nav2_core::GoalChecker * goal_checker)
 {
-  // Khóa costmap: không cho lớp obstacle/inflation cập nhật trong lúc đang đọc.
-  std::lock_guard<nav2_costmap_2d::Costmap2D::mutex_t> lock(*(costmap_->getMutex()));
+  const auto t_start = std::chrono::steady_clock::now();
+  std::lock_guard<std::mutex> lk(state_mutex_);
 
-  // Bản sao tham số cho chu kỳ này (an toàn khi người dùng đổi tham số giữa chừng).
-  DwbParams p = snapshotParams();
-  const double dt = 1.0 / std::max(controller_frequency_, 1.0);
-  const std::string frame = pose.header.frame_id;   // = frame của local costmap (odom)
+  // Một bản sao tham số cho cả chu kỳ (không đọc lại giữa chừng).
+  double max_vel_x_eff = 0.0;
+  const DwbParams p = snapshotParams(max_vel_x_eff);
+  const double dt = 1.0 / controller_frequency_;   // dt danh nghĩa (xem doc/requirements_validation.md)
+  const rclcpp::Time now = clock_->now();
 
-  const Pose2D robot{pose.pose.position.x, pose.pose.position.y,
-    tf2::getYaw(pose.pose.orientation)};
-
-  geometry_msgs::msg::TwistStamped cmd;
-  cmd.header.frame_id = costmap_ros_->getBaseFrameID();
-  cmd.header.stamp = clock_->now();
-
-  // ---------- Bước 1: đường A* -> đường cục bộ + đích cuối ----------
-  const std::vector<Pose2D> local_path = buildLocalPath(robot, frame);
-
-  geometry_msgs::msg::PoseStamped goal_in;
-  geometry_msgs::msg::PoseStamped goal_out;
-  goal_in = global_plan_.poses.back();
-  goal_in.header.frame_id = global_plan_.header.frame_id;
-  try {
-    goal_out = tf_->transform(goal_in, frame, tf2::durationFromSec(p.transform_tolerance));
-  } catch (const tf2::TransformException & ex) {
-    throw nav2_core::PlannerException(
-            std::string(
-              "DwbController: cannot transform goal: ") + ex.what());
-  }
-  const Pose2D goal{goal_out.pose.position.x, goal_out.pose.position.y,
-    tf2::getYaw(goal_out.pose.orientation)};
-  const double dist_to_goal = std::hypot(goal.x - robot.x, goal.y - robot.y);
-
-  // ---------- Bước 2a: pha ROTATE_TO_GOAL ----------
-  // Đã tới vị trí đích: dừng tịnh tiến, chỉ xoay về hướng Goal Pose. "Latch" để không quay lại đi tiếp khi
-  // robot hơi trôi ra ngoài vùng dung sai trong lúc xoay.
-  if (goal_rotation_latched_ || dist_to_goal < p.xy_goal_tolerance) {
-    if (!goal_rotation_latched_) {
-      RCLCPP_INFO(
-        logger_, "[%s] at goal position (%.2f m): rotating to goal heading", name_.c_str(),
-        dist_to_goal);
+  // Thời gian giữa hai lần gọi: chỉ để thống kê + chọn lệnh trước. KHÔNG dùng để nới dynamic window (khoảng
+  // trễ dài không được phép thành bước nhảy vận tốc lớn: cửa sổ luôn tính từ vận tốc ĐO được với dt danh nghĩa).
+  if (have_last_compute_) {
+    const double gap = std::chrono::duration<double>(t_start - last_compute_).count();
+    if (gap > 1.5 * dt) {
+      ++missed_deadline_;
     }
-    goal_rotation_latched_ = true;
-    const double err = normalizeAngle(goal.theta - robot.theta);
-    if (std::fabs(err) < p.yaw_goal_tolerance) {
-      // Đã đúng hướng: lệnh 0, goal checker của controller_server sẽ kết thúc FollowPath.
-      cmd.twist = geometry_msgs::msg::Twist();
-    } else {
-      cmd.twist = rotateInPlace(p, err, velocity, dt, robot);
-    }
-    publishDebug({}, nullptr, local_path, goal, frame);
-    return cmd;
-  }
-
-  // ---------- Bước 2b: pha ROTATE_TO_PATH ----------
-  // Cà rốt nằm lệch quá nhiều so với hướng robot (vd. lúc bắt đầu, đường đi ngược hướng robot): xoay tại
-  // chỗ trước. Dùng trễ (hysteresis): vào pha khi lệch > ngưỡng, ra khi lệch < ngưỡng/2 -> không rung.
-  const Pose2D carrot = pickCarrot(local_path, p.carrot_distance);
-  const double carrot_dist = std::hypot(carrot.x - robot.x, carrot.y - robot.y);
-  if (carrot_dist > 0.05) {
-    const double heading_err =
-      normalizeAngle(std::atan2(carrot.y - robot.y, carrot.x - robot.x) - robot.theta);
-    const double exit_angle = 0.5 * p.rotate_to_heading_angle;
-    if (std::fabs(heading_err) > p.rotate_to_heading_angle ||
-      (rotating_to_path_ && std::fabs(heading_err) > exit_angle))
-    {
-      if (!rotating_to_path_) {
-        RCLCPP_INFO(
-          logger_, "[%s] heading error %.2f rad: rotating in place toward the path",
-          name_.c_str(), heading_err);
-      }
-      rotating_to_path_ = true;
-      cmd.twist = rotateInPlace(p, heading_err, velocity, dt, robot);
-      publishDebug({}, nullptr, local_path, carrot, frame);
-      return cmd;
+    if (gap > 2.5 * dt || gap < 0.0) {
+      have_last_cmd_ = false;   // bị ngắt quãng: lệnh trước không còn đại diện cho cái bánh xe đang làm
     }
   }
-  rotating_to_path_ = false;
+  last_compute_ = t_start;
+  have_last_compute_ = true;
 
-  // ---------- Bước 3-5: pha FOLLOW_PATH (tìm kiếm Dynamic Window) ----------
-  const Trajectory best = searchDynamicWindow(p, robot, velocity, local_path, carrot, dt);
-  cmd.twist.linear.x = best.v;
-  cmd.twist.angular.z = best.w;
-  RCLCPP_DEBUG(
-    logger_,
-    "[%s] best v=%.3f w=%.3f cost=%.3f (obst %.2f path %.2f carrot %.2f head %.2f spd %.2f)",
-    name_.c_str(), best.v, best.w, best.total_cost, best.obstacle_cost, best.path_cost,
-    best.carrot_cost, best.heading_cost, best.speed_cost);
-  return cmd;
-}
-
-// =====================================================================================================
-// BƯỚC 1 — ĐƯỜNG CỤC BỘ
-// =====================================================================================================
-
-std::vector<Pose2D> DwbController::buildLocalPath(
-  const Pose2D & robot, const std::string & costmap_frame)
-{
-  if (global_plan_.poses.empty()) {
-    throw nav2_core::PlannerException("DwbController: received an empty plan");
+  // ---------- (a) Đầu vào ----------
+  if (!tracker_.hasPlan()) {
+    fail("no valid plan", p);
   }
+  if (!finitePose(pose.pose) || !std::isfinite(velocity.linear.x) ||
+    !std::isfinite(velocity.angular.z))
+  {
+    fail("non-finite robot pose or velocity input", p);
+  }
+  const std::string frame = costmap_ros_->getGlobalFrameID();
+  if (pose.header.frame_id != frame) {
+    fail("robot pose frame '" + pose.header.frame_id + "' != costmap frame '" + frame + "'", p);
+  }
+  const rclcpp::Time pose_stamp(pose.header.stamp, now.get_clock_type());
+  if (pose_stamp.nanoseconds() != 0) {   // 0 = TF tĩnh (không có tuổi)
+    const double age = (now - pose_stamp).seconds();
+    if (age > p.max_pose_age) {
+      fail("robot pose (TF " + frame + " -> base) is " + fmt(age, 2) + " s old > max_pose_age", p);
+    }
+  }
+  {
+    std::lock_guard<std::mutex> olk(odom_mutex_);
+    if (!have_odom_) {
+      fail("no odometry received on '" + odom_topic_ + "'", p);
+    }
+    const double age = (now - last_odom_rx_).seconds();
+    if (age > p.odom_timeout) {
+      fail("odometry '" + odom_topic_ + "' silent for " + fmt(age, 2) + " s > odom_timeout", p);
+    }
+  }
+  double robot_yaw = 0.0;
+  if (!yawOf(pose.pose.orientation, robot_yaw)) {
+    fail("robot pose orientation is not a valid quaternion", p);
+  }
+  const Pose2D robot{pose.pose.position.x, pose.pose.position.y, robot_yaw};
 
-  // Một transform map -> odom cho cả đường (thay vì tra TF cho từng pose).
+  // ---------- (b) TF plan_frame -> costmap frame (một lần, mới nhất) ----------
+  // transform_tolerance = thời gian CHỜ TF; max_tf_age = tuổi chấp nhận được. Hai đại lượng khác nhau.
+  // AMCL đóng dấu map->odom vào TƯƠNG LAI (+transform_tolerance của AMCL, 1.0 s) -> tuổi âm là bình thường;
+  // nếu AMCL ngừng, TF chỉ bị coi là cũ sau max_tf_age + 1.0 s.
   geometry_msgs::msg::TransformStamped tf_plan;
   try {
     tf_plan = tf_->lookupTransform(
-      costmap_frame, global_plan_.header.frame_id, tf2::TimePointZero,
-      tf2::durationFromSec(snapshotParams().transform_tolerance));
+      frame, plan_frame_, tf2::TimePointZero, tf2::durationFromSec(p.transform_tolerance));
   } catch (const tf2::TransformException & ex) {
-    throw nav2_core::PlannerException(
-            std::string(
-              "DwbController: cannot transform plan to ") + costmap_frame + ": " + ex.what());
+    fail("cannot transform plan '" + plan_frame_ + "' -> '" + frame + "': " + ex.what(), p);
   }
-  const auto to_local = [&](std::size_t i) {
-      geometry_msgs::msg::PoseStamped out;
-      tf2::doTransform(global_plan_.poses[i], out, tf_plan);
-      return Pose2D{out.pose.position.x, out.pose.position.y, tf2::getYaw(out.pose.orientation)};
-    };
-  const auto seg_len = [&](std::size_t i) {   // độ dài đoạn (i-1, i), tính trong frame map (bất biến)
-      const auto & a = global_plan_.poses[i - 1].pose.position;
-      const auto & b = global_plan_.poses[i].pose.position;
-      return std::hypot(b.x - a.x, b.y - a.y);
-    };
-  const DwbParams p = snapshotParams();
-  const std::size_t n = global_plan_.poses.size();
-
-  // (a) Tìm điểm gần robot nhất, CHỈ trong closest_search_distance phía trước closest_index_ cũ.
-  //     closest_index_ chỉ tăng -> robot không "nhảy" sang đoạn đường khác khi đường vòng lại gần nhau.
-  closest_index_ = std::min(closest_index_, n - 1);
-  std::size_t best_i = closest_index_;
-  Pose2D q = to_local(best_i);
-  double best_d = std::hypot(q.x - robot.x, q.y - robot.y);
-  double along = 0.0;
-  for (std::size_t i = closest_index_ + 1; i < n; ++i) {
-    along += seg_len(i);
-    if (along > p.closest_search_distance) {
-      break;
-    }
-    q = to_local(i);
-    const double d = std::hypot(q.x - robot.x, q.y - robot.y);
-    if (d < best_d) {
-      best_d = d;
-      best_i = i;
+  const rclcpp::Time tf_stamp(tf_plan.header.stamp, now.get_clock_type());
+  if (tf_stamp.nanoseconds() != 0 && plan_frame_ != frame) {
+    const double age = (now - tf_stamp).seconds();
+    if (age > p.max_tf_age) {
+      fail("TF " + plan_frame_ + " -> " + frame + " is " + fmt(age, 2) + " s old > max_tf_age", p);
     }
   }
-  closest_index_ = best_i;
+  double tf_yaw = 0.0;
+  if (!yawOf(
+      tf_plan.transform.rotation,
+      tf_yaw) || !std::isfinite(tf_plan.transform.translation.x) ||
+    !std::isfinite(tf_plan.transform.translation.y))
+  {
+    fail("TF " + plan_frame_ + " -> " + frame + " is not finite", p);
+  }
+  const Transform2D plan_to_local{tf_plan.transform.translation.x, tf_plan.transform.translation.y,
+    tf_yaw};
 
-  // (b) Cắt đường cục bộ: từ điểm gần nhất đi tới local_plan_length mét, dừng ở mép costmap.
+  // ---------- (c) Tiến trình dọc đường (frame plan) ----------
+  const double hysteresis = std::max(2.0 * costmap_->getResolution(), 0.1);
+  last_track_ = tracker_.update(
+    plan_to_local.inverse().apply(robot), p.closest_search_distance, p.local_plan_length,
+    hysteresis);
+  // Plan một pose = chỉ có đích, không có "hành lang" để đo độ lệch (đích vẫn phải nằm trong local costmap).
+  if (tracker_.size() > 1 && last_track_.deviation > p.max_path_deviation) {
+    fail(
+      "robot is " + fmt(last_track_.deviation, 2) + " m from the plan > max_path_deviation " +
+      fmt(p.max_path_deviation, 2), p);
+  }
+  std::vector<Pose2D> local_all;
+  local_all.reserve(last_track_.local.size());
+  for (const auto & q : last_track_.local) {
+    local_all.push_back(plan_to_local.apply(q));
+  }
+  const Pose2D goal = plan_to_local.apply(tracker_.goal());
+
+  // ---------- (d) Dung sai đích = của GoalChecker ----------
+  const GoalTolerance tol = goalTolerance(p, goal_checker);
+
+  // ---------- (e) Tính lệnh (giữ khóa costmap ngắn nhất có thể) ----------
+  const bool want_debug = debugDue(p, false);
+  ControlOutput out;
   std::vector<Pose2D> local_path;
-  along = 0.0;
-  for (std::size_t i = closest_index_; i < n; ++i) {
-    if (i > closest_index_) {
-      along += seg_len(i);
-      if (along > p.local_plan_length) {
-        break;
+  std::string mode_name;
+  {
+    std::lock_guard<nav2_costmap_2d::Costmap2D::mutex_t> clk(*(costmap_->getMutex()));
+    for (const auto & q : local_all) {
+      unsigned int mx, my;
+      if (!costmap_->worldToMap(q.x, q.y, mx, my)) {
+        break;   // ra khỏi local costmap
       }
+      local_path.push_back(q);
     }
-    const Pose2D pt = to_local(i);
-    unsigned int mx, my;
-    if (!costmap_->worldToMap(pt.x, pt.y, mx, my)) {
-      break;   // ra khỏi local costmap
-    }
-    local_path.push_back(pt);
-  }
-  if (local_path.empty()) {
-    // Điểm gần nhất đã nằm ngoài costmap: robot ở quá xa đường.
-    throw nav2_core::PlannerException(
-            "DwbController: no part of the plan lies inside the local costmap (robot too far from path)");
-  }
-  return local_path;
-}
-
-Pose2D DwbController::pickCarrot(
-  const std::vector<Pose2D> & local_path,
-  double carrot_distance) const
-{
-  // Đi dọc đường cục bộ, lấy điểm đầu tiên có quãng đường tích lũy >= carrot_distance.
-  // Đường cục bộ ngắn hơn (gần đích / mép costmap) -> lấy điểm cuối.
-  // Lý do dùng cà rốt GẦN thay vì điểm cuối đường cục bộ: ở đầu tường, điểm cuối có thể nằm SAU tường,
-  // kéo robot thẳng vào tường (lỗi đã gặp với DWB khi local costmap 3 x 3 m).
-  double along = 0.0;
-  for (std::size_t i = 1; i < local_path.size(); ++i) {
-    along += std::hypot(
-      local_path[i].x - local_path[i - 1].x, local_path[i].y - local_path[i - 1].y);
-    if (along >= carrot_distance) {
-      return local_path[i];
-    }
-  }
-  return local_path.back();
-}
-
-// =====================================================================================================
-// BƯỚC 3-5 — DYNAMIC WINDOW: LẤY MẪU, MÔ PHỎNG, CHẤM ĐIỂM
-// =====================================================================================================
-
-Trajectory DwbController::searchDynamicWindow(
-  const DwbParams & p, const Pose2D & robot, const geometry_msgs::msg::Twist & velocity,
-  const std::vector<Pose2D> & local_path, const Pose2D & carrot, double dt)
-{
-  // ---------- Bước 3: dynamic window ----------
-  // Trong một chu kỳ dt, từ v0 chỉ đạt được [v0 - decel*dt, v0 + acc*dt]; giao với [min_vel_x, max_vel_x].
-  const double v0 = velocity.linear.x;
-  const double w0 = velocity.angular.z;
-  double v_lo = std::max(p.min_vel_x, v0 - p.decel_lim_x * dt);
-  double v_hi = std::min(p.max_vel_x, v0 + p.acc_lim_x * dt);
-  double w_lo = std::max(-p.max_vel_theta, w0 - p.acc_lim_theta * dt);
-  double w_hi = std::min(p.max_vel_theta, w0 + p.acc_lim_theta * dt);
-  // v0 vượt giới hạn (vd. vừa giảm max_vel_x / speed limit): cửa sổ rỗng -> dùng mức thấp nhất đạt được.
-  if (v_lo > v_hi) {
-    v_hi = v_lo = std::max(p.min_vel_x, std::min(v_lo, p.max_vel_x));
-  }
-  if (w_lo > w_hi) {
-    const double w = std::clamp(w0, -p.max_vel_theta, p.max_vel_theta);
-    w_lo = w_hi = w;
-  }
-
-  // ---------- Bước 4: lấy mẫu đều (gồm cả hai đầu mút) + mô phỏng ----------
-  const auto sample = [](double lo, double hi, int k, int n) {
-      return n <= 1 ? 0.5 * (lo + hi) : lo + (hi - lo) * static_cast<double>(k) / (n - 1);
-    };
-  std::vector<Trajectory> trajectories;
-  trajectories.reserve(static_cast<std::size_t>(p.vx_samples * p.vtheta_samples));
-  for (int i = 0; i < p.vx_samples; ++i) {
-    const double v = sample(v_lo, v_hi, i, p.vx_samples);
-    for (int j = 0; j < p.vtheta_samples; ++j) {
-      const double w = sample(w_lo, w_hi, j, p.vtheta_samples);
-      Trajectory t = simulate(p, robot, v, w);
-      // ---------- Bước 5: kiểm tra va chạm + chấm điểm ----------
-      scoreTrajectory(p, t, local_path, carrot);
-      trajectories.push_back(std::move(t));
+    if (local_path.empty()) {
+      out.phase = Phase::BLOCKED;
+      out.error = "no part of the plan lies inside the local costmap";
+    } else {
+      ControlInput in;
+      in.robot = robot;
+      in.velocity = Velocity2D{velocity.linear.x, velocity.angular.z};
+      in.prev_cmd = have_last_cmd_ ? last_cmd_ : in.velocity;
+      in.local_path = local_path;
+      in.goal = goal;
+      in.tol = tol;
+      in.dt = dt;
+      in.max_vel_x_eff = max_vel_x_eff;
+      in.now_s = now.seconds();
+      const CollisionModel cm = makeCollisionModel(p, mode_name);
+      out = core_.compute(p, in, cm, want_debug && p.publish_trajectories);
     }
   }
 
-  // Chọn quỹ đạo hợp lệ có tổng chi phí nhỏ nhất.
-  const Trajectory * best = nullptr;
-  for (const auto & t : trajectories) {
-    if (t.valid && (!best || t.total_cost < best->total_cost)) {
-      best = &t;
+  const double compute_ms =
+    std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t_start).count();
+  ++cycles_;
+  compute_ms_max_ = std::max(compute_ms_max_, compute_ms);
+  if (compute_ms > 0.8 * dt * 1000.0) {
+    ++over_budget_;
+  }
+
+  // ---------- (f) Hiển thị + chẩn đoán (ngoài khóa costmap) ----------
+  publishPaths(local_path, out.ok ? &out.chosen : nullptr, frame);
+  const bool phase_changed = out.phase != last_phase_;
+  if (phase_changed && out.ok) {
+    RCLCPP_INFO(
+      logger_, "[%s] phase %s -> %s (dist to goal %.2f m)", name_.c_str(), phaseName(last_phase_),
+      phaseName(out.phase), out.dist_to_goal);
+  }
+  last_phase_ = out.phase;
+  if (want_debug || phase_changed || !out.ok) {
+    if (want_debug && p.publish_trajectories) {
+      publishMarkers(out, frame, p.trajectory_marker_stride);
+    }
+    publishState(p, &out, out.ok ? "" : out.error, compute_ms);
+  }
+  if (!out.ok) {
+    have_last_cmd_ = true;
+    last_cmd_ = Velocity2D{};   // controller_server sẽ phát lệnh 0
+    throw nav2_core::PlannerException("DwbController: " + out.error);
+  }
+
+  if (out.phase == Phase::FOLLOW_PATH && out.n_forward_valid == 0) {
+    // Không bỏ qua vật cản: đứng chờ (lệnh v = 0); progress checker của server sẽ abort nếu không thông.
+    RCLCPP_WARN_THROTTLE(
+      logger_, *clock_, 2000, "[%s] no admissible forward trajectory (obstacle ahead, %d/%d candidates "
+      "rejected): holding position; progress checker aborts if it does not clear",
+      name_.c_str(),
+      out.n_candidates - out.n_valid, out.n_candidates);
+  }
+  last_cmd_ = out.cmd;
+  have_last_cmd_ = true;
+  geometry_msgs::msg::TwistStamped cmd;
+  cmd.header.frame_id = costmap_ros_->getBaseFrameID();
+  cmd.header.stamp = now;
+  cmd.twist.linear.x = out.cmd.v;
+  cmd.twist.angular.z = out.cmd.w;
+  RCLCPP_DEBUG(
+    logger_,
+    "[%s] %s v=%.3f w=%.3f cost=%.3f (obst %.2f path %.2f carrot %.2f head %.2f spd %.2f osc %.0f) "
+    "valid %d/%d %.2f ms", name_.c_str(), phaseName(out.phase), out.cmd.v, out.cmd.w,
+    out.chosen.total_cost, out.chosen.obstacle_cost, out.chosen.path_cost, out.chosen.carrot_cost,
+    out.chosen.heading_cost, out.chosen.speed_cost, out.chosen.oscillation_cost, out.n_valid,
+    out.n_candidates, compute_ms);
+  return cmd;
+}
+
+void DwbController::fail(const std::string & reason, const DwbParams & p)
+{
+  have_last_cmd_ = true;
+  last_cmd_ = Velocity2D{};
+  last_phase_ = Phase::BLOCKED;
+  publishState(p, nullptr, reason, 0.0);
+  throw nav2_core::PlannerException("DwbController: " + reason);
+}
+
+CollisionModel DwbController::makeCollisionModel(const DwbParams & p, std::string & mode_name) const
+{
+  // center: ô dưới tâm >= INSCRIBED. Chỉ đúng khi footprint TRÒN (robot_radius) và tâm xoay = tâm thân, vì khi
+  // đó inflation layer đã "bơm" vật cản đúng bằng bán kính nội tiếp (gồm footprint_padding).
+  // footprint: thêm kiểm tra viền footprint (đa giác, đã gồm padding). auto: center nếu costmap dùng robot_radius.
+  const bool center = p.collision_check == "center" ||
+    (p.collision_check == "auto" && costmap_ros_->getUseRadius());
+  std::vector<Pose2D> fp;
+  if (!center) {
+    for (const auto & pt : costmap_ros_->getRobotFootprint()) {
+      fp.push_back(Pose2D{pt.x, pt.y, 0.0});
     }
   }
-  publishDebug(trajectories, best, local_path, carrot, costmap_ros_->getGlobalFrameID());
-
-  if (!best) {
-    // Mọi quỹ đạo đều va chạm: controller_server sẽ thử lại trong failure_tolerance rồi abort + dừng.
-    throw nav2_core::PlannerException(
-            "DwbController: no collision-free trajectory in the dynamic window");
-  }
-  return *best;
+  CollisionModel cm(
+    costmap_, center ? CollisionMode::CENTER : CollisionMode::FOOTPRINT, fp, p.unknown_is_obstacle);
+  mode_name = cm.mode() == CollisionMode::CENTER ? "center" : "footprint";
+  return cm;
 }
 
-Trajectory DwbController::simulate(
-  const DwbParams & p, const Pose2D & start, double v,
-  double w) const
+GoalTolerance DwbController::goalTolerance(
+  const DwbParams & p,
+  nav2_core::GoalChecker * goal_checker)
 {
-  // Mô hình robot vi sai (unicycle), tích phân Euler với bước sim_granularity:
-  //   x += v cosθ Δt,  y += v sinθ Δt,  θ += ω Δt
-  Trajectory t;
-  t.v = v;
-  t.w = w;
-  const int steps = std::max(1, static_cast<int>(std::ceil(p.sim_time / p.sim_granularity)));
-  t.poses.reserve(static_cast<std::size_t>(steps));
-  Pose2D s = start;
-  for (int k = 0; k < steps; ++k) {
-    s.x += v * std::cos(s.theta) * p.sim_granularity;
-    s.y += v * std::sin(s.theta) * p.sim_granularity;
-    s.theta = normalizeAngle(s.theta + w * p.sim_granularity);
-    t.poses.push_back(s);
+  GoalTolerance tol{p.xy_goal_tolerance, p.yaw_goal_tolerance};
+  if (!goal_checker) {
+    return tol;
   }
-  return t;
-}
-
-void DwbController::scoreTrajectory(
-  const DwbParams & p, Trajectory & t, const std::vector<Pose2D> & local_path,
-  const Pose2D & carrot) const
-{
-  // (1) Va chạm + chi phí vật cản: duyệt mọi pose; một pose va chạm -> cả quỹ đạo bị loại.
-  unsigned char max_cost = 0;
-  for (const auto & s : t.poses) {
-    if (isInCollision(p, s.x, s.y)) {
-      t.valid = false;
-      return;
-    }
-    max_cost = std::max(max_cost, costAt(s.x, s.y));
+  geometry_msgs::msg::Pose pose_tol;
+  geometry_msgs::msg::Twist vel_tol;
+  if (!goal_checker->getTolerances(pose_tol, vel_tol)) {
+    return tol;
   }
-  if (max_cost == NO_INFORMATION) {
-    max_cost = MAX_NON_OBSTACLE;   // unknown được phép (unknown_is_obstacle:=false): coi như rất gần
+  double yaw = 0.0;
+  const bool xy_ok = std::isfinite(pose_tol.position.x) && pose_tol.position.x > 0.0;
+  const bool yaw_ok = yawOf(pose_tol.orientation, yaw) && std::fabs(yaw) > 0.0;
+  if (xy_ok) {
+    tol.xy = pose_tol.position.x;
   }
-
-  const Pose2D & end = t.poses.back();
-  // (2) obstacle: 0 (xa vật cản) .. 1 (sát vùng nội tiếp). Giữ khoảng cách với vật cản.
-  t.obstacle_cost = static_cast<double>(max_cost) / static_cast<double>(MAX_NON_OBSTACLE);
-  // (3) path: khoảng cách (m) từ cuối quỹ đạo tới đường A* cục bộ. Bám đường.
-  t.path_cost = distanceToPath(end.x, end.y, local_path);
-  // (4) carrot: khoảng cách (m) từ cuối quỹ đạo tới cà rốt. Tiến dọc đường về đích.
-  t.carrot_cost = std::hypot(carrot.x - end.x, carrot.y - end.y);
-  // (5) heading: lệch hướng ở cuối quỹ đạo so với hướng tới cà rốt, chuẩn hóa 0..1. Hướng đầu đúng đường.
-  const double to_carrot = std::atan2(carrot.y - end.y, carrot.x - end.x);
-  t.heading_cost = (t.carrot_cost > 0.05) ?
-    std::fabs(normalizeAngle(to_carrot - end.theta)) / M_PI : 0.0;
-  // (6) speed: 0 khi đi nhanh nhất, 1 khi đứng yên. Tránh "đứng yên cũng được điểm tốt".
-  t.speed_cost = p.max_vel_x > 1e-6 ? (p.max_vel_x - t.v) / p.max_vel_x : 0.0;
-
-  // Tổng có trọng số. Đổi trọng số = đổi "tính cách" robot (bám đường chặt / né vật cản xa / đi nhanh).
-  t.total_cost =
-    p.obstacle_scale * t.obstacle_cost +
-    p.path_distance_scale * t.path_cost +
-    p.carrot_distance_scale * t.carrot_cost +
-    p.heading_scale * t.heading_cost +
-    p.speed_scale * t.speed_cost;
-}
-
-// =====================================================================================================
-// XOAY TẠI CHỖ (pha ROTATE_TO_PATH và ROTATE_TO_GOAL)
-// =====================================================================================================
-
-geometry_msgs::msg::Twist DwbController::rotateInPlace(
-  const DwbParams & p, double error, const geometry_msgs::msg::Twist & velocity, double dt,
-  const Pose2D & robot) const
-{
-  // Robot tròn xoay quanh tâm thì thân không quét thêm vùng mới -> chỉ cần tâm hiện tại không va chạm.
-  // (Giả định tâm xoay = tâm thân tròn: CHƯA kiểm chứng trên robot.)
-  if (isInCollision(p, robot.x, robot.y)) {
-    throw nav2_core::PlannerException("DwbController: robot is in collision, cannot rotate in place");
+  if (yaw_ok) {
+    tol.yaw = std::fabs(yaw);
   }
-  // ω mong muốn tỉ lệ sai số góc, giới hạn |ω| <= max_vel_theta và >= min_in_place_vel_theta.
-  double w_des = std::clamp(p.rotate_gain * error, -p.max_vel_theta, p.max_vel_theta);
-  if (std::fabs(w_des) < p.min_in_place_vel_theta) {
-    w_des = std::copysign(p.min_in_place_vel_theta, error);
+  if (!warned_tolerance_mismatch_ &&
+    ((xy_ok && std::fabs(tol.xy - p.xy_goal_tolerance) > 1e-6) ||
+    (yaw_ok && std::fabs(tol.yaw - p.yaw_goal_tolerance) > 1e-6)))
+  {
+    warned_tolerance_mismatch_ = true;
+    RCLCPP_WARN(
+      logger_, "[%s] goal checker tolerances (xy %.3f m, yaw %.3f rad) differ from %s.xy/yaw_goal_tolerance "
+      "(%.3f, %.3f): using the goal checker's values",
+      name_.c_str(), tol.xy, tol.yaw, name_.c_str(),
+      p.xy_goal_tolerance, p.yaw_goal_tolerance);
   }
-  // Tôn trọng gia tốc góc: |ω - ω0| <= acc_lim_theta * dt.
-  const double w0 = velocity.angular.z;
-  geometry_msgs::msg::Twist out;
-  out.angular.z = std::clamp(w_des, w0 - p.acc_lim_theta * dt, w0 + p.acc_lim_theta * dt);
-  // Tịnh tiến giảm dần về 0 theo decel_lim_x (không phanh gấp).
-  out.linear.x = std::max(0.0, velocity.linear.x - p.decel_lim_x * dt);
-  return out;
-}
-
-// =====================================================================================================
-// TIỆN ÍCH
-// =====================================================================================================
-
-unsigned char DwbController::costAt(double x, double y) const
-{
-  unsigned int mx, my;
-  if (!costmap_->worldToMap(x, y, mx, my)) {
-    return NO_INFORMATION;
-  }
-  return costmap_->getCost(mx, my);
-}
-
-bool DwbController::isInCollision(const DwbParams & p, double x, double y) const
-{
-  unsigned int mx, my;
-  if (!costmap_->worldToMap(x, y, mx, my)) {
-    return true;   // ra ngoài local costmap: không biết gì -> không đi
-  }
-  const unsigned char c = costmap_->getCost(mx, my);
-  if (c == NO_INFORMATION) {
-    return p.unknown_is_obstacle;
-  }
-  return c >= INSCRIBED_INFLATED_OBSTACLE;   // 253 (nội tiếp) hoặc 254 (vật cản)
-}
-
-double DwbController::distanceToPath(double x, double y, const std::vector<Pose2D> & path)
-{
-  // Khoảng cách nhỏ nhất từ (x, y) tới các đoạn thẳng nối các điểm liên tiếp của đường.
-  if (path.size() == 1) {
-    return std::hypot(path[0].x - x, path[0].y - y);
-  }
-  double best = std::numeric_limits<double>::infinity();
-  for (std::size_t i = 1; i < path.size(); ++i) {
-    const double ax = path[i - 1].x, ay = path[i - 1].y;
-    const double dx = path[i].x - ax, dy = path[i].y - ay;
-    const double len2 = dx * dx + dy * dy;
-    double u = len2 > 1e-12 ? ((x - ax) * dx + (y - ay) * dy) / len2 : 0.0;
-    u = std::clamp(u, 0.0, 1.0);
-    best = std::min(best, std::hypot(ax + u * dx - x, ay + u * dy - y));
-  }
-  return best;
-}
-
-double DwbController::normalizeAngle(double a)
-{
-  return std::atan2(std::sin(a), std::cos(a));   // về (-π, π]
+  return tol;
 }
 
 // =====================================================================================================
@@ -531,55 +563,33 @@ double DwbController::normalizeAngle(double a)
 void DwbController::declareAndLoadParams()
 {
   auto node = node_.lock();
-  DwbParams d;   // giá trị mặc định (xem dwb_controller.hpp)
-  const auto decl = [&](const std::string & key, const rclcpp::ParameterValue & def) {
-      nav2_util::declare_parameter_if_not_declared(node, name_ + "." + key, def);
-      return node->get_parameter(name_ + "." + key);
-    };
+  DwbParams d;   // mặc định (dwa_core.hpp)
   DwbParams p;
-  p.max_vel_x = decl("max_vel_x", rclcpp::ParameterValue(d.max_vel_x)).as_double();
-  p.min_vel_x = decl("min_vel_x", rclcpp::ParameterValue(d.min_vel_x)).as_double();
-  p.max_vel_theta = decl("max_vel_theta", rclcpp::ParameterValue(d.max_vel_theta)).as_double();
-  p.min_in_place_vel_theta =
-    decl("min_in_place_vel_theta", rclcpp::ParameterValue(d.min_in_place_vel_theta)).as_double();
-  p.acc_lim_x = decl("acc_lim_x", rclcpp::ParameterValue(d.acc_lim_x)).as_double();
-  p.decel_lim_x = decl("decel_lim_x", rclcpp::ParameterValue(d.decel_lim_x)).as_double();
-  p.acc_lim_theta = decl("acc_lim_theta", rclcpp::ParameterValue(d.acc_lim_theta)).as_double();
-  p.vx_samples = decl("vx_samples", rclcpp::ParameterValue(d.vx_samples)).as_int();
-  p.vtheta_samples = decl("vtheta_samples", rclcpp::ParameterValue(d.vtheta_samples)).as_int();
-  p.sim_time = decl("sim_time", rclcpp::ParameterValue(d.sim_time)).as_double();
-  p.sim_granularity =
-    decl("sim_granularity", rclcpp::ParameterValue(d.sim_granularity)).as_double();
-  p.local_plan_length =
-    decl("local_plan_length", rclcpp::ParameterValue(d.local_plan_length)).as_double();
-  p.carrot_distance =
-    decl("carrot_distance", rclcpp::ParameterValue(d.carrot_distance)).as_double();
-  p.closest_search_distance =
-    decl("closest_search_distance", rclcpp::ParameterValue(d.closest_search_distance)).as_double();
-  p.rotate_to_heading_angle =
-    decl("rotate_to_heading_angle", rclcpp::ParameterValue(d.rotate_to_heading_angle)).as_double();
-  p.rotate_gain = decl("rotate_gain", rclcpp::ParameterValue(d.rotate_gain)).as_double();
-  p.xy_goal_tolerance =
-    decl("xy_goal_tolerance", rclcpp::ParameterValue(d.xy_goal_tolerance)).as_double();
-  p.yaw_goal_tolerance =
-    decl("yaw_goal_tolerance", rclcpp::ParameterValue(d.yaw_goal_tolerance)).as_double();
-  p.path_distance_scale =
-    decl("path_distance_scale", rclcpp::ParameterValue(d.path_distance_scale)).as_double();
-  p.carrot_distance_scale =
-    decl("carrot_distance_scale", rclcpp::ParameterValue(d.carrot_distance_scale)).as_double();
-  p.heading_scale = decl("heading_scale", rclcpp::ParameterValue(d.heading_scale)).as_double();
-  p.obstacle_scale = decl("obstacle_scale", rclcpp::ParameterValue(d.obstacle_scale)).as_double();
-  p.speed_scale = decl("speed_scale", rclcpp::ParameterValue(d.speed_scale)).as_double();
-  p.unknown_is_obstacle =
-    decl("unknown_is_obstacle", rclcpp::ParameterValue(d.unknown_is_obstacle)).as_bool();
-  p.transform_tolerance =
-    decl("transform_tolerance", rclcpp::ParameterValue(d.transform_tolerance)).as_double();
-  p.publish_trajectories =
-    decl("publish_trajectories", rclcpp::ParameterValue(d.publish_trajectories)).as_bool();
-  p.trajectory_marker_stride =
-    decl("trajectory_marker_stride", rclcpp::ParameterValue(d.trajectory_marker_stride)).as_int();
+  ParamRefs rd = refs(d);
+  ParamRefs rp = refs(p);
+  const auto key = [&](const std::string & k) {return name_ + "." + k;};
+  for (std::size_t k = 0; k < rd.d.size(); ++k) {
+    nav2_util::declare_parameter_if_not_declared(
+      node, key(rd.d[k].first), rclcpp::ParameterValue(*rd.d[k].second));
+    *rp.d[k].second = node->get_parameter(key(rd.d[k].first)).as_double();
+  }
+  for (std::size_t k = 0; k < rd.i.size(); ++k) {
+    nav2_util::declare_parameter_if_not_declared(
+      node, key(rd.i[k].first), rclcpp::ParameterValue(*rd.i[k].second));
+    *rp.i[k].second = static_cast<int>(node->get_parameter(key(rd.i[k].first)).as_int());
+  }
+  for (std::size_t k = 0; k < rd.b.size(); ++k) {
+    nav2_util::declare_parameter_if_not_declared(
+      node, key(rd.b[k].first), rclcpp::ParameterValue(*rd.b[k].second));
+    *rp.b[k].second = node->get_parameter(key(rd.b[k].first)).as_bool();
+  }
+  for (std::size_t k = 0; k < rd.s.size(); ++k) {
+    nav2_util::declare_parameter_if_not_declared(
+      node, key(rd.s[k].first), rclcpp::ParameterValue(*rd.s[k].second));
+    *rp.s[k].second = node->get_parameter(key(rd.s[k].first)).as_string();
+  }
 
-  const std::string reason = validate(p);
+  const std::string reason = validateParams(p);
   if (!reason.empty()) {
     throw std::runtime_error("DwbController [" + name_ + "]: invalid parameters: " + reason);
   }
@@ -590,58 +600,46 @@ void DwbController::declareAndLoadParams()
 rcl_interfaces::msg::SetParametersResult DwbController::onParamChange(
   const std::vector<rclcpp::Parameter> & params)
 {
-  // Callback được gọi cho MỌI tham số của controller_server: chỉ xử lý tham số "<name_>.xxx".
+  // Gọi cho MỌI tham số của controller_server: chỉ xử lý "<name_>.xxx". Cả lô được kiểm tra trên một BẢN SAO;
+  // chỉ khi toàn bộ hợp lệ mới thay params_ (nguyên tử). Lỗi -> giữ nguyên tham số cũ.
   rcl_interfaces::msg::SetParametersResult result;
   result.successful = true;
   std::lock_guard<std::mutex> lock(params_mutex_);
   DwbParams p = params_;
-  // Bảng tra: tên tham số (không có tiền tố) -> trường tương ứng trong bản sao p.
-  const std::map<std::string, double *> doubles{
-    {"max_vel_x", &p.max_vel_x}, {"min_vel_x", &p.min_vel_x},
-    {"max_vel_theta", &p.max_vel_theta}, {"min_in_place_vel_theta", &p.min_in_place_vel_theta},
-    {"acc_lim_x", &p.acc_lim_x}, {"decel_lim_x", &p.decel_lim_x},
-    {"acc_lim_theta", &p.acc_lim_theta}, {"sim_time", &p.sim_time},
-    {"sim_granularity", &p.sim_granularity}, {"local_plan_length", &p.local_plan_length},
-    {"carrot_distance", &p.carrot_distance},
-    {"closest_search_distance", &p.closest_search_distance},
-    {"rotate_to_heading_angle", &p.rotate_to_heading_angle}, {"rotate_gain", &p.rotate_gain},
-    {"xy_goal_tolerance", &p.xy_goal_tolerance}, {"yaw_goal_tolerance", &p.yaw_goal_tolerance},
-    {"path_distance_scale", &p.path_distance_scale},
-    {"carrot_distance_scale", &p.carrot_distance_scale}, {"heading_scale", &p.heading_scale},
-    {"obstacle_scale", &p.obstacle_scale}, {"speed_scale", &p.speed_scale},
-    {"transform_tolerance", &p.transform_tolerance}};
-  const std::map<std::string, int *> ints{
-    {"vx_samples", &p.vx_samples}, {"vtheta_samples", &p.vtheta_samples},
-    {"trajectory_marker_stride", &p.trajectory_marker_stride}};
-  const std::map<std::string, bool *> bools{
-    {"unknown_is_obstacle", &p.unknown_is_obstacle},
-    {"publish_trajectories", &p.publish_trajectories}};
-
+  ParamRefs r = refs(p);
   const std::string prefix = name_ + ".";
+  bool touched = false;
   for (const auto & prm : params) {
     const std::string & full = prm.get_name();
     if (full.rfind(prefix, 0) != 0) {
       continue;
     }
-    const std::string key = full.substr(prefix.size());
+    const std::string k = full.substr(prefix.size());
     try {
-      if (auto it = doubles.find(key); it != doubles.end()) {
-        // Kiểu do ROS 2 kiểm tra trước (double phải ghi dạng 0.5 / 5.0, không ghi 5).
-        *it->second = prm.as_double();
-      } else if (auto iti = ints.find(key); iti != ints.end()) {
-        *iti->second = static_cast<int>(prm.as_int());
-      } else if (auto itb = bools.find(key); itb != bools.end()) {
-        *itb->second = prm.as_bool();
+      bool found = false;
+      for (auto & e : r.d) {
+        if (e.first == k) {*e.second = prm.as_double(); found = true;}
       }
-      // Tên khác (vd. "plugin") không thuộc thuật toán: bỏ qua.
+      for (auto & e : r.i) {
+        if (e.first == k) {*e.second = static_cast<int>(prm.as_int()); found = true;}
+      }
+      for (auto & e : r.b) {
+        if (e.first == k) {*e.second = prm.as_bool(); found = true;}
+      }
+      for (auto & e : r.s) {
+        if (e.first == k) {*e.second = prm.as_string(); found = true;}
+      }
+      touched = touched || found;   // tên khác (vd. "plugin") không thuộc thuật toán: bỏ qua
     } catch (const rclcpp::exceptions::InvalidParameterTypeException & ex) {
       result.successful = false;
       result.reason = full + ": wrong type (" + ex.what() + ")";
       return result;
     }
   }
-  // Kiểm tra tính hợp lệ trước khi áp dụng (giá trị sai -> từ chối, giữ tham số cũ).
-  result.reason = validate(p);
+  if (!touched) {
+    return result;
+  }
+  result.reason = validateParams(p);
   if (!result.reason.empty()) {
     result.successful = false;
     return result;
@@ -650,104 +648,156 @@ rcl_interfaces::msg::SetParametersResult DwbController::onParamChange(
   return result;
 }
 
-std::string DwbController::validate(const DwbParams & p)
-{
-  // Trả về "" nếu hợp lệ, ngược lại là lý do. Dùng cả lúc configure (YAML) và khi ros2 param set.
-  if (p.max_vel_x < 0.0 || p.min_vel_x < 0.0 || p.min_vel_x > p.max_vel_x) {
-    return "need 0 <= min_vel_x <= max_vel_x (reversing is not allowed: no rear LiDAR coverage)";
-  }
-  if (p.max_vel_theta <= 0.0 || p.acc_lim_x <= 0.0 || p.decel_lim_x <= 0.0 ||
-    p.acc_lim_theta <= 0.0 || p.min_in_place_vel_theta < 0.0 ||
-    p.min_in_place_vel_theta > p.max_vel_theta)
-  {
-    return "max_vel_theta, acc_lim_x, decel_lim_x, acc_lim_theta must be > 0 and "
-           "0 <= min_in_place_vel_theta <= max_vel_theta";
-  }
-  if (p.vx_samples < 1 || p.vtheta_samples < 1 || p.sim_time <= 0.0 ||
-    p.sim_granularity <= 0.0 || p.trajectory_marker_stride < 1)
-  {
-    return "samples >= 1, sim_time > 0, sim_granularity > 0, trajectory_marker_stride >= 1";
-  }
-  if (p.carrot_distance <= 0.0 || p.local_plan_length <= 0.0 || p.closest_search_distance <= 0.0 ||
-    p.xy_goal_tolerance <= 0.0 || p.yaw_goal_tolerance <= 0.0 || p.transform_tolerance < 0.0)
-  {
-    return
-      "carrot_distance, local_plan_length, closest_search_distance, goal tolerances must be > 0";
-  }
-  return "";
-}
-
-DwbParams DwbController::snapshotParams()
+DwbParams DwbController::snapshotParams(double & max_vel_x_eff)
 {
   std::lock_guard<std::mutex> lock(params_mutex_);
   DwbParams p = params_;
-  if (speed_limit_x_ > 0.0) {
-    p.max_vel_x = std::min(p.max_vel_x, speed_limit_x_);
+  max_vel_x_eff = p.max_vel_x;
+  if (limit_mode_ == LimitMode::PERCENT) {
+    max_vel_x_eff = p.max_vel_x * limit_value_ / 100.0;
+  } else if (limit_mode_ == LimitMode::ABSOLUTE) {
+    max_vel_x_eff = std::min(p.max_vel_x, limit_value_);
   }
   return p;
 }
 
 // =====================================================================================================
-// HIỂN THỊ (RViz)
+// HIỂN THỊ / CHẨN ĐOÁN
 // =====================================================================================================
 
-void DwbController::publishDebug(
-  const std::vector<Trajectory> & trajectories, const Trajectory * best,
-  const std::vector<Pose2D> & local_path, const Pose2D & carrot, const std::string & frame)
+bool DwbController::debugDue(const DwbParams & p, bool force)
 {
-  const auto stamp = clock_->now();
-  const auto to_pose = [&](const Pose2D & s) {
-      geometry_msgs::msg::PoseStamped ps;
-      ps.header.frame_id = frame;
-      ps.header.stamp = stamp;
-      ps.pose.position.x = s.x;
-      ps.pose.position.y = s.y;
-      tf2::Quaternion q;
-      q.setRPY(0.0, 0.0, s.theta);
-      ps.pose.orientation = tf2::toMsg(q);
-      return ps;
-    };
-
-  // /<plugin>/local_path: đoạn đường A* đang xét.
-  if (local_path_pub_->is_activated()) {
-    nav_msgs::msg::Path lp;
-    lp.header.frame_id = frame;
-    lp.header.stamp = stamp;
-    for (const auto & s : local_path) {
-      lp.poses.push_back(to_pose(s));
-    }
-    local_path_pub_->publish(lp);
+  if (p.debug_publish_rate <= 0.0) {
+    return false;
   }
-
-  // /local_plan: quỹ đạo được chọn (rỗng trong các pha xoay tại chỗ).
-  if (local_plan_pub_->is_activated()) {
-    nav_msgs::msg::Path best_path;
-    best_path.header.frame_id = frame;
-    best_path.header.stamp = stamp;
-    if (best) {
-      for (const auto & s : best->poses) {
-        best_path.poses.push_back(to_pose(s));
-      }
-    }
-    local_plan_pub_->publish(best_path);
+  const auto t = std::chrono::steady_clock::now();
+  if (!force && have_last_debug_ &&
+    std::chrono::duration<double>(t - last_debug_).count() < 1.0 / p.debug_publish_rate - 1e-3)
+  {
+    return false;
   }
+  last_debug_ = t;
+  have_last_debug_ = true;
+  return true;
+}
 
-  DwbParams p = snapshotParams();
-  if (!p.publish_trajectories || !markers_pub_->is_activated()) {
+void DwbController::publishState(
+  const DwbParams & p, const ControlOutput * out, const std::string & error, double compute_ms)
+{
+  if (!state_pub_ || !state_pub_->is_activated() || p.debug_publish_rate <= 0.0) {
     return;
   }
-  // /<plugin>/trajectories: quỹ đạo ứng viên (xanh lá = hợp lệ, đỏ = va chạm), quỹ đạo tốt nhất (xanh dương),
-  // cà rốt (cầu vàng). Xóa marker cũ trước (DELETEALL).
+  diagnostic_msgs::msg::DiagnosticStatus st;
+  st.name = name_;
+  st.hardware_id = "controller_server";
+  const Phase ph = out ? out->phase : Phase::BLOCKED;
+  st.level = error.empty() ? diagnostic_msgs::msg::DiagnosticStatus::OK :
+    diagnostic_msgs::msg::DiagnosticStatus::WARN;
+  st.message = error.empty() ? phaseName(ph) : std::string(phaseName(ph)) + ": " + error;
+  const auto kv = [&st](const std::string & k, const std::string & v) {
+      diagnostic_msgs::msg::KeyValue e;
+      e.key = k;
+      e.value = v;
+      st.values.push_back(e);
+    };
+  kv("stamp", fmt(clock_->now().seconds(), 3));
+  kv("phase", phaseName(ph));
+  kv("compute_ms", fmt(compute_ms, 3));
+  kv("compute_ms_max", fmt(compute_ms_max_, 3));
+  kv("cycles", std::to_string(cycles_));
+  kv("over_budget", std::to_string(over_budget_));
+  kv("missed_deadline", std::to_string(missed_deadline_));
+  kv("progress", fmt(last_track_.progress, 3));
+  kv("deviation", fmt(last_track_.deviation, 3));
+  kv("osc_flips", std::to_string(core_.oscillation().flips()));
+  if (out) {
+    kv("v_cmd", fmt(out->cmd.v, 4));
+    kv("w_cmd", fmt(out->cmd.w, 4));
+    kv("dist_to_goal", fmt(out->dist_to_goal, 3));
+    kv("n_candidates", std::to_string(out->n_candidates));
+    kv("n_valid", std::to_string(out->n_valid));
+    kv("n_forward_valid", std::to_string(out->n_forward_valid));
+    kv("rej_collision", std::to_string(out->n_reject[static_cast<int>(Reject::COLLISION)]));
+    kv("rej_unknown", std::to_string(out->n_reject[static_cast<int>(Reject::UNKNOWN)]));
+    kv("rej_off_costmap", std::to_string(out->n_reject[static_cast<int>(Reject::OFF_MAP)]));
+    kv("rej_braking", std::to_string(out->n_reject[static_cast<int>(Reject::BRAKING)]));
+    kv("overspeed", (out->window.v_overspeed || out->window.w_overspeed) ? "true" : "false");
+    kv("cost_total", fmt(out->chosen.total_cost, 4));
+    kv("cost_obstacle", fmt(out->chosen.obstacle_cost, 4));
+    kv("cost_path", fmt(out->chosen.path_cost, 4));
+    kv("cost_carrot", fmt(out->chosen.carrot_cost, 4));
+    kv("cost_heading", fmt(out->chosen.heading_cost, 4));
+    kv("cost_speed", fmt(out->chosen.speed_cost, 4));
+    kv("cost_oscillation", fmt(out->chosen.oscillation_cost, 4));
+  }
+  state_pub_->publish(st);
+}
+
+void DwbController::publishPaths(
+  const std::vector<Pose2D> & local_path, const Trajectory * chosen, const std::string & frame)
+{
+  const auto stamp = clock_->now();
+  const auto to_path = [&](const std::vector<Pose2D> & pts) {
+      nav_msgs::msg::Path out;
+      out.header.frame_id = frame;
+      out.header.stamp = stamp;
+      for (const auto & s : pts) {
+        geometry_msgs::msg::PoseStamped ps;
+        ps.header = out.header;
+        ps.pose.position.x = s.x;
+        ps.pose.position.y = s.y;
+        tf2::Quaternion q;
+        q.setRPY(0.0, 0.0, s.theta);
+        ps.pose.orientation = tf2::toMsg(q);
+        out.poses.push_back(ps);
+      }
+      return out;
+    };
+  if (local_path_pub_ && local_path_pub_->is_activated()) {
+    local_path_pub_->publish(to_path(local_path));
+  }
+  // /local_plan: quỹ đạo của lệnh được chọn (gồm cả pha xoay: trễ + một chu kỳ); rỗng khi BLOCKED.
+  if (local_plan_pub_ && local_plan_pub_->is_activated()) {
+    local_plan_pub_->publish(to_path(chosen ? chosen->poses : std::vector<Pose2D>{}));
+  }
+}
+
+void DwbController::clearDebug()
+{
+  if (local_plan_pub_ && local_plan_pub_->is_activated()) {
+    nav_msgs::msg::Path empty;
+    empty.header.frame_id = costmap_ros_->getGlobalFrameID();
+    empty.header.stamp = clock_->now();
+    local_plan_pub_->publish(empty);
+    local_path_pub_->publish(empty);
+  }
+  if (markers_pub_ && markers_pub_->is_activated()) {
+    visualization_msgs::msg::MarkerArray arr;
+    visualization_msgs::msg::Marker clear;
+    clear.action = visualization_msgs::msg::Marker::DELETEALL;
+    arr.markers.push_back(clear);
+    markers_pub_->publish(arr);
+  }
+}
+
+void DwbController::publishMarkers(const ControlOutput & out, const std::string & frame, int stride)
+{
+  if (!markers_pub_ || !markers_pub_->is_activated()) {
+    return;
+  }
+  // Ứng viên: xanh lá = hợp lệ, đỏ = bị loại; quỹ đạo chọn: xanh dương; đuôi phanh: cam; cà rốt: cầu vàng.
+  const auto stamp = clock_->now();
   visualization_msgs::msg::MarkerArray arr;
   visualization_msgs::msg::Marker clear;
   clear.action = visualization_msgs::msg::Marker::DELETEALL;
   arr.markers.push_back(clear);
   int id = 0;
-  const auto line = [&](const Trajectory & t, float r, float g, float b, double width) {
+  const auto line = [&](const std::vector<Pose2D> & pts, const char * ns, float r, float g, float b,
+      double width) {
       visualization_msgs::msg::Marker m;
       m.header.frame_id = frame;
       m.header.stamp = stamp;
-      m.ns = "candidates";
+      m.ns = ns;
       m.id = id++;
       m.type = visualization_msgs::msg::Marker::LINE_STRIP;
       m.action = visualization_msgs::msg::Marker::ADD;
@@ -757,7 +807,7 @@ void DwbController::publishDebug(
       m.color.g = g;
       m.color.b = b;
       m.color.a = 0.8f;
-      for (const auto & s : t.poses) {
+      for (const auto & s : pts) {
         geometry_msgs::msg::Point pt;
         pt.x = s.x;
         pt.y = s.y;
@@ -765,19 +815,17 @@ void DwbController::publishDebug(
       }
       return m;
     };
-  for (std::size_t i = 0; i < trajectories.size();
-    i += static_cast<std::size_t>(p.trajectory_marker_stride))
-  {
-    const auto & t = trajectories[i];
+  for (std::size_t i = 0; i < out.candidates.size(); i += static_cast<std::size_t>(stride)) {
+    const auto & t = out.candidates[i];
     arr.markers.push_back(
-      t.valid ? line(t, 0.1f, 0.8f, 0.1f, 0.005) : line(
-        t, 0.9f, 0.1f, 0.1f,
-        0.005));
+      t.valid() ? line(t.poses, "candidates", 0.1f, 0.8f, 0.1f, 0.005) :
+      line(t.poses, "candidates", 0.9f, 0.1f, 0.1f, 0.005));
   }
-  if (best) {
-    auto m = line(*best, 0.0f, 0.4f, 1.0f, 0.02);
-    m.ns = "best";
-    arr.markers.push_back(m);
+  if (out.ok && out.chosen.poses.size() > 1) {
+    arr.markers.push_back(line(out.chosen.poses, "best", 0.0f, 0.4f, 1.0f, 0.02));
+  }
+  if (out.ok && out.chosen.braking.size() > 1) {
+    arr.markers.push_back(line(out.chosen.braking, "braking", 1.0f, 0.5f, 0.0f, 0.012));
   }
   visualization_msgs::msg::Marker c;
   c.header.frame_id = frame;
@@ -786,8 +834,8 @@ void DwbController::publishDebug(
   c.id = id++;
   c.type = visualization_msgs::msg::Marker::SPHERE;
   c.action = visualization_msgs::msg::Marker::ADD;
-  c.pose.position.x = carrot.x;
-  c.pose.position.y = carrot.y;
+  c.pose.position.x = out.carrot.x;
+  c.pose.position.y = out.carrot.y;
   c.pose.orientation.w = 1.0;
   c.scale.x = c.scale.y = c.scale.z = 0.08;
   c.color.r = 1.0f;

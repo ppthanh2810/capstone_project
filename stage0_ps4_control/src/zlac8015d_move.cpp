@@ -17,14 +17,14 @@ class zlac8015d_move : public rclcpp::Node
 public:
   zlac8015d_move()
   : Node("zlac8015d_move"),
-    motors_("/dev/ttyUSB0")
+    motors_("/dev/ttyUSB2")
   {
     wheel_radius_ = declare_parameter<double>("wheel_radius", 0.0535);
     wheel_distance_ = declare_parameter<double>("wheel_distance", 0.34);
 
     motors_.disableMotor();
-    motors_.setAccelTime(1000, 1000);
-    motors_.setDecelTime(1000, 1000);
+    motors_.setAccelTime(500, 500);
+    motors_.setDecelTime(500, 500);
     motors_.setMode(3);
     motors_.setRpm(0, 0);
     motors_.enableMotor();

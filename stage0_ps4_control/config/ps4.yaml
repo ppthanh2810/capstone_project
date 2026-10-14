@@ -8,10 +8,10 @@ joy_teleop:
       axis_mappings:
         linear-x:
           axis: 1
-          scale: 0.5
+          scale: 0.4
           offset: 0.0
         angular-z:
           axis: 3
-          scale: 0.6
+          scale: 0.4
           offset: 0.0
  

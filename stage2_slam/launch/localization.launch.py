@@ -48,13 +48,13 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             "serial_port",
-            default_value="/dev/ttyUSB2",
+            default_value="/dev/ttyUSB1",
             description="Cổng USB của RPLidar C1",
         ),
 
         DeclareLaunchArgument(
             "imu_port",
-            default_value="/dev/ttyUSB1",
+            default_value="/dev/ttyUSB0",
             description="Cổng USB-UART của ESP32 (IMU), truyền xuống ekf.launch.py",
         ),
 

@@ -23,7 +23,7 @@ struct ImuSample {
 
 class Bno055 {
 public:
-  explicit Bno055(std::string port = "/dev/ttyUSB1") : port_(std::move(port)) {}
+  explicit Bno055(std::string port = "/dev/ttyUSB0") : port_(std::move(port)) {}
   ~Bno055() { closePort(); }
   Bno055(const Bno055 &) = delete;
   Bno055 &operator=(const Bno055 &) = delete;

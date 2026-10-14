@@ -210,46 +210,75 @@ controller_server:
       # Oscillation: phạt quỹ đạo đổi chiều liên tục (dùng tham số mặc định của critic).
 
     # ==========================================================================================
-    # CustomDWB — bộ điều khiển Dynamic Window TỰ VIẾT (stage3_navigation/src/dwb_controller.cpp)
-    # Mọi tham số chỉnh được khi đang chạy:
-    #   ros2 param set /controller_server CustomDWB.<tên> <giá trị>
-    # Giới hạn động học = cùng giá trị khởi đầu thận trọng như FollowPath (DWB), NOT_VERIFIED trên robot.
+    # CustomDWB — bộ điều khiển Dynamic Window TỰ VIẾT
+    #   thuật toán: stage3_navigation/src/dwa_core.cpp, lớp vỏ ROS: src/dwb_controller.cpp
+    #   tài liệu: stage3_navigation/doc/{sources,requirements_validation,offline_runbook}.md
+    # Mọi tham số chỉnh được khi đang chạy (cả lô được kiểm tra nguyên tử; giá trị sai -> từ chối, giữ cũ):
+    #   ros2 param set /controller_server CustomDWB.<tên> <giá trị>     (số thực phải ghi dạng 5.0)
+    # Giới hạn động học / trễ = giá trị khởi đầu thận trọng, NOT_VERIFIED trên robot (chưa đo).
     # ==========================================================================================
     CustomDWB:
       plugin: "stage3_navigation::DwbController"
-      # ---- Giới hạn động học ----
+      # ---- Giới hạn động học (lệnh LUÔN nằm trong [min_vel_x, max_vel_x] và |ω| <= max_vel_theta) ----
       max_vel_x: 0.15              # m/s
       min_vel_x: 0.0               # 0 = không lùi (phía sau không có LiDAR); plugin từ chối giá trị < 0
       max_vel_theta: 0.5           # rad/s
       min_in_place_vel_theta: 0.1  # rad/s, |ω| tối thiểu khi xoay tại chỗ (thắng ma sát) - NOT_VERIFIED
-      acc_lim_x: 0.5               # m/s²
-      decel_lim_x: 0.5             # m/s² (giá trị dương)
-      acc_lim_theta: 1.0           # rad/s²
+      acc_lim_x: 0.5               # m/s², tăng |v|
+      decel_lim_x: 0.5             # m/s², giảm |v| (giá trị DƯƠNG; Nav2 DWB dùng số âm)
+      acc_lim_theta: 1.0           # rad/s², tăng |ω|
+      decel_lim_theta: 1.0         # rad/s², giảm |ω| (giá trị dương)
       # ---- Lấy mẫu dynamic window + mô phỏng ----
+      # Cửa sổ = tập (v, ω) đạt được trong 1 chu kỳ (dt = 1/controller_frequency) từ vận tốc ĐO. Luôn có thêm mẫu
+      # v = 0 / ω = 0 nếu đạt được. Tải: vx * (vθ+1) * bước <= 100000 pose/chu kỳ (kiểm tra khi set).
       vx_samples: 20
-      vtheta_samples: 21           # lẻ -> có ω = 0
-      sim_time: 1.7                # s (0.15 m/s -> nhìn trước ~0.26 m)
-      sim_granularity: 0.05        # s
+      vtheta_samples: 21
+      sim_time: 1.7                # s chân trời chấm điểm (0.15 m/s -> ~0.26 m)
+      sim_granularity: 0.05        # s bước tối đa; bước còn bị giới hạn để quét <= nửa ô costmap
+      # ---- Mô hình an toàn (quỹ đạo phải phanh dừng được trước vật cản) ----
+      # Mỗi ứng viên được mô phỏng: [0, latency) theo lệnh trước -> chuyển tiếp có giới hạn gia tốc -> giữ lệnh;
+      # cộng đuôi phanh từ latency + dt (decel_lim_x / decel_lim_theta) + stopping_margin phía trước.
+      control_latency: 0.1         # s, trễ lệnh -> bánh. SYNTHETIC (chưa đo): cần đo trên robot
+      stopping_margin: 0.05        # m, biên bất định thêm sau khi dừng hẳn
       # ---- Đường cục bộ + cà rốt ----
       local_plan_length: 1.5       # m đường A* phía trước được xét (còn bị cắt ở mép local costmap)
       carrot_distance: 0.6         # m, điểm dẫn hướng dọc đường A*
-      closest_search_distance: 1.0 # m, phạm vi tìm điểm gần nhất phía trước (chống nhảy đoạn)
+      closest_search_distance: 1.0 # m, cửa sổ tìm tiến trình phía trước (theo độ dài cung, không nhảy nhánh)
+      max_path_deviation: 0.8      # m, robot lệch đường A* hơn mức này -> từ chối (lệnh 0, abort)
       # ---- Xoay tại chỗ ----
       rotate_to_heading_angle: 0.8 # rad: lệch hướng tới cà rốt > ngưỡng -> xoay tại chỗ (thoát khi < 0.4)
       rotate_gain: 1.5             # ω = gain * sai số góc
-      xy_goal_tolerance: 0.15      # m, = general_goal_checker
-      yaw_goal_tolerance: 0.25     # rad, = general_goal_checker
-      # ---- Trọng số hàm chi phí: tổng = Σ scale * thành phần (nhỏ hơn = tốt hơn) ----
+      # ---- Đích ----
+      # Dung sai THỰC lấy từ goal checker của FollowPath (general_goal_checker.getTolerances()); hai giá trị dưới
+      # chỉ dùng khi checker không cung cấp (có cảnh báo nếu khác checker).
+      xy_goal_tolerance: 0.15      # m, dự phòng
+      yaw_goal_tolerance: 0.25     # rad, dự phòng
+      goal_tolerance_fraction: 0.9 # vào ROTATE_TO_GOAL khi d < 0.9*xy_tol; dừng xoay khi |yaw| < 0.9*yaw_tol
+      goal_latch_release_margin: 0.05  # m, trôi ra ngoài xy_tol + 0.05 -> tiếp cận lại
+      # ---- Hàm chi phí MỀM: tổng = Σ scale * thành phần (nhỏ hơn = tốt hơn) ----
+      # Va chạm / unknown / ngoài costmap / không phanh kịp là ràng buộc CỨNG (loại quỹ đạo), không nằm ở đây.
+      # Thang: path, carrot tính bằng m; heading, obstacle, speed, oscillation trong [0, 1].
       path_distance_scale: 4.0     # x khoảng cách cuối quỹ đạo -> đường A* (m): bám đường
       carrot_distance_scale: 2.0   # x khoảng cách cuối quỹ đạo -> cà rốt (m): tiến về đích
-      heading_scale: 1.0           # x lệch hướng tới cà rốt (0..1): hướng đầu đúng đường
-      obstacle_scale: 0.5          # x chi phí costmap lớn nhất dọc quỹ đạo (0..1): tránh xa vật cản
-      speed_scale: 0.3             # x (max_vel_x - v)/max_vel_x (0..1): khuyến khích đi nhanh
-      # ---- An toàn / hiển thị ----
-      unknown_is_obstacle: true
-      transform_tolerance: 0.3     # s
-      publish_trajectories: true   # /CustomDWB/trajectories (MarkerArray), /CustomDWB/local_path
+      heading_scale: 1.0           # x lệch hướng tới cà rốt / π: hướng đầu đúng đường
+      obstacle_scale: 0.5          # x chi phí costmap lớn nhất dọc cung dài max_vel_x*sim_time / 252
+      speed_scale: 0.3             # x (max_vel_x - v)/max_vel_x: khuyến khích đi nhanh (không lấn ràng buộc cứng)
+      oscillation_scale: 1.0       # phạt ω quay lại chiều cũ ngay sau một lần đổi chiều
+      # ---- Chống dao động: hết "vừa đổi chiều" khi đi > dist, xoay > angle, hoặc sau time ----
+      oscillation_reset_dist: 0.05 # m
+      oscillation_reset_angle: 0.2 # rad
+      oscillation_reset_time: 2.0  # s (> 0: không khóa chiều xoay vô hạn)
+      # ---- Dữ liệu / TF (thiếu hoặc cũ -> PlannerException -> controller_server phát lệnh 0, abort) ----
+      unknown_is_obstacle: true    # CHỈ có tác dụng khi local costmap track_unknown_space: true (hiện false)
+      transform_tolerance: 0.3     # s, thời gian CHỜ TF (không phải tuổi)
+      max_tf_age: 1.0              # s, tuổi tối đa TF map -> odom (AMCL đóng dấu +1.0 s vào tương lai)
+      max_pose_age: 0.5            # s, tuổi tối đa TF odom -> base_footprint (EKF 30 Hz)
+      odom_timeout: 0.5            # s, /odometry/filtered im lặng lâu hơn -> dừng
+      collision_check: "auto"      # auto: footprint tròn (robot_radius) -> ô tâm; đa giác -> thêm viền footprint
+      # ---- Hiển thị / chẩn đoán ----
+      publish_trajectories: true   # /CustomDWB/trajectories (MarkerArray)
       trajectory_marker_stride: 4  # vẽ 1/4 số quỹ đạo ứng viên
+      debug_publish_rate: 5.0      # Hz cho marker + /CustomDWB/state (DiagnosticStatus); 0 = tắt
 
 # Local costmap (node con của controller_server): rolling window quanh robot trong frame odom.
 local_costmap:

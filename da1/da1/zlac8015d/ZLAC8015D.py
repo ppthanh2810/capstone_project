@@ -8,7 +8,7 @@ import numpy as np
 
 class Controller:
 
-	def __init__(self, port="/dev/ttyUSB0"):
+	def __init__(self, port="/dev/ttyUSB2"):
 
 		self._port = port
 

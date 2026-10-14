@@ -41,6 +41,15 @@ install(TARGETS goal_path_bridge
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# Lõi thuật toán Dynamic Window (không phụ thuộc ROS node, chỉ nav2_costmap_2d::Costmap2D): dùng chung cho
+# plugin, unit test và mô phỏng kín vòng.
+add_library(dwa_core SHARED src/dwa_core.cpp)
+target_compile_features(dwa_core PUBLIC cxx_std_17)
+target_include_directories(dwa_core PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(dwa_core nav2_costmap_2d)
+
 # Plugin nav2_core::Controller tự viết (Dynamic Window): libdwb_controller.so, nạp bởi controller_server
 # qua pluginlib (dwb_controller_plugin.xml). Chọn bằng navigation.launch.py local_planner:=custom.
 add_library(dwb_controller SHARED src/dwb_controller.cpp)
@@ -48,12 +57,20 @@ target_compile_features(dwb_controller PUBLIC cxx_std_17)
 target_include_directories(dwb_controller PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+target_link_libraries(dwb_controller dwa_core)
 ament_target_dependencies(dwb_controller
-  rclcpp rclcpp_lifecycle geometry_msgs nav_msgs visualization_msgs nav2_core nav2_costmap_2d
-  nav2_util pluginlib tf2 tf2_ros tf2_geometry_msgs)
+  rclcpp rclcpp_lifecycle geometry_msgs nav_msgs visualization_msgs diagnostic_msgs nav2_core
+  nav2_costmap_2d nav2_util pluginlib tf2 tf2_ros tf2_geometry_msgs)
 pluginlib_export_plugin_description_file(nav2_core dwb_controller_plugin.xml)
 
-install(TARGETS dwb_controller
+# Mô phỏng kín vòng KHÔNG cần ROS graph (động học có trễ + giới hạn gia tốc, costmap tổng hợp): benchmark lõi.
+add_executable(dwa_closed_loop_sim test/dwa_closed_loop_sim.cpp test/sim_world.cpp)
+target_include_directories(dwa_closed_loop_sim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/test)
+target_link_libraries(dwa_closed_loop_sim dwa_core)
+ament_target_dependencies(dwa_closed_loop_sim nav2_costmap_2d)
+install(TARGETS dwa_closed_loop_sim DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS dwa_core dwb_controller
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -62,7 +79,7 @@ install(DIRECTORY include/
   DESTINATION include
 )
 
-install(DIRECTORY launch config rviz
+install(DIRECTORY launch config rviz test/offline
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -76,6 +93,23 @@ if(BUILD_TESTING)
   # a copyright and license is added to all source files
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
+
+  # Unit test lõi DWA (không cần ROS graph) + kịch bản kín vòng tất định.
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_dwa_core test/test_dwa_core.cpp test/sim_world.cpp)
+  target_include_directories(test_dwa_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/test)
+  target_link_libraries(test_dwa_core dwa_core)
+  ament_target_dependencies(test_dwa_core nav2_costmap_2d)
+
+  # Test plugin qua lớp nav2_core::Controller thật (lifecycle node + Costmap2DROS + TF buffer, không có
+  # controller_server, không publish cmd_vel): lifecycle, setPlan, TF/odom cũ, tham số, speed limit.
+  # ENV: graph ROS cách ly (domain riêng + chỉ localhost) — test tạo node/topic thật trong process.
+  ament_add_gtest(test_dwb_controller_plugin test/test_dwb_controller_plugin.cpp TIMEOUT 120
+    ENV ROS_DOMAIN_ID=87 ROS_LOCALHOST_ONLY=1)
+  target_link_libraries(test_dwb_controller_plugin dwb_controller dwa_core)
+  ament_target_dependencies(test_dwb_controller_plugin
+    rclcpp rclcpp_lifecycle nav2_core nav2_costmap_2d nav2_util tf2_ros tf2_geometry_msgs nav_msgs
+    geometry_msgs pluginlib)
 endif()
 
 ament_package()

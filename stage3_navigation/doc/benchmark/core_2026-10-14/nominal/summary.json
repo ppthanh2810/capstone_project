@@ -1,0 +1,26 @@
+{
+  "tool": "dwa_closed_loop_sim",
+  "robot_model": "nominal",
+  "machine": "Bravo-15-B7ED x86_64 6.8.0-40-generic",
+  "runs_per_scenario": 5,
+  "scenarios": [
+    {"name": "straight", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 19.5, "compute_p50_ms": 1.33212, "compute_p99_ms": 2.00342, "compute_max_ms": 2.44754},
+    {"name": "l_turn", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 24.84, "compute_p50_ms": 1.46704, "compute_p99_ms": 1.86628, "compute_max_ms": 1.97978},
+    {"name": "s_curve", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 36.92, "compute_p50_ms": 1.50718, "compute_p99_ms": 1.87839, "compute_max_ms": 2.33095},
+    {"name": "self_intersect", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 49, "compute_p50_ms": 1.52843, "compute_p99_ms": 2.02997, "compute_max_ms": 2.70959},
+    {"name": "duplicates", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 12.9, "compute_p50_ms": 1.33039, "compute_p99_ms": 1.80319, "compute_max_ms": 2.60076},
+    {"name": "single_pose", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 4.1, "compute_p50_ms": 1.42312, "compute_p99_ms": 1.73604, "compute_max_ms": 1.77313},
+    {"name": "goal_near", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 3.2, "compute_p50_ms": 0.015209, "compute_p99_ms": 0.0246892, "compute_max_ms": 0.029627},
+    {"name": "corridor_ok", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.297872, "mean_time_s": 26.14, "compute_p50_ms": 1.36517, "compute_p99_ms": 1.84346, "compute_max_ms": 1.94501},
+    {"name": "corridor_narrow", "expect_success": false, "success": 0, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.135859, "mean_time_s": 15.5, "compute_p50_ms": 1.18236, "compute_p99_ms": 1.65875, "compute_max_ms": 2.02445},
+    {"name": "obstacle_bypass", "expect_success": false, "success": 0, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.150301, "mean_time_s": 20.52, "compute_p50_ms": 1.28698, "compute_p99_ms": 1.74109, "compute_max_ms": 1.99061},
+    {"name": "blocked_wall", "expect_success": false, "success": 0, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.150327, "mean_time_s": 20.8, "compute_p50_ms": 1.24584, "compute_p99_ms": 1.63409, "compute_max_ms": 1.89509},
+    {"name": "obstacle_near_path", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.160088, "mean_time_s": 26.2, "compute_p50_ms": 1.3441, "compute_p99_ms": 1.74177, "compute_max_ms": 1.92849},
+    {"name": "symmetric_obstacle", "expect_success": false, "success": 0, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.150313, "mean_time_s": 18.9, "compute_p50_ms": 1.25802, "compute_p99_ms": 1.69099, "compute_max_ms": 1.8841},
+    {"name": "start_backwards", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 22.28, "compute_p50_ms": 1.32733, "compute_p99_ms": 1.73821, "compute_max_ms": 1.88267},
+    {"name": "overspeed_start", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 31.5, "compute_p50_ms": 1.32764, "compute_p99_ms": 1.59453, "compute_max_ms": 1.91776},
+    {"name": "overspeed_wall", "expect_success": false, "success": 0, "runs": 5, "runs_with_collision": 0, "min_clearance_m": 0.150344, "mean_time_s": 15.8, "compute_p50_ms": 1.13859, "compute_p99_ms": 2.13813, "compute_max_ms": 2.36419},
+    {"name": "goal_yaw_pi", "expect_success": true, "success": 5, "runs": 5, "runs_with_collision": 0, "min_clearance_m": null, "mean_time_s": 19.4, "compute_p50_ms": 1.34364, "compute_p99_ms": 8.94821, "compute_max_ms": 12.0522}
+  ],
+  "runs_violating_expectations": 0
+}
