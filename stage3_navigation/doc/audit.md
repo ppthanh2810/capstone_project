@@ -20,7 +20,7 @@ trên mã cục bộ trước khi sửa. "Trước" = mã `e6561b4`; "Sau" = mã
 | A9 | P1 | Global (0.20 m, không padding) và local (0.20 + 0.10) dùng biên khác nhau | `nav2_params.yaml` | closed-loop `corridor_narrow` (khe 0.54 m: A* cho qua, controller dừng trước khe, không va chạm, không "thành công giả") | **Không đổi geometry** (chưa đo footprint/khoảng hở thật). Đề xuất trong `p2_proposals.md` (#4) |
 | A10 | P1 | Baseline Nav2 không dùng generator DWA | `FollowPath` YAML | — | Giữ `FollowPath` (Standard); thêm profile **chỉ trong benchmark** `FollowPathLA` (LimitedAccel, `sim_period 0.1`) |
 | A11 | P1 | Không có unit/integration test cho controller | `CMakeLists.txt` | — | `test_dwa_core` (44), `test_dwb_controller_plugin` (12), `dwa_closed_loop_sim`, fixture ROS `test/offline/` |
-| A12 | P2 | Global path không xét vật cản mới, không replan | thiết kế | `blocked_wall`, `obstacle_bypass` | Không đổi (P2, `p2_proposals.md`) |
+| A12 | P2 | Global path không xét vật cản mới, không replan | thiết kế | `blocked_wall`, `obstacle_bypass` | 2026-10-15: obstacle layer ở global costmap + replan trong `goal_path_bridge` (`replanning.md`), offline only |
 
 ## Phát hiện thêm trong lúc làm
 

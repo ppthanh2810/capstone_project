@@ -31,8 +31,17 @@ find_package(pluginlib REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
 # Bridge RViz Goal Pose -> ComputePathToPose -> /global_path; tùy chọn -> FollowPath (DWB) khi được kích hoạt.
+# path_blockage: kiểm tra đường A* bị chặn trên lưới costmap (không phụ thuộc ROS), dùng cho replanning.
+add_library(path_blockage STATIC src/path_blockage.cpp)
+target_compile_features(path_blockage PUBLIC cxx_std_17)
+set_target_properties(path_blockage PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(path_blockage PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 add_executable(goal_path_bridge src/goal_path_bridge.cpp)
 target_compile_features(goal_path_bridge PUBLIC cxx_std_17)
+target_link_libraries(goal_path_bridge path_blockage)
 ament_target_dependencies(goal_path_bridge
   rclcpp rclcpp_action geometry_msgs nav_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs
   std_msgs std_srvs diagnostic_msgs)
@@ -100,6 +109,10 @@ if(BUILD_TESTING)
   target_include_directories(test_dwa_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/test)
   target_link_libraries(test_dwa_core dwa_core)
   ament_target_dependencies(test_dwa_core nav2_costmap_2d)
+
+  # Unit test kiểm tra đường bị chặn (replanning), không cần ROS graph.
+  ament_add_gtest(test_path_blockage test/test_path_blockage.cpp)
+  target_link_libraries(test_path_blockage path_blockage)
 
   # Test plugin qua lớp nav2_core::Controller thật (lifecycle node + Costmap2DROS + TF buffer, không có
   # controller_server, không publish cmd_vel): lifecycle, setPlan, TF/odom cũ, tham số, speed limit.

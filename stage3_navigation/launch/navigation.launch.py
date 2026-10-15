@@ -162,6 +162,14 @@ def generate_launch_description():
                         "false: chỉ khi gọi /goal_path_bridge/follow",
         ),
 
+        DeclareLaunchArgument(
+            "replan",
+            default_value="true",
+            description="true: đường A* đang bám bị vật cản (global_costmap) chặn "
+                        "hoặc FollowPath abort -> A* lại tới cùng đích, DWB bám đường mới "
+                        "(goal_path_bridge replan.*). false: dừng/abort như trước",
+        ),
+
         OpaqueFunction(function=_check_args),
 
         # ---- Stage 2 + A* (planner_server, global_costmap, lifecycle_manager_planning, RViz) ----
@@ -215,6 +223,8 @@ def generate_launch_description():
                         LaunchConfiguration("auto_follow"), value_type=bool),
                     "require_localized": ParameterValue(require_localized, value_type=bool),
                     "controller_id": controller_id,
+                    "replan.enabled": ParameterValue(
+                        LaunchConfiguration("replan"), value_type=bool),
                 },
             ],
             arguments=["--ros-args", "--log-level", log_level],

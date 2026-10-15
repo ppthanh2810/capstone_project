@@ -70,6 +70,15 @@ Gửi path: `ros2 topic pub --once /goal_pose geometry_msgs/msg/PoseStamped "{he
 `ros2 service call /goal_path_bridge/follow std_srvs/srv/Trigger`. Đây là topic goal, không phải topic vận tốc;
 chỉ chạy trong graph cách ly ở trên.
 
+### 3c. Replanning (goal_path_bridge, vật cản chưa có trong bản đồ)
+```bash
+cd ~/capstone_ws/capstone_project/stage3_navigation/test/offline
+python3 run_replan_test.py --out ~/capstone_ws/stage3_replan_runs/<tên>            # 5 kịch bản, replan bật
+python3 run_replan_test.py --out <dir> --replan false --scenario replan_detour      # đối chứng hành vi cũ
+```
+Domain 161 + `ROS_LOCALHOST_ONLY=1`, `auto_follow:=true monitor:=false`, kiểm graph trước khi gửi `/goal_pose`.
+Kết quả: `<dir>/summary.json`, `<dir>/<kịch bản>/{launch.log,sim.csv,client.json}`. Thiết kế + kết quả: `replanning.md`.
+
 ## 4. Rollout phần cứng — NGƯỜI VẬN HÀNH thực hiện, từng bước cần xác nhận
 
 Điều kiện trước: phần 1–3 PASS; đọc `requirements_validation.md` (mục NOT_VERIFIED).
