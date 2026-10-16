@@ -1,0 +1,115 @@
+# =============================================================================
+# capstone_project — thư viện cần cài để build + chạy toàn bộ package (trừ da1)
+# Nền: Ubuntu 22.04 + ROS 2 Humble (đã cài /opt/ros/humble, ví dụ ros-humble-desktop
+#      hoặc ros-humble-ros-base). Mọi thứ dưới đây đều cài bằng apt, KHÔNG cần pip.
+#
+# Cài tất cả (bỏ qua dòng chú thích):
+#   sudo apt update
+#   sudo apt install -y $(sed 's/#.*//' requirements.txt | xargs)
+#
+# Sau đó (tuỳ chọn, kiểm tra lại bằng rosdep):
+#   sudo rosdep init        # chỉ lần đầu
+#   rosdep update
+#   cd ~/capstone_ws && rosdep install --from-paths capstone_project \
+#       --ignore-src -r -y --skip-keys "da1"
+#
+# Build:
+#   source /opt/ros/humble/setup.bash
+#   cd ~/capstone_ws && colcon build --symlink-install --packages-skip da1
+#   source install/setup.bash
+#
+# Phiên bản đã dùng trên máy dev (2026-10): Nav2/DWB 1.1.20, slam_toolbox 2.6.10,
+# robot_localization 3.5.4, librealsense2 2.57.7, realsense2_camera 4.57.7, libmodbus 3.1.6.
+# =============================================================================
+
+# ---- Công cụ build ----------------------------------------------------------
+build-essential
+cmake
+git
+pkg-config                                  # zlac8015d_hw: pkg_check_modules(libmodbus)
+python3-colcon-common-extensions            # colcon build / test
+python3-rosdep
+
+# ---- Lõi ROS 2 (thường đã có khi cài ros-humble-desktop) ---------------------
+ros-humble-ros2launch
+ros-humble-launch-ros
+ros-humble-pluginlib                        # stage3: plugin CustomDWB
+ros-humble-tf2-ros
+ros-humble-tf2-geometry-msgs
+ros-humble-diagnostic-msgs                  # stage2 CSM/monitor, stage3 CustomDWB state
+ros-humble-visualization-msgs               # stage3 MarkerArray trajectories
+ros-humble-std-srvs
+ros-humble-nav-msgs
+ros-humble-sensor-msgs
+ros-humble-lifecycle-msgs
+
+# ---- Test / lint (colcon test) -----------------------------------------------
+ros-humble-ament-cmake-gtest                # stage3 gtests
+ros-humble-ament-lint-auto
+ros-humble-ament-lint-common
+
+# ---- Phần cứng ---------------------------------------------------------------
+libmodbus-dev                               # hardware/zlac8015d_hw (ZLAC8015D Modbus RTU)
+# imu_bno055, stage1 imu_odom: chỉ dùng termios (libc), không cần thư viện thêm
+# sllidar_ros2: SDK vendor có sẵn trong repo, không cần thư viện thêm
+
+# ---- Robot description / RViz ------------------------------------------------
+ros-humble-robot-state-publisher
+ros-humble-joint-state-publisher
+ros-humble-rviz2
+ros-humble-rviz-default-plugins
+liburdfdom-tools                            # check_urdf (kiểm tra URDF, tuỳ chọn)
+ros-humble-tf2-tools                        # view_frames (debug TF, tuỳ chọn)
+
+# ---- stage0: teleop PS4 ------------------------------------------------------
+ros-humble-joy
+ros-humble-joy-teleop
+ros-humble-twist-mux
+
+# ---- stage1: odometry + EKF --------------------------------------------------
+ros-humble-robot-localization
+
+# ---- stage2: scan / SLAM / localization --------------------------------------
+ros-humble-laser-filters                    # scan.launch.py (cắt nửa sau)
+ros-humble-slam-toolbox                     # mapping.launch.py
+ros-humble-nav2-bringup                     # localization.launch.py -> localization_launch.py
+ros-humble-nav2-map-server
+ros-humble-nav2-amcl
+ros-humble-nav2-lifecycle-manager
+ros-humble-nav2-rviz-plugins
+
+# ---- stage3: A* planning + local control (CustomDWB / Nav2 DWB) --------------
+ros-humble-nav2-planner
+ros-humble-nav2-navfn-planner
+ros-humble-nav2-controller
+ros-humble-nav2-costmap-2d
+ros-humble-nav2-core
+ros-humble-nav2-util
+ros-humble-nav2-msgs
+ros-humble-dwb-core
+ros-humble-dwb-plugins
+ros-humble-dwb-critics
+ros-humble-dwb-msgs
+ros-humble-nav-2d-utils
+
+# ---- stage3 script/offline test (Python) -------------------------------------
+# scripts/analyze_cmd_lag.py, test/offline/{offline_sim,run_benchmark,run_replan_test}.py
+ros-humble-rosbag2                          # ros2 bag record/play
+ros-humble-rosbag2-py
+ros-humble-rosbag2-storage-default-plugins
+ros-humble-rosidl-runtime-py
+python3-numpy
+python3-yaml
+
+# ---- Camera Intel RealSense D435 ---------------------------------------------
+# Chưa dùng trong stage0–3 (chỉ da1), giữ lại để tích hợp camera sau này.
+# Khi chạy: ros2 launch realsense2_camera rs_launch.py publish_tf:=false
+ros-humble-librealsense2
+ros-humble-realsense2-camera
+ros-humble-realsense2-camera-msgs
+
+# ---- Không cài qua apt (ghi chú) ---------------------------------------------
+# Firmware ESP32 (hardware/imu_bno055/src/esp32.c): Arduino IDE / arduino-cli +
+#   board esp32 (ESP32-C3), thư viện Wire (có sẵn). Firmware đang nạp trên ESP32
+#   là file khác, không có trong repo (xem CLAUDE.md).
+# Quyền cổng serial: sudo usermod -aG dialout $USER  (đăng xuất/đăng nhập lại)
