@@ -18,15 +18,15 @@ class zlac8015d_move : public rclcpp::Node
 public:
   zlac8015d_move()
   : Node("zlac8015d_move"),
-    motors_("/dev/ttyUSB2")
+    motors_("/dev/ttyUSB0")
   {
     wheel_radius_ = declare_parameter<double>("wheel_radius", 0.0535);
     wheel_distance_ = declare_parameter<double>("wheel_distance", 0.34);
     // Thời gian tăng/giảm tốc của driver (thanh ghi 0x2080..0x2083, ms). Trước 2026-10-14 cố định 500 ms;
     // log robot cho thấy phản hồi vận tốc trễ ~0.7-0.8 s khi DWB điều khiển -> giảm còn 200 ms.
     // Áp dụng cho cả teleop PS4. NOT_VERIFIED trên robot (độ giật / trượt bánh).
-    const int accel_time_ms = static_cast<int>(declare_parameter<int>("accel_time_ms", 200));
-    const int decel_time_ms = static_cast<int>(declare_parameter<int>("decel_time_ms", 200));
+    const int accel_time_ms = static_cast<int>(declare_parameter<int>("accel_time_ms", 500));
+    const int decel_time_ms = static_cast<int>(declare_parameter<int>("decel_time_ms", 500));
     if (accel_time_ms < 50 || accel_time_ms > 2000 || decel_time_ms < 50 || decel_time_ms > 2000) {
       throw std::invalid_argument("accel_time_ms and decel_time_ms must be in [50, 2000] ms");
     }

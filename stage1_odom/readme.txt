@@ -82,7 +82,7 @@
                            │
                            │
                      USB-UART
-                    /dev/ttyUSB0
+                    /dev/ttyUSB1
                            │
                            │
                      imu_odom node

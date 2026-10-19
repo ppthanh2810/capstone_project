@@ -1,4 +1,4 @@
-# Stage 3 (Nav2 Humble): planner_server + global_costmap (static + obstacle + inflation) + A* (luôn chạy)
+# Stage 3 (Nav2 Humble): planner_server + global_costmap + A* (luôn chạy)
 # + Stage 3.2: controller_server + local_costmap + DWB (chỉ khi chạy navigation.launch.py).
 # KHÔNG có BT navigator/map_server/AMCL ở đây: /map và TF map -> odom -> base_footprint
 # đến từ Stage 2 (slam_toolbox HOẶC map_server + AMCL) và Stage 1 (EKF).
@@ -6,7 +6,7 @@
 planner_server:
   ros__parameters:
     use_sim_time: false
-    # Chỉ lập kế hoạch theo yêu cầu (action ComputePathToPose). Lập lại khi đường bị chặn do goal_path_bridge (replan.*).
+    # Chỉ lập kế hoạch theo yêu cầu (action ComputePathToPose), không tự replan.
     expected_planner_frequency: 1.0
     planner_plugins: ["GridBased"]
     GridBased:
@@ -30,10 +30,9 @@ global_costmap:
       robot_base_frame: base_footprint
       # Robot tròn Ø400 mm.
       robot_radius: 0.20
-      # 2 Hz: obstacle layer (LiDAR) cần cập nhật đủ nhanh để goal_path_bridge phát hiện đường bị chặn và A* lập lại
-      # (trước đây 1 Hz khi chỉ có static + inflation). Mỗi lần publish gửi cả bản đồ (always_send_full_costmap).
-      update_frequency: 2.0
-      publish_frequency: 2.0
+      # Cập nhật/công bố chậm là đủ: chỉ có lớp tĩnh (bản đồ) + inflation.
+      update_frequency: 1.0
+      publish_frequency: 1.0
       transform_tolerance: 0.5
       # Kích thước/origin lấy theo /map (static layer). Với slam_toolbox, costmap tự đổi kích thước khi map lớn ra.
       rolling_window: false
@@ -46,11 +45,7 @@ global_costmap:
       unknown_cost_value: 255
       trinary_costmap: true
       always_send_full_costmap: true
-      # static (bản đồ) -> obstacle (vật cản sống, LiDAR; camera sau này) -> inflation (cho cả hai).
-      # obstacle_layer làm A* tránh vật cản chưa có trong bản đồ, và goal_path_bridge (replan.*) dựa vào nó để biết
-      # đường đang bám bị chặn. Thêm cảm biến = thêm observation source / layer ở đây (và ở local_costmap),
-      # không phải sửa code: bridge và planner chỉ đọc costmap.
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      plugins: ["static_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_topic: /map
@@ -58,50 +53,6 @@ global_costmap:
         map_subscribe_transient_local: true
         # slam_toolbox / map_server không publish /map_updates đáng tin -> nhận cả map mới mỗi lần.
         subscribe_to_updates: false
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: true
-        footprint_clearing_enabled: true
-        combination_method: 1      # max với static layer (không xóa tường của bản đồ)
-        observation_sources: scan  # thêm camera: "scan camera" (xem mẫu bên dưới) — hoặc layer riêng (khuyến nghị)
-        scan:
-          # Giống local_costmap: chỉ nửa trước (±90°), nửa sau NaN -> không đánh dấu, không xóa.
-          # Hệ quả: vết vật cản đã đi ra sau robot ở lại trong frame map (không bị xóa) cho tới khi robot quay lại
-          # nhìn thấy chỗ đó trống, hoặc xóa costmap (replan.clear_costmap_on_failure / service clear_*).
-          topic: /scan_filtered
-          data_type: "LaserScan"
-          sensor_frame: ""
-          marking: true
-          clearing: true
-          inf_is_valid: false
-          obstacle_min_range: 0.0
-          obstacle_max_range: 2.5
-          raytrace_min_range: 0.0
-          raytrace_max_range: 3.0
-          min_obstacle_height: 0.0
-          max_obstacle_height: 2.0
-          # 0.0: KHÔNG kiểm tra scan cũ ở global costmap. planner_server (Humble) chờ costmap "current" trước khi
-          # lập kế hoạch -> scan dừng sẽ treo A*. An toàn khi scan dừng do local_costmap (expected_update_rate 0.5).
-          expected_update_rate: 0.0
-          observation_persistence: 0.0
-        # ---- MẪU nguồn camera (CHƯA dùng, RealSense chưa có trong launch nào) ----
-        # Camera depth -> PointCloud2 (vd /camera/depth/color/points, realsense2_camera pointcloud.enable:=true,
-        # publish_tf:=false để không trùng TF URDF), hoặc node phát hiện vật cản (YOLO + depth) xuất PointCloud2
-        # của các điểm vật cản (vd /obstacles/camera_points, frame_id camera_depth_optical_frame).
-        # Khuyến nghị: layer RIÊNG ("camera_layer", cùng plugin ObstacleLayer) thay vì thêm vào observation_sources
-        # trên: trong một layer, tia LiDAR (cao 0.35 m) sẽ XÓA vật cản thấp chỉ camera thấy.
-        # camera:
-        #   topic: /obstacles/camera_points
-        #   data_type: "PointCloud2"
-        #   sensor_frame: ""
-        #   marking: true
-        #   clearing: true              # depth thô: true; chỉ điểm phát hiện (không có tia trống): false
-        #   min_obstacle_height: 0.05   # bỏ sàn (cần TF camera chính xác)
-        #   max_obstacle_height: 1.5
-        #   obstacle_max_range: 2.5
-        #   raytrace_max_range: 3.0
-        #   expected_update_rate: 0.0
-        #   observation_persistence: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         # Khoảng an toàn: bán kính 0.20 m (nội tiếp, NavFn coi như vật cản) + vùng chi phí giảm dần tới 0.55 m
@@ -166,31 +117,6 @@ goal_path_bridge:
     # Đang bám đường: UNCERTAIN/INITIALIZING liên tục <= mức này được bỏ qua (LOST, status cũ -> hủy ngay).
     # Robot 2026-10-14: UNCERTAIN chập chờn 0.5-1 s khi quay/đi làm 6/8 lượt bị hủy. Bắt đầu vẫn đòi LOCALIZED.
     localization_uncertain_grace: 2.0  # s
-    # ---- Replanning (Stage 3.3): đường A* đang bám bị vật cản chặn -> A* lại tới cùng đích -> DWB bám đường mới ----
-    # Chỉ trong phiên đã kích hoạt (~/follow hoặc auto_follow). Đường mới thay đường cũ (preempt FollowPath),
-    # không cần gọi ~/follow lại. Bị chặn = một ô trên global_costmap (static + obstacle + inflation) dọc đường
-    # phía trước có chi phí >= blocked_cost. Chỉ đọc costmap -> cảm biến nào đưa vào costmap cũng dùng được.
-    # Giá trị ban đầu, NOT_VERIFIED trên robot. Chỉnh được: ros2 param set /goal_path_bridge replan.<tên> <giá trị>
-    replan:
-      enabled: true               # navigation.launch.py replan:=false để tắt (hành vi cũ: abort là dừng hẳn)
-      lookahead_distance: 2.5     # m dọc đường phía trước robot được kiểm tra (= obstacle_max_range)
-      start_offset: 0.10          # m, bỏ qua đoạn ngay tại robot (viền footprint)
-      blocked_cost: 99            # 99 = nội tiếp (tâm robot ở đó là chạm), 100 = lethal. NavFn cũng coi >= 99 là vật cản
-      confirm_time: 0.5           # s, phải bị chặn liên tục ngần này (lọc nhiễu một lần quét)
-      min_interval: 2.0           # s giữa hai lần gọi A* lập lại
-      max_obstacle_replans: 20    # lần lập lại do vật cản / phiên (<= 0: không giới hạn); quá -> dừng, FAILED
-      max_abort_replans: 3        # lần lập lại sau khi FollowPath bị abort (DWB kẹt / không tiến) / phiên
-      wait_timeout: 15.0          # s: không có đường (hoặc đường không bám được) -> robot dừng, thử lại mỗi
-                                  # min_interval tới hết thời gian này rồi bỏ cuộc (FAILED)
-      costmap_timeout: 5.0        # s, /global_costmap/costmap cũ hơn -> không kiểm tra (cảnh báo)
-      # true: lập lại thất bại -> xóa obstacle layer NGOÀI hình vuông quanh robot (1 lần mỗi đợt chờ), để bỏ vết vật
-      # cản cũ phía sau robot (nửa sau scan NaN -> không bao giờ được xóa). MẶC ĐỊNH false: offline (replan_no_path,
-      # tường dài chưa có trong bản đồ) việc xóa làm mất cả phần tường robot ĐÃ thấy -> A* quên -> robot đi qua lại
-      # dọc tường tới follow_timeout. Xóa tay khi cần: ros2 service call
-      # /global_costmap/clear_entirely_global_costmap nav2_msgs/srv/ClearEntireCostmap
-      clear_costmap_on_failure: false
-      clear_keep_distance: 5.0    # m, cạnh hình vuông giữ lại (±2.5 m = tầm LiDAR đánh dấu)
-      clear_costmap_service: /global_costmap/clear_except_global_costmap
 
 # ============================================================================================
 # Stage 3.2 — DWB local controller (chỉ chạy trong navigation.launch.py)
@@ -402,7 +328,7 @@ local_costmap:
         enabled: true
         footprint_clearing_enabled: true
         combination_method: 1      # max
-        observation_sources: scan  # camera sau này: layer riêng như mẫu ở global_costmap
+        observation_sources: scan
         scan:
           # /scan_filtered: chỉ có nửa trước (±90°), nửa sau = NaN -> ObstacleLayer bỏ qua (không đánh dấu,
           # không xóa). Vật cản đã đánh dấu rồi đi ra sau robot vẫn được giữ, không bị xóa.

@@ -28,7 +28,7 @@ class ImuOdom : public rclcpp::Node
 public:
   ImuOdom() : Node("imu_odom")
   {
-    port_ = declare_parameter<std::string>("port", "/dev/ttyUSB0");
+    port_ = declare_parameter<std::string>("port", "/dev/ttyUSB1");
     frame_id_ = declare_parameter<std::string>("frame_id", "imu_link");
 
     // true: yaw của /imu_odom tính tương đối so với mẫu hợp lệ đầu tiên (hướng lúc khởi động = 0).

@@ -2,7 +2,7 @@
 kèm hướng từ IMU (/imu_odom).
 
 !!! Launch này BẬT MOTOR (motor:=true mặc định): zlac8015d_move ghi Modbus lúc khởi động
-(disable -> setMode(3) -> enable) trên /dev/ttyUSB2. Kê bánh khỏi mặt đất khi test lần đầu,
+(disable -> setMode(3) -> enable) trên /dev/ttyUSB0. Kê bánh khỏi mặt đất khi test lần đầu,
 để E-stop trong tầm tay. Chỉ xem dữ liệu, không bật motor: motor:=false.
 
 Chạy (không có EKF):
@@ -57,7 +57,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "imu_port",
-            default_value="/dev/ttyUSB0",
+            default_value="/dev/ttyUSB1",
             description="Cổng USB-UART của ESP32 (IMU)",
         ),
 
