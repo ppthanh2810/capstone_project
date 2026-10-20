@@ -3,7 +3,7 @@
 // =====================================================================================================
 //
 // Plugin costmap stage3_navigation::FusionLayer (fusion_layer.cpp) chỉ là lớp vỏ ROS (TF, subscription,
-// tham số); toàn bộ luật hợp nhất nằm ở đây để gtest chạy không cần ROS graph (test/test_camera_fusion.cpp).
+// tham số); toàn bộ luật hợp nhất nằm ở đây (không phụ thuộc ROS).
 //
 // Luật (doc/obstacle_perception_plan.md mục 2). Lớp này CHỈ giữ bằng chứng của camera; vật LiDAR thấy vẫn do
 // obstacle_layer (ObstacleLayer của Nav2) đánh dấu và xóa. Hai lớp gộp bằng max trong master costmap, nên tia

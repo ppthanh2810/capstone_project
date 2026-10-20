@@ -4,13 +4,10 @@
 //
 // File này chứa toàn bộ phần toán của bộ điều khiển (dynamic window, mô phỏng quỹ đạo, kiểm tra va chạm +
 // khả năng phanh, bám đường theo tiến trình, chống dao động, chọn pha). Nó chỉ phụ thuộc
-// nav2_costmap_2d::Costmap2D (một lớp lưới thuần C++, không cần node) để:
-//   - unit test (test/test_dwa_core.cpp) và mô phỏng kín vòng (test/dwa_closed_loop_sim.cpp) chạy KHÔNG cần
-//     ROS graph;
-//   - plugin (dwb_controller.cpp) chỉ còn là lớp vỏ: TF, odometry watchdog, tham số, debug.
+// nav2_costmap_2d::Costmap2D (một lớp lưới thuần C++, không cần node) để plugin (dwb_controller.cpp) chỉ
+// còn là lớp vỏ: TF, odometry watchdog, tham số, debug.
 //
 // Quy ước: SI (m, rad, s); robot vi sai: chỉ (v, ω), vy = 0; v >= min_vel_x >= 0 (KHÔNG lùi).
-// Nguồn tham khảo đã dùng: xem stage3_navigation/doc/sources.md.
 // =====================================================================================================
 
 #ifndef STAGE3_NAVIGATION__DWA_CORE_HPP_

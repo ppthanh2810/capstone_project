@@ -304,7 +304,7 @@ geometry_msgs::msg::TwistStamped DwbController::computeVelocityCommands(
   // Một bản sao tham số cho cả chu kỳ (không đọc lại giữa chừng).
   double max_vel_x_eff = 0.0;
   const DwbParams p = snapshotParams(max_vel_x_eff);
-  const double dt = 1.0 / controller_frequency_;   // dt danh nghĩa (xem doc/requirements_validation.md)
+  const double dt = 1.0 / controller_frequency_;   // dt danh nghĩa
   const rclcpp::Time now = clock_->now();
 
   // Thời gian giữa hai lần gọi: chỉ để thống kê + chọn lệnh trước. KHÔNG dùng để nới dynamic window (khoảng

@@ -71,7 +71,7 @@ def _controller_server(context):
         if not _is_true(context, "camera"):
             actions.append(LogInfo(
                 msg="[stage3] camera:=false: không chạy driver RealSense, lớp camera cần nguồn "
-                    "point cloud khác (vd. offline_sim.py camera:=true), nếu không costmap "
+                    "point cloud khác (vd. bag), nếu không costmap "
                     "không current"))
     actions.append(Node(
         package="nav2_controller",

@@ -25,9 +25,9 @@ Package này giúp robot **biết mình đang ở đâu trên bản đồ**. Nó
 | `src/scan_match_initializer*.cpp` | CSM: chỉnh lại vị trí ban đầu trước khi gửi AMCL |
 | `config/scan_match_initializer.yaml` | Tham số CSM |
 | `src/localization_monitor_node.cpp`, `src/localization_health.cpp` | Monitor: đánh giá định vị tốt hay xấu |
+| `src/scan_map_consistency.cpp` | Monitor: độ khớp scan–bản đồ có distance filter |
 | `config/localization_monitor.yaml` | Ngưỡng của monitor |
 | `rviz/scan.rviz`, `slam.rviz`, `localization.rviz` | Cấu hình RViz cho từng launch |
-| `config/slam_mapping.yaml` | **Không launch nào dùng** (bản nháp) |
 | `readme.txt` | Ghi chú cũ |
 
 Bản đồ đang dùng: `capstone_project/maps/map.yaml` + `map.pgm`.
@@ -250,8 +250,21 @@ Cách làm:
 | fallback | `forward_guess` | `true` |
 | fallback | `publish_ambiguous` | `true` |
 
-Ngưỡng được chọn trên dữ liệu tổng hợp, **chưa hiệu chỉnh trên robot**. Lần chạy robot 2026-10-13: kết quả
-`AMBIGUOUS` (điểm 0.938, chỉnh 0.42 m).
+Ngưỡng được chọn trên dữ liệu tổng hợp, **chưa hiệu chỉnh trên robot**. Kết quả trên robot:
+
+| Ngày | Kết quả |
+|---|---|
+| 2026-10-13 | `AMBIGUOUS`, điểm 0.938, chỉnh 0.42 m |
+| 2026-10-17 | điểm 0.954 |
+| 2026-10-20 (24 lần) | 14 `AMBIGUOUS`, 1 `ACCEPTED` (điểm 0.955–0.989, chỉnh 0.05–0.33 m / ≤ 18°); 9 `REJECTED` |
+
+- Phần lớn là `AMBIGUOUS` (ambiguity ≥ 0.90): bản đồ có nhiều chỗ giống nhau quanh điểm xuất phát. AMCL vẫn nhận
+  pose CSM, chỉ là covariance rộng hơn. Hệ quả (robot 2026-10-20): AMCL std_xy ~0.5 m / std_yaw ~0.25 rad > ngưỡng
+  monitor (0.25 / 0.17) → `UNCERTAIN` tới khi AMCL hội tụ (robot phải di chuyển, vì `update_min_d/a` 0.05) → stage 3
+  từ chối `follow`.
+- `REJECTED` (5 lần điểm < 0.65, 4 lần đỉnh nằm ở mép cửa sổ ±0.5 m / ±20°) → CSM gửi nguyên pose click. Gặp khi click
+  lệch xa vị trí thật; click lại gần hơn rồi thử lại.
+- AMCL thường log `Failed to transform initial pose in time` (TF trễ vài chục ms) rồi vẫn `Setting pose`: vô hại.
 
 ---
 
@@ -296,10 +309,9 @@ Các kiểm tra:
 - `/localization/status` có thêm `scan_consistency_all` (cách cũ), `blocked_ratio`, `through_wall_ratio`,
   `counted_points` để so sánh trên robot.
 - Tắt bộ lọc (quay về cách cũ): `distance_filter.enabled: false` trong `config/localization_monitor.yaml`.
-- Code: `src/scan_map_consistency.cpp`. Test: `test/test_scan_map_consistency.cpp`
-  (`colcon test --packages-select stage2_slam`).
+- Code: `src/scan_map_consistency.cpp`.
 
-Kết quả test tổng hợp (có nhiễu range 0.02 m, pose lệch 0.04 m / 0.03 rad):
+Kết quả test tổng hợp lúc phát triển (gtest nay đã xoá; nhiễu range 0.02 m, pose lệch 0.04 m / 0.03 rad):
 
 | Trường hợp | Cũ | Mới |
 |---|---|---|
@@ -307,10 +319,13 @@ Kết quả test tổng hợp (có nhiễu range 0.02 m, pose lệch 0.04 m / 0.
 | Lạc (yaw 0.15 / ngang 0.25 / dọc 0.3 m) | ≤ 0.10 | ≤ 0.22 (vẫn báo) |
 
 > ⚠️ Giới hạn: nếu bản đồ "tưởng" robot ở xa tường phía trước hơn thực tế, các tia tường đó thành "ngắn" và bị bỏ.
-> Trong phòng có tường hai bên thì vẫn bị bắt (test `backward_0.4`), nhưng ở chỗ trống chỉ có một bức tường phía
+> Trong phòng có tường hai bên thì vẫn bị bắt (ca lùi 0.4 m trong test cũ), nhưng ở chỗ trống chỉ có một bức tường phía
 > trước thì có thể không. Covariance và kiểm tra nhảy pose của AMCL vẫn còn để bù. Ngưỡng **chưa kiểm chứng trên robot**.
 
 Ngưỡng là giá trị khởi đầu, chỉ `consistency_warn` đã chỉnh theo robot (0.55 → 0.45 ngày 2026-10-14).
+
+Robot 2026-10-20: distance filter đã chạy nhưng **chưa đánh giá được**, vì IMU không gửi dữ liệu (yaw EKF đứng
+yên khi robot quay) → consistency tụt 0.07 → `LOST` là đúng. Cần chạy lại khi `/imu_odom` ≈ 50 Hz.
 
 ---
 
@@ -331,7 +346,9 @@ Trong RViz:
 
 - Vị trí LiDAR trên robot lấy từ CAD, chưa hiệu chuẩn.
 - Robot không thấy phía sau (nửa sau bị lọc).
+- AMCL và monitor tin vào TF `odom → base_footprint`. Nếu IMU hỏng, scan trong RViz trông như "TF LiDAR sai"
+  (xoay lệch bản đồ) dù URDF đúng. Kiểm tra `ros2 topic hz /imu_odom` trước (xem `stage1_odom/README.md`).
 - Sau khi bị hủy điều hướng vì định vị kém, robot đứng yên, AMCL không cập nhật, monitor có thể **kẹt ở UNCERTAIN**.
   Cách gỡ: đặt lại 2D Pose Estimate, hoặc nhích robot bằng PS4.
 - `package.xml` chưa khai báo các package mà launch include (`slam_toolbox`, `nav2_bringup`, `laser_filters`, …).
-- Chưa có test cho CSM. Monitor chỉ có test cho distance filter và `blocked_ratio` (`test/test_scan_map_consistency.cpp`).
+- Không có unit test cho CSM và monitor (test distance filter đã xoá 2026-10-20).

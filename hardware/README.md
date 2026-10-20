@@ -78,9 +78,12 @@ Thanh ghi hay dùng:
 | RPM phản hồi trái / phải | `0x20AB` / `0x20AC` |
 | Vị trí encoder | `0x20A7`–`0x20AA` |
 | Mã lỗi trái / phải | `0x20A5` / `0x20A6` |
+| Thời gian tăng tốc trái / phải | `0x2080` / `0x2081` |
+| Thời gian giảm tốc trái / phải | `0x2082` / `0x2083` |
 
 Phía node `zlac8015d_move`:
-- Tham số: `wheel_radius` 0.0535, `wheel_distance` 0.34, `accel_time_ms` và `decel_time_ms` (cùng 200).
+- Tham số: `wheel_radius` 0.0535, `wheel_distance` 0.34, `accel_time_ms` và `decel_time_ms` (cùng **500 ms**; từng
+  là 200 ms từ 2026-10-14 tới 2026-10-19, xem `stage0_ps4_control/README.md`).
 - Cổng `/dev/ttyUSB2` viết cứng trong code.
 - Bánh phải bị đảo dấu khi gửi lệnh và khi đọc phản hồi.
 - Mất lệnh 0.5 s thì đặt RPM về 0.
@@ -115,6 +118,10 @@ Thông số chính:
 | Frame | `imu_link` |
 
 > Không chạy `bno055_node` cùng `imu_odom`: hai node mở cùng một cổng.
+
+> ⚠️ Sau khi cắm lại ESP32, có lúc nó **không gửi dòng `IMU,…` nào** (robot 2026-10-20, 13:48 → ~14:16) mà không có
+> lỗi nào trong log. Khi đó yaw của EKF đứng yên. Kiểm tra `ros2 topic hz /imu_odom` (≈ 50 Hz); nếu 0 thì nhấn RESET
+> ESP32 hoặc cắm lại, rồi xem dữ liệu thô (`stage1_odom/README.md` mục 8).
 
 ---
 
@@ -189,4 +196,6 @@ Thông số chính:
     của `stage1_odom`;
   - và `TRAVEL_IN_ONE_REV = 0.336` ở thư viện motor.
 - Vị trí cảm biến lấy từ CAD, **chưa hiệu chuẩn**.
-- RealSense D435 có frame trong URDF nhưng **chưa có driver nào được dùng** trong các launch stage.
+- RealSense D435: frame trong URDF (`camera_link`, `camera_{color,depth}_optical_frame`). Driver chạy qua
+  `stage3_navigation/launch/camera.launch.py` (`navigation.launch.py camera:=true`, `publish_tf:=false`). Không có
+  package riêng trong `hardware/`. Độ nghiêng camera chưa đo (CAD = nằm ngang).

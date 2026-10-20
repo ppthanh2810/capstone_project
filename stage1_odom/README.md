@@ -139,7 +139,10 @@ Mỗi dòng phải có đúng 15 trường:
 IMU,millis,qw,qx,qy,qz,gx,gy,gz,ax,ay,az,mx,my,mz
 ```
 
-Gyro tính bằng độ/s, gia tốc bằng m/s², từ trường bằng µT. Dòng sai định dạng bị bỏ.
+Gyro tính bằng độ/s, gia tốc bằng m/s², từ trường bằng µT. Dòng sai định dạng bị bỏ **im lặng** (không log).
+
+> ⚠️ Node **không cảnh báo khi không có dòng hợp lệ nào**: log chỉ có `Connected to /dev/ttyUSB0` rồi im. Dấu hiệu
+> đang chạy đúng là dòng `IMU ODOM | Yaw: …` cứ 2 s một lần. Không có dòng này = `/imu_odom` không được phát.
 
 ### Đầu ra
 
@@ -261,6 +264,12 @@ Thử bằng tay:
   và quay tại chỗ.
 - Mọi covariance (bánh xe, IMU) và nhiễu quá trình của EKF là giá trị đặt tay, **chưa đo**.
 - Kết quả robot 2026-10-14: yaw của IMU và yaw tính từ bánh xe lệch nhau không quá 0.03 rad khi quay 135°.
-  Độ trễ lệnh → `/odometry/filtered` đo được khoảng 0.2 s.
+  Độ trễ lệnh → `/odometry/filtered` đo được khoảng 0.2 s (driver tăng/giảm tốc 200 ms; nay mặc định lại 500 ms).
+- **Hướng của EKF chỉ đến từ IMU** (`/wheel_odom` chỉ góp `vx`, `vy`). IMU mất dữ liệu → yaw của
+  `odom → base_footprint` **đứng yên** dù robot quay. Ngày 2026-10-20 (từ 13:56, sau khi cắm lại ESP32 lúc 13:48)
+  `imu_odom` không nhận được dòng hợp lệ nào: RViz thấy scan xoay lệch bản đồ, monitor báo LOST, CustomDWB quay
+  tại chỗ ~270° rồi abort. Trước khi chạy stage 2/3, luôn kiểm tra `ros2 topic hz /imu_odom` ≈ 50 Hz.
+- Xem dữ liệu thô của ESP32 (không chạy node nào khác trên cổng này):
+  `stty -F /dev/ttyUSB0 115200 raw -echo && timeout 3 cat /dev/ttyUSB0 | head -5`.
 - `package.xml` không khai báo `zlac8015d_hw`, dù `CMakeLists.txt` có `find_package` nó. Build vẫn chạy vì
   `stage0_ps4_control` được build trước.

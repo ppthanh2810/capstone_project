@@ -7,7 +7,7 @@
 //
 //   nav2_params.yaml:  controller_server.ros__parameters.CustomDWB.plugin: "stage3_navigation::DwbController"
 //
-// Phân công trách nhiệm (Nav2 Humble 1.1.20, xem doc/sources.md):
+// Phân công trách nhiệm (Nav2 Humble 1.1.20):
 //   controller_server: action FollowPath, local_costmap, odometry, goal/progress checker, lifecycle, publish
 //     cmd_vel; bắt PlannerException -> lệnh 0 trong failure_tolerance rồi abort + lệnh 0. Khi local costmap
 //     KHÔNG current (scan cũ), server chờ trong vòng lặp và KHÔNG gọi plugin, KHÔNG publish gì (cũng không

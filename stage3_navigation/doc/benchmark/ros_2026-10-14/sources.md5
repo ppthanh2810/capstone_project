@@ -1,9 +1,0 @@
-6a35721b4bc05c27e56c4a272e77be5d  src/dwa_core.cpp
-f7281ebebf8f4e787866a4db226c4e52  src/dwb_controller.cpp
-6584123140af2d7e850ecf1452a5fdde  src/goal_path_bridge.cpp
-2d89facdb580401956ac423a655cc0be  include/stage3_navigation/dwa_core.hpp
-d1ecaad7f3befbaf07f266e43a072d82  include/stage3_navigation/dwb_controller.hpp
-51e3c222ac60ab352020dc0df7006834  config/nav2_params.yaml
-3a2f634bff1eceda2e45bbd677798b30  test/offline/offline_sim.py
-f3e2488869db381af5ec2c70c551d48c  test/offline/run_benchmark.py
-2f2b9e9e844bc06546a856ac31ebb3d9  test/offline/scenarios.json

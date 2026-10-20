@@ -55,9 +55,9 @@ global_costmap:
         subscribe_to_updates: false
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        # Khoảng an toàn: bán kính 0.20 m (nội tiếp, NavFn coi như vật cản) + vùng chi phí giảm dần tới 0.55 m
+        # Khoảng an toàn: bán kính 0.20 m (nội tiếp, NavFn coi như vật cản) + vùng chi phí giảm dần tới 0.40 m
         # -> đường ưu tiên đi cách tường, nhưng vẫn qua được khe >= 0.40 m.
-        inflation_radius: 0.55
+        inflation_radius: 0.40
         cost_scaling_factor: 3.0
         inflate_unknown: false
         inflate_around_unknown: false
@@ -215,7 +215,7 @@ controller_server:
     # ==========================================================================================
     # CustomDWB — bộ điều khiển Dynamic Window TỰ VIẾT
     #   thuật toán: stage3_navigation/src/dwa_core.cpp, lớp vỏ ROS: src/dwb_controller.cpp
-    #   tài liệu: stage3_navigation/doc/{sources,requirements_validation,offline_runbook}.md
+    #   tài liệu: stage3_navigation/README.md
     # Mọi tham số chỉnh được khi đang chạy (cả lô được kiểm tra nguyên tử; giá trị sai -> từ chối, giữ cũ):
     #   ros2 param set /controller_server CustomDWB.<tên> <giá trị>     (số thực phải ghi dạng 5.0)
     # Giới hạn động học / trễ = giá trị khởi đầu thận trọng, NOT_VERIFIED trên robot (chưa đo).
@@ -242,7 +242,7 @@ controller_server:
       # Mỗi ứng viên được mô phỏng: [0, latency) theo lệnh trước -> chuyển tiếp có giới hạn gia tốc -> giữ lệnh;
       # cộng đuôi phanh từ latency + dt (decel_lim_x / decel_lim_theta) + stopping_margin phía trước.
       control_latency: 0.2         # s, trễ lệnh -> /odometry/filtered ĐO trên robot 2026-10-14 (bag rot_debug,
-                                   # scripts/analyze_cmd_lag.py, driver accel/decel 200 ms; một lượt xoay)
+                                   # driver accel/decel 200 ms; một lượt xoay)
       stopping_margin: 0.05        # m, biên bất định thêm sau khi dừng hẳn
       # ---- Gốc của dynamic window ----
       # command: cửa sổ + bước acc/decel tính từ LỆNH TRƯỚC, kẹp trong ± max_feedback_gap_* quanh vận tốc đo.

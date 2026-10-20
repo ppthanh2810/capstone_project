@@ -43,6 +43,9 @@ Vì sao cần IMU:
 
 Kết quả trên robot (2026-10-14): khi quay 135°, yaw của IMU và yaw tính từ bánh xe lệch nhau không quá 0.03 rad.
 
+> ⚠️ EKF **chỉ** lấy hướng từ IMU. IMU mất dữ liệu → hướng robot trong ROS đứng yên dù robot quay: scan lệch bản đồ
+> trong RViz, AMCL/monitor mất định vị, CustomDWB quay tại chỗ không dừng (robot 2026-10-20).
+
 ---
 
 ## 3. Luồng dữ liệu
@@ -263,6 +266,12 @@ Thử bằng tay:
 
 Xem dữ liệu thô của ESP32: chỉ làm khi **không** có node nào đang mở cổng, vì mở serial là thao tác phần cứng.
 
+```bash
+stty -F /dev/ttyUSB0 115200 raw -echo && timeout 3 cat /dev/ttyUSB0 | head -5
+```
+
+Đúng: các dòng `IMU,<millis>,…` có 15 trường. Trống, hoặc thấy `BNO055 initialization failed` → lỗi ở ESP32 / BNO055.
+
 ---
 
 ## 11. Lỗi hay gặp
@@ -270,7 +279,8 @@ Xem dữ liệu thô của ESP32: chỉ làm khi **không** có node nào đang 
 | Triệu chứng | Nguyên nhân thường gặp |
 |---|---|
 | Log `Cannot open /dev/ttyUSB0` | Sai cổng (USB đổi thứ tự) hoặc thiếu quyền `dialout` |
-| Đã kết nối nhưng không có topic | Dòng không đủ 15 trường (firmware khác), hoặc sai baudrate |
+| Đã kết nối nhưng không có topic | Dòng không đủ 15 trường (firmware khác), sai baudrate, hoặc ESP32 không gửi gì. `imu_odom` **không báo lỗi** trong các trường hợp này: log chỉ có `Connected to …`, thiếu dòng `IMU ODOM | Yaw` mỗi 2 s |
+| Hết dữ liệu sau khi cắm lại ESP32 | Robot 2026-10-20: cắm lại lúc 13:48, không có dữ liệu tới ~14:16. Nhấn RESET / cắm lại ESP32, kiểm tra dữ liệu thô |
 | Yaw nhảy khi đến gần motor / sắt | NDOF dùng từ kế; nhiễu từ làm yaw lệch |
 | Yaw trôi chậm khi đứng yên | Cảm biến chưa tự hiệu chuẩn xong; xoay robot vài vòng |
 | Hai node cùng báo lỗi đọc | Đang chạy cả `bno055_node` và `imu_odom` |

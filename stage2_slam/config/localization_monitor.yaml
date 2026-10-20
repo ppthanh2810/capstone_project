@@ -20,7 +20,7 @@ localization_monitor:
     # và xa tường (score < match_score) = vật cản chưa có trong map (ghế, người) -> bỏ khỏi
     # scan_consistency. Tia "xuyên tường" vẫn tính -> lạc thật vẫn bị phát hiện.
     # enabled: false -> cách tính cũ (mọi điểm). /localization/status có cả scan_consistency_all
-    # (cách cũ) để so sánh. Ngưỡng chọn trên dữ liệu tổng hợp (test_scan_map_consistency) - NOT_VERIFIED.
+    # (cách cũ) để so sánh. Ngưỡng chọn trên dữ liệu tổng hợp - NOT_VERIFIED.
     distance_filter:
       enabled: true
       short_margin: 0.15

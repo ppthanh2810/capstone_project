@@ -71,7 +71,7 @@ joy_teleop:
       topic_name: /cmd_vel_joy
       deadman_buttons: [1]
       axis_mappings:
-        linear-x:  { axis: 1, scale: 0.2, offset: 0.0 }
+        linear-x:  { axis: 1, scale: 0.5, offset: 0.0 }
         angular-z: { axis: 3, scale: 0.4, offset: 0.0 }
 ```
 
@@ -79,12 +79,14 @@ joy_teleop:
 |---|---|---|
 | `deadman_buttons` | `[1]` | Phải **giữ nút 1** thì mới có lệnh |
 | `linear-x.axis` | `1` | Cần trái, lên / xuống |
-| `linear-x.scale` | `0.2` | Tiến / lùi tối đa **0.2 m/s** |
+| `linear-x.scale` | `0.5` | Tiến / lùi tối đa **0.5 m/s** |
 | `angular-z.axis` | `3` | Cần phải, trái / phải |
 | `angular-z.scale` | `0.4` | Xoay tối đa **0.4 rad/s** |
 
 Ghi chú:
-- Lệnh = giá trị cần (−1 … 1) × `scale`. Đẩy cần trái lên hết thì `linear.x = 0.2`.
+- Lệnh = giá trị cần (−1 … 1) × `scale`. Đẩy cần trái lên hết thì `linear.x = 0.5`.
+- `scale` tiến đổi 0.2 → **0.5** (2026-10-20, chưa commit): nhanh hơn nhiều so với DWB (0.15 m/s). Lái chậm khi gần người
+  / vật cản.
 - Số thứ tự nút và trục phụ thuộc driver tay cầm. Kiểm tra bằng `ros2 topic echo /joy` (bấm nút / gạt cần xem số nào
   đổi). Với tay PS4, nút 1 thường là **nút tròn (○)**.
 - **Thả nút deadman thì `joy_teleop` ngừng gửi lệnh.** Robot dừng nhờ timeout của `twist_mux` và watchdog của
@@ -146,14 +148,15 @@ Hằng số viết trong code (không đổi được bằng tham số):
 
 Ghi chú về tham số:
 - `accel_time_ms` và `decel_time_ms` phải trong [50, 2000] ms, nếu không node báo lỗi và dừng.
-- Trước 2026-10-14 thời gian tăng/giảm tốc cố định 500 ms. Đổi còn 200 ms để giảm trễ khi DWB điều khiển. Mức giật
-  và trượt bánh với 200 ms **chưa kiểm tra trên robot**.
+- Lịch sử: 2026-10-14 đổi 500 → 200 ms để giảm trễ khi DWB điều khiển (hết quay lố ~50°). Commit `6471a37`
+  (2026-10-19) **đưa mặc định về lại 500 ms**. Với 500 ms, phản hồi vận tốc chậm hơn `control_latency` 0.2 s mà
+  CustomDWB giả định → robot có thể quay lố khi tự hành. Comment trong code vẫn ghi "giảm còn 200 ms" (cũ).
 - `wheel_radius` và `wheel_distance` phải khớp với `stage1_odom` và URDF.
 
 ### Khởi động (ghi xuống driver)
 
 1. `disableMotor`.
-2. Đặt thời gian tăng/giảm tốc (200 ms, cả 2 bánh).
+2. Đặt thời gian tăng/giảm tốc (`accel_time_ms` / `decel_time_ms`, mặc định 500 ms, cả 2 bánh).
 3. `setMode(3)`: chế độ điều khiển vận tốc.
 4. `setRpm(0, 0)`.
 5. `enableMotor`.
@@ -173,9 +176,10 @@ Ví dụ với cấu hình PS4 hiện tại:
 
 | Lệnh | RPM mỗi bánh |
 |---|---|
-| Tiến 0.2 m/s | ≈ 35.7 |
+| Tiến 0.5 m/s | ≈ 89.2 |
 | Xoay 0.4 rad/s tại chỗ | ≈ 12.1 (hai bánh ngược chiều) |
-| Cả hai tối đa | ≈ 47.8 (bánh ngoài) |
+| Cả hai tối đa | ≈ 101.4 (bánh ngoài) |
+| DWB tối đa 0.15 m/s | ≈ 26.8 |
 
 - RPM làm tròn số nguyên, nên mỗi bánh chỉnh được theo bước khoảng 0.0056 m/s.
 - Ghi lệnh lỗi (Modbus) thì chỉ cảnh báo `Set RPM failed`, không dừng node.

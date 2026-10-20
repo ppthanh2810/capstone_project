@@ -9,19 +9,12 @@ Package này giúp robot **tự đi tới một đích** chọn trên RViz, theo
 
 - **Không có replanning.** Đường A\* không đổi trong cả lần bám. Vật cản mới chỉ do DWB xử lý (mục 9).
 - Bộ điều khiển mặc định là **CustomDWB** (`stage3_navigation::DwbController`, tự viết). Nav2 DWB vẫn giữ để so sánh.
-- Tính năng replan (commit `0d553eb`, 2026-10-15) đã được gỡ ngày 2026-10-19. Code và tham số stage 3 = bản trước đó
-  (`a7c59a1`), cộng cổng serial mới.
+- Tính năng replan (commit `0d553eb`, 2026-10-15) đã được gỡ ngày 2026-10-19. Code và tham số CustomDWB = bản trước đó
+  (`a7c59a1`), cộng cổng serial mới. Từ 2026-10-20 có thêm lớp camera (M2, `camera:=true`) và `camera_view`.
 
 > ⚠️ **Mọi launch ở đây đều include Stage 2**, nên bật LiDAR, IMU, **motor** và tay PS4 (trừ `stage2:=false`).
 > `navigation_enabled:=false` (mặc định) chỉ ngắt **lệnh của DWB** khỏi motor; tay PS4 vẫn lái được.
 > `navigation_enabled:=true` (DWB lái motor thật): kê bánh / giữ E-stop.
-
-Tài liệu sâu hơn trong `doc/`:
-- `audit.md`: các lỗi đã sửa ở CustomDWB.
-- `offline_runbook.md`: cách chạy test và benchmark.
-- `requirements_validation.md`: kiểm chứng yêu cầu.
-- `sources.md`: nguồn tham khảo.
-- `p2_proposals.md`: đề xuất chưa làm.
 
 ---
 
@@ -38,7 +31,7 @@ Tài liệu sâu hơn trong `doc/`:
 10. Các tình huống và cách hệ thống phản ứng
 11. Kết quả trên robot
 12. Theo dõi và debug
-13. Test và công cụ
+13. Test
 14. Giới hạn đã biết
 
 ---
@@ -62,10 +55,8 @@ Tài liệu sâu hơn trong `doc/`:
 | `config/camera_fusion.yaml` | Thêm `fusion_layer` vào local costmap (nạp chồng) |
 | `config/camera_voxel.yaml` | Thêm `VoxelLayer` của Nav2 (đối chứng) |
 | `launch/camera.launch.py` | Driver RealSense D435 (point cloud, không TF) |
-| `rviz/planning.rviz` | RViz duy nhất của stage 3 |
-| `scripts/analyze_cmd_lag.py` | Đo độ trễ lệnh → vận tốc thật từ bag |
-| `test/` | gtest, mô phỏng kín vòng, benchmark offline |
-| `doc/` | Tài liệu thiết kế, audit, benchmark |
+| `rviz/planning.rviz` | RViz chính của stage 3 |
+| `rviz/camera.rviz` | Cửa sổ ảnh camera (`camera_view:=true`) |
 
 ---
 
@@ -228,12 +219,14 @@ Những gì launch tự đặt:
 | E | `... local_planner:=nav2_dwb` | Như C/D với Nav2 DWB | So sánh |
 | F | `... auto_follow:=true` | A\* xong là bám ngay | Bỏ bước gọi `follow` |
 | G | `... monitor:=false` | Không đòi LOCALIZED | Thử DWB né vật cản (mục 9) |
-| H | `... stage2:=false rviz:=false` | Không phần cứng | Test offline (nguồn dữ liệu ngoài) |
+| H | `... stage2:=false rviz:=false` | Không phần cứng | Cần nguồn `/map`, TF, scan, odom bên ngoài (vd. bag); repo không còn mô phỏng |
 
 ### Quy trình chuẩn (C hoặc D)
-1. Chạy launch. Chờ log `Managed nodes are active` (có thể chỉ xuất hiện sau bước 2).
+1. Chạy launch. Kiểm tra IMU: `ros2 topic hz /imu_odom` ≈ 50 Hz (mục 10, dòng "IMU mất dữ liệu").
+   Chờ log `Managed nodes are active` (có thể chỉ xuất hiện sau bước 2).
 2. RViz **2D Pose Estimate**: click vị trí thật của robot. CSM chỉnh lại pose, AMCL bắt đầu phát TF.
-3. Chờ `/localization/status` = `LOCALIZED`.
+3. Chờ `/localization/status` = `LOCALIZED`. Nếu CSM báo `AMBIGUOUS`, AMCL nhận covariance rộng (std_xy ~0.5 m) →
+   monitor `UNCERTAIN` → `follow` bị từ chối. Nhích robot bằng PS4 vài chục cm để AMCL hội tụ, hoặc đặt pose lại.
 4. RViz **2D Goal Pose**: chọn đích. Thấy `/global_path` hiện lên.
 5. Bắt đầu bám (bỏ qua bước này nếu `auto_follow:=true`):
    ```bash
@@ -296,12 +289,27 @@ A\* chạy **chỉ khi có goal mới**. Không lập lại định kỳ, không
 | `plugins` | `static_layer`, `inflation_layer` |
 
 - **`static_layer`**: lấy `/map`, transient_local, không nhận `/map_updates`.
-- **`inflation_layer`**: `inflation_radius 0.55`, `cost_scaling_factor 3.0`, không inflate vùng unknown.
+- **`inflation_layer`**: `inflation_radius 0.40`, `cost_scaling_factor 3.0`, không inflate vùng unknown.
 
 Hệ quả:
 - A\* **chỉ thấy bản đồ tĩnh**, không biết vật cản mới (người, thùng…).
 - Ô cách tường < 0.20 m là inscribed (99), A\* coi như vật cản → A\* đi được khe **≥ 0.40 m**.
-- Đường A\* ưu tiên đi giữa lối, cách xa tường (nhờ inflation tới 0.55 m).
+- Đường A\* ưu tiên đi giữa lối, cách xa tường (nhờ inflation tới 0.40 m).
+
+Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.20))`):
+
+| `d` | Chi phí |
+|---|---|
+| ≤ 0.20 m | 253 (A\* không đi) |
+| 0.25 m | ~218 |
+| 0.30 m | ~187 |
+| 0.35 m | ~161 |
+| 0.40 m | ~138 |
+| > 0.40 m | 0 |
+
+- Đổi 0.55 → 0.40 m (2026-10-20): ngoài 0.40 m A\* không còn bị đẩy ra xa tường. Đường ngắn hơn, đi sát tường hơn
+  ở lối rộng.
+- Khe hẹp nhất A\* đi được **không đổi** (≥ 0.40 m, do `robot_radius`). CustomDWB vẫn cần khe ≥ ~0.6 m (mục 6.6).
 
 ### 6.3 `controller_server`
 
@@ -344,7 +352,7 @@ Hệ quả:
 | `vx_samples` × `vtheta_samples` | 20 × 21 | ≈ 420–440 ứng viên mỗi chu kỳ |
 | `sim_time` | 1.7 s | Nhìn trước (0.15 m/s → ~0.26 m) |
 | `sim_granularity` | 0.05 s | Bước mô phỏng tối đa |
-| `control_latency` | 0.2 s | Trễ lệnh → bánh (đo từ bag 2026-10-14) |
+| `control_latency` | 0.2 s | Trễ lệnh → bánh (đo từ bag 2026-10-14, driver tăng/giảm tốc 200 ms; nay driver mặc định 500 ms) |
 | `stopping_margin` | 0.05 m | Khoảng trống thêm sau khi phanh |
 
 **Vận tốc gốc của cửa sổ:**
@@ -417,32 +425,213 @@ ros2 param set /controller_server CustomDWB.max_vel_x 0.12
   `acc_lim_theta` 1.0, `sim_time` 1.7, `vx_samples` 20, `vtheta_samples` 20.
 - Critics mặc định Humble: `RotateToGoal, Oscillation, BaseObstacle, GoalAlign, PathAlign, PathDist, GoalDist`.
 - Trọng số: `PathAlign` 32, `GoalAlign` 24, `PathDist` 32, `GoalDist` 24, `RotateToGoal` 32, `BaseObstacle` 0.02.
-- Khác CustomDWB: không có watchdog odometry, không mô phỏng trễ và đuôi phanh. Benchmark offline: khi odometry
-  ngừng, Nav2 DWB vẫn chạy tiếp tới đích.
+- Khác CustomDWB: không có watchdog odometry, không mô phỏng trễ và đuôi phanh. Benchmark offline cũ (đã xoá): khi
+  odometry ngừng, Nav2 DWB vẫn chạy tiếp tới đích.
 
 ### 6.6 `local_costmap` (cho DWB)
 
 | Tham số | Giá trị |
 |---|---|
 | `global_frame` | `odom` |
-| Kích thước | 2 × 2 m, rolling window quanh robot |
+| Kích thước | 2 × 2 m (40 × 40 ô), rolling window quanh robot |
 | `resolution` | 0.05 m |
 | `robot_radius` + `footprint_padding` | 0.20 + 0.10 m (nội tiếp **0.30 m**) |
 | `update_frequency` / `publish_frequency` | 5.0 / 2.0 Hz |
 | `transform_tolerance` | 0.3 s |
 | `track_unknown_space` | `false` |
-| `plugins` | `obstacle_layer`, `inflation_layer` |
+| `plugins` | `obstacle_layer`, (`fusion_layer`), `inflation_layer` |
 | obstacle: nguồn | `/scan_filtered`, đánh dấu 2.5 m / xóa 3.0 m, `inf_is_valid: false` |
 | obstacle: `expected_update_rate` | 0.5 s (scan cũ hơn → costmap "không current") |
 | inflation | `inflation_radius 0.45`, `cost_scaling_factor 3.0` |
 
-Lý do chọn:
+`fusion_layer` (camera) chỉ có khi `camera:=true` hoặc `camera_layer:=fusion` (mục 6.6b). Không có camera thì chỉ
+có LiDAR.
+
+#### 6.6.1 Mỗi ô lưu gì
+
+Mỗi ô là một số 0–255:
+
+| Giá trị | Ý nghĩa |
+|---|---|
+| 254 `LETHAL` | Có vật cản trong ô |
+| 253 `INSCRIBED` | Tâm robot ở đây là thân chạm vật (≤ 0.30 m) |
+| 1–252 | Gần vật cản, càng gần càng cao |
+| 0 `FREE` | Trống |
+
+- Không dùng 255 (`NO_INFORMATION`): `track_unknown_space: false`, nên ô chưa ai thấy được coi là **trống**.
+- Trên topic `/local_costmap/costmap` (OccupancyGrid) giá trị được đổi thang: 254 → 100, 253 → 99, 1–252 → 1–98.
+
+#### 6.6.2 Bộ nhớ nằm ở đâu
+
+Costmap tổng (master) **không tự nhớ gì**. Mỗi chu kỳ nó được xóa trắng rồi vẽ lại từ các lớp. Trí nhớ nằm trong
+từng lớp:
+
+| Lớp | Nhớ gì | Quên khi |
+|---|---|---|
+| `obstacle_layer` (LiDAR) | Lưới riêng 40 × 40, ô = LETHAL hoặc FREE | Tia LiDAR đi xuyên qua ô; ô ra khỏi cửa sổ 2 × 2 m; robot đè lên ô |
+| `fusion_layer` (camera) | Danh sách ô trong frame `odom` + trạng thái từng ô | Camera nhìn xuyên 2 frame; 10 s không thấy lại; ô xa robot > 3 m |
+| `inflation_layer` | Không nhớ, tính lại mỗi chu kỳ | — |
+
+Hệ quả:
+- **Vật LiDAR thấy được nhớ vô thời hạn** cho tới khi một tia LiDAR đi qua ô đó. Không có hết hạn theo thời gian
+  (`observation_persistence: 0.0` chỉ nói buffer giữ scan mới nhất, không làm ô tự xóa).
+- Vật đã đi ra **sau lưng** robot vẫn được nhớ, vì nửa sau scan là NaN, không xóa được. Nó chỉ mất khi ra khỏi
+  cửa sổ (cách robot > ~1 m theo trục x hoặc y).
+- Cửa sổ trượt theo robot. Phần mới lộ ra ở mép được điền **FREE**. Quay lại chỗ cũ thì vật LiDAR đã quên phải được
+  quét lại.
+- Bộ nhớ camera không gắn với cửa sổ: ô camera trong bán kính 3 m vẫn được giữ khi ra khỏi cửa sổ, và hiện lại nếu
+  robot quay về (trừ khi đã hết 10 s).
+
+#### 6.6.3 Một chu kỳ cập nhật (5 Hz, mỗi 0.2 s)
+
+Luồng cập nhật của `local_costmap` chạy độc lập với controller:
+
+```
+1. Dời cửa sổ về quanh robot (TF odom → base_footprint)
+2. updateBounds từng lớp:
+     obstacle_layer : lấy scan mới nhất → XÓA theo tia → ĐÁNH DẤU điểm cuối tia
+     fusion_layer   : xử lý cloud còn chờ TF → hết hạn ô cũ → chọn ô sẽ vẽ
+3. Xóa trắng master (FREE)
+4. updateCosts theo thứ tự plugins:
+     obstacle_layer : chép lưới của nó vào master, lấy max; xóa ô dưới thân robot
+     fusion_layer   : ghi LETHAL vào ô camera đã xác nhận (chỉ tăng, không bao giờ hạ)
+     inflation_layer: từ mọi ô LETHAL, tô chi phí giảm dần tới 0.45 m
+5. Kiểm tra "current": scan ≤ 0.5 s và (nếu có camera) cloud ≤ 1.0 s
+```
+
+- Controller (10 Hz) đọc master mới nhất. Nó không chờ chu kỳ costmap.
+- Bất kỳ lớp nào **không current** → `controller_server` ngừng gọi controller, không gửi lệnh → robot dừng nhờ
+  timeout 0.5 s của `twist_mux` / watchdog driver (mục 14).
+- `/local_costmap/costmap` chỉ phát 2 Hz để vẽ RViz. RViz chậm hơn costmap thật.
+
+#### 6.6.4 LiDAR: đánh dấu và xóa (`obstacle_layer`)
+
+Với mỗi tia trong scan mới nhất (`/scan_filtered`, 720 tia, chỉ nửa trước ±90°):
+
+| Tia | Xóa | Đánh dấu |
+|---|---|---|
+| Có điểm cuối, ≤ 2.5 m | Các ô từ LiDAR tới trước điểm cuối → FREE | Ô điểm cuối → LETHAL |
+| Có điểm cuối, 2.5–3.0 m | Các ô trên đường tia → FREE | Không |
+| Có điểm cuối, > 3.0 m | Tia bị cắt ở 3.0 m, xóa tới đó | Không |
+| `inf` (không phản hồi) | **Không** (`inf_is_valid: false`) | Không |
+| NaN (nửa sau) | Không | Không |
+
+- Xóa chạy **trước** đánh dấu trong cùng chu kỳ. Ô vừa bị tia khác xóa vẫn được đánh dấu lại nếu có điểm cuối
+  nằm trong nó.
+- `footprint_clearing_enabled: true`: ô nằm trong vòng 0.30 m dưới robot bị xóa. Robot không tự thấy mình là vật cản.
+- `combination_method: 1` (max): lớp này chỉ nâng giá trị của master, không hạ.
+- LiDAR chỉ quét **một mặt phẳng cao 0.347 m**. Vật thấp hơn hoặc nhô ra phía trên (mặt bàn) không được đánh dấu.
+
+Ví dụ:
+- **Người đứng chắn rồi đi khỏi:** chu kỳ kế tiếp các tia trúng tường phía sau đi qua chỗ người đứng → ô bị xóa,
+  trong ≤ ~0.3 s.
+- **Người đi khỏi nhưng phía sau trống (ngoài 3 m / tia `inf`):** không có tia nào xóa → ô **vẫn LETHAL**. Thường gặp
+  ở cửa mở, hành lang dài, kính.
+- **Vật đi ra sau lưng:** giữ nguyên tới khi ra khỏi cửa sổ.
+
+#### 6.6.5 Camera: đánh dấu và xóa (`fusion_layer`)
+
+Mỗi frame point cloud (D435, ~15 fps) được biến đổi về `odom` rồi xử lý như sau.
+
+**Bước 1: lọc điểm.** Điểm được dùng để đánh dấu khi thỏa cả:
+- cao 0.05–0.70 m so với sàn (thấp hơn = sàn / nhiễu sàn; cao hơn = robot đi lọt dưới);
+- cách camera theo phương ngang 0.30–2.5 m;
+- cách tâm robot ≥ 0.25 m (bỏ điểm trên thân robot).
+
+Ô 5 cm có ≥ 3 điểm như vậy = "camera thấy ô này trong frame này". Mỗi ô nhớ dải độ cao `[zmin, zmax]` đã thấy.
+
+**Bước 2: trạng thái ô.**
+
+```
+           thấy (frame 1)               thấy 3 frame liên tiếp
+  (không) ───────────────▶ PENDING ──────────────────────────────▶ CONFIRMED ──▶ vẽ LETHAL
+                              │        hoặc: gần điểm LiDAR mới              │
+                              │                                             │
+                  lỡ 1 frame  ▼                       nhìn xuyên 2 frame    ▼
+                           bỏ ngay                    hoặc 10 s không thấy → xóa
+```
+
+| Trạng thái | Vẽ vào costmap? | Ra khỏi trạng thái khi |
+|---|---|---|
+| `PENDING` | Không | 3 frame liên tiếp → `CONFIRMED`; lỡ 1 frame → bỏ |
+| `CONFIRMED` | Có (LETHAL) | Nhìn xuyên 2 frame, hết 10 s, hoặc xa robot > 3 m |
+
+- `PENDING` lọc nhiễu độ sâu: một chấm nhiễu xuất hiện 1–2 frame không bao giờ thành vật cản.
+- Ô `PENDING` nằm trong 0.10 m quanh một điểm LiDAR (scan ≤ 0.5 s) → `CONFIRMED` **ngay**, không cần đủ 3 frame.
+
+**Bước 3: xóa ("nhìn xuyên qua").** Ảnh độ sâu được gom thành lưới bin 1° (ngang) × 2° (đứng) quanh trục camera.
+Mỗi bin giữ khoảng cách ngang nhỏ nhất. Ô `CONFIRMED` không thấy trong frame này được tính là trống khi **mọi** bin
+phủ dải `[zmin, zmax]` của ô đều có điểm, và điểm đó **xa hơn** ô (> d + 0.05 m). Nghĩa là camera nhìn thấy
+thứ ở phía sau, xuyên qua đúng chỗ vật từng đứng.
+
+Không xóa (chờ hết 10 s) khi:
+- bin rỗng: lỗ độ sâu (vật đen, kính, phản quang);
+- có vật gần hơn che ô;
+- ô ra ngoài góc nhìn ngang ~80° hoặc dải độ cao rơi ra ngoài góc nhìn đứng ~55° (robot quá gần mặt bàn);
+- ô gần camera hơn 0.30 m.
+
+**Bước 4: vẽ.** Mỗi chu kỳ costmap, ô `CONFIRMED` được ghi LETHAL vào master, **trừ** ô nằm trong 0.10 m quanh một
+điểm LiDAR mới. Ô đó LiDAR đã vẽ, ở vị trí chính xác hơn, nên camera không vẽ chồng (tránh vật "dày" ra).
+
+#### 6.6.6 Camera và LiDAR gộp lại thế nào
+
+Hai lớp giữ bộ nhớ **riêng**. Master lấy **max** của hai lớp, rồi inflation tô quanh mọi ô LETHAL.
+
+| LiDAR | Camera | Ô trên master |
+|---|---|---|
+| Thấy | Thấy | LETHAL ngay (`obstacle_layer` vẽ) |
+| Không | Thấy | LETHAL sau 3 frame (`fusion_layer` vẽ) |
+| Thấy | Không | LETHAL (`obstacle_layer` vẽ) |
+| Không | Không | FREE, sau khi **cả hai** lớp đã xóa ô |
+
+- Camera nhìn xuyên **không xóa** được vật LiDAR đang nhớ, và ngược lại. Mỗi cảm biến chỉ xóa bộ nhớ của mình.
+- Vì vậy một ô chỉ trở lại FREE khi lớp nào đang giữ nó tự xóa: tia LiDAR đi qua, hoặc camera nhìn xuyên / hết 10 s.
+
+Thời gian từ lúc vật xuất hiện tới khi có trong costmap (ước lượng từ tần số, chưa đo trên robot):
+
+| Trường hợp | Trễ |
+|---|---|
+| LiDAR thấy (scan 10 Hz) | ≤ ~0.3 s |
+| Chỉ camera thấy (15 fps × 3 frame) | ~0.35–0.5 s |
+| Cả hai thấy | như LiDAR |
+
+#### 6.6.7 Inflation: biến ô LETHAL thành vùng nguy hiểm
+
+Với khoảng cách `d` từ tâm ô tới ô LETHAL gần nhất:
+
+| `d` | Chi phí |
+|---|---|
+| 0 | 254 LETHAL |
+| ≤ 0.30 m | 253 INSCRIBED |
+| 0.35 m | ~217 |
+| 0.40 m | ~187 |
+| 0.45 m | ~160 |
+| > 0.45 m | 0 |
+
+- Công thức: `252 · exp(−3.0 · (d − 0.30))` cho 0.30 < d ≤ 0.45.
+- CustomDWB loại cứng mọi quỹ đạo có ô ≥ 253 (tâm robot cách vật < 0.30 m). Vùng 1–252 chỉ bị phạt mềm (mục 8).
+
+#### 6.6.8 Xem bộ nhớ costmap khi chạy
+
+```bash
+ros2 topic echo /local_costmap/fusion_layer/status   # pending_cells, confirmed_cells, drawn_cells, cloud_age
+ros2 service call /local_costmap/clear_entirely_local_costmap nav2_msgs/srv/ClearEntireCostmap   # xóa hết cả 2 lớp
+```
+- RViz: `/local_costmap/costmap` (2 Hz). Vật "ma" còn lại sau khi người đi khỏi thường là trường hợp không có tia
+  LiDAR nào đi qua (mục 6.6.4).
+- `drawn_cells` < `confirmed_cells`: phần chênh là ô LiDAR đã vẽ (`lidar_suppressed_cells`).
+
+#### 6.6.9 Lý do chọn tham số
+
 - **2 × 2 m (không phải 3 × 3):** Nav2 DWB lấy đích cục bộ = điểm cuối đường A\* còn trong costmap. Với 3 × 3 m, ở
   đầu tường đích cục bộ nằm sau tường → robot đứng yên → abort (tái hiện offline).
 - **Padding 0.10 m:** không có padding thì khi test offline DWB lái sát tới chạm vật cản chưa có trong bản đồ.
 - **Đánh đổi:** DWB không qua được khe < ~0.6 m, trong khi A\* vẫn lập đường qua khe ≥ 0.4 m.
 - Nửa sau scan là NaN, mà `track_unknown_space: false` → vùng phía sau được coi là **trống**. Bảo vệ thực sự là
   **không cho lùi**.
+- **Giới hạn của `fusion_layer`:** nó không xóa ô dưới thân robot (khác `obstacle_layer`). Một ô ma của camera sát
+  robot (< 0.30 m từ camera, không nhìn xuyên được) chỉ mất sau 10 s. Nếu nó nằm trong vùng 0.30 m quanh tâm,
+  CustomDWB báo BLOCKED và đứng yên trong lúc đó.
 
 ### 6.6b Lớp camera trong `local_costmap` (M2, tùy chọn)
 
@@ -471,7 +660,7 @@ Tham số chính của `fusion_layer` (`config/camera_fusion.yaml`, đều là g
 - Không có cloud mới trong 1 s → local costmap "không current" → controller_server ngừng điều khiển → robot dừng.
   Camera chết thì robot dừng chứ không chạy mù.
 - Tham số chỉ đọc lúc khởi động (đổi → chạy lại launch).
-- Luật và giới hạn: mục 9b.
+- Cơ chế lưu nhớ / xóa ô: mục 6.6.2, 6.6.5, 6.6.6. Luật và kết quả offline: mục 9b.
 
 ### 6.7 `goal_path_bridge`
 
@@ -659,7 +848,7 @@ Trước khi chọn pha:
 | oscillation | 1 nếu đổi chiều xoay ngay sau lần đổi trước | 1.0 |
 
    Cung obstacle có **độ dài cố định**, không phụ thuộc tốc độ. Nếu đo theo thời gian, ứng viên chậm "thấy" ít vùng
-   gần vật cản hơn nên luôn rẻ hơn, và robot bò dần về 0 ở mép vùng đó (lỗi B1 trong `doc/audit.md`).
+   gần vật cản hơn nên luôn rẻ hơn, và robot bò dần về 0 ở mép vùng đó (lỗi B1 đã sửa).
 6. Chọn ứng viên rẻ nhất. Không còn ứng viên nào → `BLOCKED` → lỗi.
 7. Có ứng viên nhưng **không cái nào có v > 0** (vật cản ngay trước) → v = 0, cảnh báo `holding position`.
 
@@ -707,7 +896,8 @@ bridge **hủy sau 2 s, trước khi DWB kịp xử lý** (mục 11). Từ 2026-
 bản đồ; xem `stage2_slam/README.md` mục 7), nên có thể thử **giữ `monitor:=true`** (chưa kiểm chứng trên robot):
 
 ```bash
-ros2 launch stage3_navigation navigation.launch.py navigation_enabled:=true auto_follow:=true
+ros2 launch stage3_navigation navigation.launch.py camera:=true csm:=true monitor:=true \
+  navigation_enabled:=true auto_follow:=false
 ros2 topic echo /localization/status   # xem scan_consistency, scan_consistency_all, blocked_ratio
 ```
 
@@ -741,7 +931,7 @@ Cách làm:
   Các ô đó hết hạn sau `decay_time` 10 s không thấy lại.
 - Trạng thái: `ros2 topic echo /local_costmap/fusion_layer/status` (số ô, thời gian xử lý, tuổi cloud).
 
-Kết quả offline (2026-10-20, camera giả lập, CustomDWB, 3 lần mỗi ô):
+Kết quả offline lúc phát triển (2026-10-20, camera giả lập, CustomDWB, 3 lần mỗi ô; công cụ benchmark nay đã xoá):
 
 | Kịch bản (CustomDWB, 3 lần) | `none` (chỉ LiDAR) | `fusion` |
 |---|---|---|
@@ -787,6 +977,8 @@ ros2 launch stage3_navigation navigation.launch.py camera:=true camera_view:=tru
 | **Bị đẩy lệch đường** | ≤ 0.8 m: tự kéo về. > 0.8 m: `ABORTED` → gửi goal mới |
 | **Đường chữ U / tự cắt** | Không nhảy nhánh nhờ cửa sổ tìm 1 m + cực tiểu đầu tiên |
 | **Đổi tham số khi chạy** | Kiểm tra cả lô; sai → giữ cũ; đúng → áp dụng từ chu kỳ sau |
+| **IMU mất dữ liệu** | Yaw EKF đứng yên khi robot quay. ROTATE_TO_PATH quay ở 0.5 rad/s không giảm (robot 2026-10-20: ~270°) → sau 10 s `Failed to make progress`. Trong RViz scan xoay lệch bản đồ, monitor LOST. Không có cảnh báo riêng |
+| **CSM `AMBIGUOUS`** | AMCL nhận covariance rộng → monitor UNCERTAIN (std_xy > 0.25) → `REFUSED`. Nhích robot cho AMCL hội tụ |
 
 ---
 
@@ -803,14 +995,18 @@ Lấy từ log `~/.ros/log/goal_path_bridge_*.log` (không có bag, trừ `~/rot
 | 2026-10-16 18:30 | có replan | Đích 1.41 m tới nơi; đích 3.41 m bị hủy (UNCERTAIN); 2 lần abort |
 | 2026-10-17 15:58 | có replan, vật cản trên đường | Xoay 180° → đi ~0.3 m → bị hủy (UNCERTAIN, consistency 0.248). Không phải DWB dừng |
 | 2026-10-19 08:35–08:48 | có replan | Đích 1.26 m tới nơi; các đích 2.17 m và 5.60 m bị hủy (UNCERTAIN > 2 s); 1 lần bị từ chối lúc bắt đầu |
+| 2026-10-20 13:56–14:09 | không replan, `camera:=true` (fusion) | **IMU không gửi dữ liệu** (sau khi cắm lại ESP32): 2 lần quay tại chỗ ~270° → abort; 1 lần quay ~110° → monitor LOST → hủy |
+| 2026-10-20 14:17–14:24 | như trên, IMU đã chạy lại | Đích 2.57 m và 1.84 m **tới nơi**. 3 lần abort sau `holding position` (vật cản phía trước, 399/420 quỹ đạo bị loại); 5 lần `REFUSED` (UNCERTAIN do covariance AMCL rộng sau CSM `AMBIGUOUS`) |
 
 **Kết luận:**
 - Đích ngắn (~1.3–1.4 m, có xoay tại chỗ) **thường tới nơi**.
 - Nguyên nhân dừng giữa đường **chủ yếu là bridge hủy vì monitor báo UNCERTAIN**, không phải DWB.
 - Hành vi né vật cản của DWB **chưa được thử trọn vẹn trên robot**, vì các lần có vật cản đều bị hủy vì localization
   trước.
-- Các lần chạy 2026-10-14 lúc 15:26 và 15:40 dùng **gần như đúng code stage 3 hiện tại** (`a7c59a1`, cổng cũ). Các lần từ
-  2026-10-16 tới 2026-10-19 dùng bản **có replan**. Từ khi gỡ replan, chưa chạy lại trên robot.
+- Các lần chạy 2026-10-14 lúc 15:26 và 15:40 dùng code CustomDWB như hiện tại (`a7c59a1`, cổng cũ). Các lần từ
+  2026-10-16 tới 2026-10-19 dùng bản **có replan**. Ngày 2026-10-20 chạy bản hiện tại (không replan, có camera).
+- 2026-10-20: lần đầu thấy CustomDWB **dừng trước vật cản** trên robot (`holding position` → abort), nhưng không có
+  bag nên chưa biết vật cản thật hay do LiDAR / camera (vật cản ma). Lần sau cần ghi bag (mục 12).
 
 ---
 
@@ -849,31 +1045,14 @@ Ghi bag cho lần thử né vật cản (để biết DWB dừng hay bridge hủ
 ```bash
 ros2 bag record -o ~/obstacle_run /cmd_vel_out /cmd_vel_nav /odometry/filtered /scan_filtered \
   /local_costmap/costmap /CustomDWB/state /goal_path_bridge/follow_state /localization/status /amcl_pose
-python3 scripts/analyze_cmd_lag.py ~/obstacle_run --axis v
 ```
 
 ---
 
-## 13. Test và công cụ
+## 13. Test
 
-| Thành phần | Làm gì |
-|---|---|
-| `test/test_dwa_core.cpp` | gtest lõi: cửa sổ, phanh, va chạm, bám đường, đích, dao động, tham số + kịch bản kín vòng |
-| `test/test_dwb_controller_plugin.cpp` | gtest plugin qua `nav2_core::Controller` (domain 87, localhost) |
-| `test/dwa_closed_loop_sim.cpp` + `sim_world.*` | Benchmark kín vòng (`--robot nominal/sluggish/laggy`) |
-| `test/offline/offline_sim.py`, `run_benchmark.py`, `scenarios.json` | Benchmark trong `controller_server` thật, so với Nav2 DWB |
-| `scripts/analyze_cmd_lag.py` | Bag → độ trễ, gia tốc/phanh thực, quay lố |
-| `test/test_camera_fusion.cpp` | gtest luật hợp nhất camera + LiDAR (frame độ sâu tổng hợp) |
-
-```bash
-cd ~/capstone_ws
-colcon build --symlink-install --packages-select stage3_navigation
-colcon test --packages-select stage3_navigation && colcon test-result --verbose
-```
-
-Kết quả sau khi thêm lớp camera M2 (2026-10-20): **125 kết quả, 0 lỗi**, 15 bỏ qua (cppcheck, ament tự bỏ).
-Benchmark có camera: `python3 run_benchmark.py --camera-layer fusion|voxel|none --scenarios cam_table_on_path,...`. Cách chạy benchmark
-và test offline: `doc/offline_runbook.md`.
+Đã xoá toàn bộ test, mô phỏng và benchmark offline (2026-10-20); package chỉ còn phần chạy trên robot.
+`colcon test` chỉ còn chạy linter (ament_lint_auto).
 
 ---
 
@@ -881,19 +1060,21 @@ và test offline: `doc/offline_runbook.md`.
 
 - **DWB chỉ né được vật cản không chắn hẳn đường.** Vật cản chắn đường → dừng → abort sau 10 s. Không đi vòng.
 - **A\* không biết vật cản mới:** global costmap chỉ có bản đồ tĩnh.
-- **Vật cản chưa có trong bản đồ làm monitor tưởng mất định vị** → bridge hủy trước khi DWB xử lý. Đề xuất sửa
-  (chưa làm): chỉ tính điểm khớp trên các điểm scan gần bản đồ.
+- **Vật cản chưa có trong bản đồ làm monitor tưởng mất định vị** → bridge hủy trước khi DWB xử lý. Đã thêm distance
+  filter (2026-10-20, `stage2_slam/README.md` mục 7), **chưa đánh giá trên robot**.
 - **Đường dài bị hủy giữa chừng:** điểm khớp scan–bản đồ tụt dần khi đi xa (đích 8.82 m bị hủy sau ~3.5 m).
   Nguyên nhân chưa rõ, cần bag.
 - **Không có hành vi phục hồi:** không lùi, không xoay thoát khi đứng sát vật cản.
 - **Global vs local khác nhau:** A\* (nội tiếp 0.20 m) đi được khe mà DWB (0.30 m) không qua được.
-- **controller_server treo khi scan đứng** (giới hạn của Nav2 Humble), xem `doc/p2_proposals.md` #2.
+- **controller_server treo khi scan đứng** (giới hạn của Nav2 Humble): không gọi controller, không publish gì; robot chỉ dừng nhờ timeout 0.5 s của twist_mux / watchdog driver.
 - **Feedback `distance_to_goal`** mà bridge log không phản ánh tiến độ. Xem `progress` / `dist_to_goal` trong
   `/CustomDWB/state`.
 - **Kiểm tra va chạm chỉ ở ô tâm:** đúng khi footprint tròn và tâm xoay trùng tâm thân (giả định, chưa kiểm chứng).
 - **`/local_plan` có hai publisher** (hai plugin); chỉ plugin đang chạy publish.
 - **Chưa đo trên robot:** giới hạn vận tốc/gia tốc, quãng phanh, trọng số. `control_latency` 0.2 s mới đo từ một bag.
-- **Lớp camera (M2) chưa chạy trên robot:** độ nghiêng camera (CAD = nằm ngang), vật cản ma từ sàn, chiều cao
+- **Lớp camera (M2) đã chạy trên robot nhưng chưa đánh giá** (2026-10-20, không bag): độ nghiêng camera (CAD = nằm ngang), vật cản ma từ sàn, chiều cao
   robot kể cả laptop (`max_obstacle_height` 0.70 là ước lượng) đều chưa kiểm. Vật quá gần camera (< 0.3 m, hoặc
   mặt bàn khi robot ở < ~0.8 m) không xóa được, chỉ hết hạn sau 10 s.
+- **Mất IMU không bị phát hiện:** `imu_odom`, EKF và CustomDWB đều không báo; chỉ thấy qua `ros2 topic hz /imu_odom`.
+- **Driver tăng/giảm tốc 500 ms** (mặc định lại từ 2026-10-19) khác giả định `control_latency` 0.2 s → có thể quay lố.
 - **Không có PS4 lock / E-stop phần mềm:** PS4 chỉ ghi đè tạm thời. Dừng thật: `cancel`, Ctrl+C, E-stop phần cứng.
