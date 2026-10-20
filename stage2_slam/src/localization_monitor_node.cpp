@@ -1,6 +1,8 @@
 // localization_monitor: giám sát chất lượng localization, CHỈ công bố trạng thái.
 // Không publish TF, không gửi /initialpose, không điều khiển motor, không gọi recovery.
 //
+// scan_consistency dùng distance filter (scan_map_consistency.hpp): tia ngắn hơn bản đồ do vật cản
+// chưa có trong map bị loại, nên vật lạ không bị coi là "lạc".
 // Input : map, scan_filtered, odometry/filtered, amcl_pose, initialpose, TF, /amcl/get_state
 // Output: localization/status (diagnostic_msgs/DiagnosticStatus, message = LOCALIZED | UNCERTAIN |
 //         LOST | INITIALIZING, values = lý do + số liệu chẩn đoán)
@@ -25,6 +27,7 @@
 #include "tf2_ros/transform_listener.h"
 
 #include "stage2_slam/localization_health.hpp"
+#include "stage2_slam/scan_map_consistency.hpp"
 #include "stage2_slam/scan_match_initializer.hpp"
 #include "stage2_slam/scan_match_initializer_node.hpp"
 
@@ -53,6 +56,17 @@ public:
     pre_cfg_.max_points = static_cast<std::size_t>(
       declare_parameter<int>("preprocess.max_points", static_cast<int>(pre_cfg_.max_points)));
     min_points_ = declare_parameter<int>("min_valid_points", 60);
+    // Distance filter (Fox et al. 1999): bỏ tia ngắn hơn bản đồ (vật cản chưa có trong map) khỏi
+    // consistency. enabled:=false -> cách tính cũ (mọi điểm).
+    df_cfg_.enabled = declare_parameter<bool>("distance_filter.enabled", df_cfg_.enabled);
+    df_cfg_.short_margin =
+      declare_parameter<double>("distance_filter.short_margin", df_cfg_.short_margin);
+    df_cfg_.long_margin =
+      declare_parameter<double>("distance_filter.long_margin", df_cfg_.long_margin);
+    df_cfg_.match_score =
+      declare_parameter<double>("distance_filter.match_score", df_cfg_.match_score);
+    df_cfg_.min_counted_points = static_cast<std::size_t>(declare_parameter<int>(
+        "distance_filter.min_counted_points", static_cast<int>(df_cfg_.min_counted_points)));
 
     auto & c = cfg_;
     c.initializing_grace = declare_parameter<double>("initializing_grace", c.initializing_grace);
@@ -70,6 +84,7 @@ public:
     c.consistency_lost = declare_parameter<double>("consistency_lost", c.consistency_lost);
     c.consistency_lost_count =
       declare_parameter<int>("consistency_lost_count", c.consistency_lost_count);
+    c.blocked_ratio_warn = declare_parameter<double>("blocked_ratio_warn", c.blocked_ratio_warn);
     c.jump_linear_warn = declare_parameter<double>("jump_linear_warn", c.jump_linear_warn);
     c.jump_angular_warn = declare_parameter<double>("jump_angular_warn", c.jump_angular_warn);
 
@@ -80,11 +95,14 @@ public:
       "map", rclcpp::QoS(1).transient_local().reliable(),
       [this](nav_msgs::msg::OccupancyGrid::SharedPtr m) {
         std::string err;
-        auto f = ScoreField::build(toGridMap(*m), score_cfg_, &err);
+        const GridMap grid = toGridMap(*m);
+        auto f = ScoreField::build(grid, score_cfg_, &err);
         if (f) {
           field_ = std::make_shared<ScoreField>(std::move(*f));
+          raycaster_ = std::make_shared<MapRaycaster>(grid, score_cfg_.occupied_threshold);
         } else {
           field_.reset();
+          raycaster_.reset();
           RCLCPP_ERROR(get_logger(), "invalid map: %s", err.c_str());
         }
       });
@@ -201,6 +219,7 @@ private:
     }
 
     std::optional<double> consistency;
+    std::optional<ConsistencyResult> cr;
     std::size_t points = 0;
     if (last_scan_) {
       const rclcpp::Time scan_stamp(last_scan_->header.stamp, get_clock()->get_clock_type());
@@ -211,13 +230,16 @@ private:
         if (laser_in_map) {
           const auto pre = scanToPoints(toScanData(*last_scan_), Pose2D{}, pre_cfg_);
           points = pre.points.size();
-          if (static_cast<int>(points) >= min_points_) {
-            consistency = scorePose(*field_, pre.points, *laser_in_map);
+          if (static_cast<int>(points) >= min_points_ && raycaster_) {
+            cr = evaluateScanConsistency(*field_, *raycaster_, pre.points, *laser_in_map, df_cfg_);
+            consistency = df_cfg_.enabled ? cr->consistency :
+              std::optional<double>(cr->consistency_all);
           }
         }
       }
     }
     in.scan_consistency = consistency;
+    if (cr && df_cfg_.enabled) {in.blocked_ratio = cr->short_ratio;}
     if (jump_linear_ && in.now - jump_time_ < jump_hold_) {
       in.jump_linear = jump_linear_;
       in.jump_angular = jump_angular_;
@@ -251,6 +273,10 @@ private:
     kv("tf_age", num(in.tf_stamp ? std::optional<double>(in.now - *in.tf_stamp) : std::nullopt));
     kv("scan_consistency", num(consistency));
     kv("scan_points", std::to_string(points));
+    kv("scan_consistency_all", num(cr ? std::optional<double>(cr->consistency_all) : std::nullopt));
+    kv("blocked_ratio", num(cr ? std::optional<double>(cr->short_ratio) : std::nullopt));
+    kv("through_wall_ratio", num(cr ? std::optional<double>(cr->long_ratio) : std::nullopt));
+    kv("counted_points", cr ? std::to_string(cr->counted) : std::string("n/a"));
     kv("std_x", num(std_x_));
     kv("std_y", num(std_y_));
     kv("std_yaw", num(std_yaw_));
@@ -270,10 +296,12 @@ private:
   int min_points_{60};
   ScoreFieldConfig score_cfg_;
   PreprocessConfig pre_cfg_;
+  DistanceFilterConfig df_cfg_;
   HealthConfig cfg_;
   HealthMemory mem_;
 
   std::shared_ptr<ScoreField> field_;
+  std::shared_ptr<MapRaycaster> raycaster_;
   sensor_msgs::msg::LaserScan::SharedPtr last_scan_;
   std::optional<double> odom_stamp_, std_x_, std_y_, std_yaw_, last_initialpose_;
   std::optional<double> jump_linear_, jump_angular_;

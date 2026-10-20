@@ -4,6 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, LogInfo,
                             OpaqueFunction)
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
@@ -25,6 +26,13 @@ from launch_ros.parameter_descriptions import ParameterValue
 #   nav2_dwb -> "FollowPath" = dwb_core::DWBLocalPlanner (Nav2)
 LOCAL_PLANNERS = {"custom": "CustomDWB", "nav2_dwb": "FollowPath"}
 
+# Lớp camera trong local_costmap (M2): file YAML nạp CHỒNG lên params_file cho controller_server.
+#   fusion -> config/camera_fusion.yaml (stage3_navigation::FusionLayer, hợp nhất camera + LiDAR)
+#   voxel  -> config/camera_voxel.yaml  (nav2_costmap_2d::VoxelLayer, đối chứng)
+#   none   -> chỉ LiDAR (như trước)
+#   auto   -> fusion nếu camera:=true, ngược lại none
+CAMERA_LAYERS = {"fusion": "camera_fusion.yaml", "voxel": "camera_voxel.yaml", "none": None}
+
 # Tham số chuyển nguyên xuống planning.launch.py (mode được planning.launch.py kiểm tra).
 PLANNING_ARGS = ("mode", "serial_port", "imu_port", "map", "csm", "monitor", "params_file",
                  "allow_unknown", "stage2", "rviz", "log_level")
@@ -34,18 +42,67 @@ def _is_true(context, name):
     return LaunchConfiguration(name).perform(context).lower() == "true"
 
 
+def _camera_layer(context):
+    layer = LaunchConfiguration("camera_layer").perform(context)
+    if layer == "auto":
+        return "fusion" if _is_true(context, "camera") else "none"
+    if layer not in CAMERA_LAYERS:
+        raise RuntimeError(
+            f"camera_layer:={layer} không hợp lệ, chọn một trong "
+            f"{('auto',) + tuple(CAMERA_LAYERS)}")
+    return layer
+
+
+def _controller_server(context):
+    # controller_server (CustomDWB + FollowPath = dwb_core::DWBLocalPlanner)
+    # + local_costmap (obstacle [+ camera] + inflation).
+    # Action: /follow_path. Không có BT navigator: FollowPath chỉ do goal_path_bridge gửi.
+    params = [LaunchConfiguration("params_file")]
+    # Đầu ra vận tốc của controller_server (topic "cmd_vel" của nó).
+    cmd_vel_topic = "/cmd_vel_nav" if _is_true(context, "navigation_enabled") else "/cmd_vel_dwb"
+    layer = _camera_layer(context)
+    actions = []
+    if CAMERA_LAYERS[layer]:
+        overlay = (Path(get_package_share_directory("stage3_navigation")) / "config" /
+                   CAMERA_LAYERS[layer])
+        params.append(str(overlay))
+        actions.append(LogInfo(
+            msg=f"[stage3] local_costmap + lớp camera '{layer}' ({overlay.name})"))
+        if not _is_true(context, "camera"):
+            actions.append(LogInfo(
+                msg="[stage3] camera:=false: không chạy driver RealSense, lớp camera cần nguồn "
+                    "point cloud khác (vd. offline_sim.py camera:=true), nếu không costmap "
+                    "không current"))
+    actions.append(Node(
+        package="nav2_controller",
+        executable="controller_server",
+        name="controller_server",
+        output="screen",
+        parameters=params,
+        remappings=[("cmd_vel", cmd_vel_topic)],
+        arguments=["--ros-args", "--log-level", LaunchConfiguration("log_level")],
+    ))
+    return actions
+
+
 def _check_args(context):
     planner = LaunchConfiguration("local_planner").perform(context)
     if planner not in LOCAL_PLANNERS:
         raise RuntimeError(
             f"local_planner:={planner} không hợp lệ, chọn một trong {tuple(LOCAL_PLANNERS)}")
+    _camera_layer(context)
+    warnings = []
+    if _is_true(context, "camera_view") and not _is_true(context, "camera"):
+        warnings.append(LogInfo(msg="[stage3] camera_view:=true bị bỏ qua: cần camera:=true"))
     if _is_true(context, "navigation_enabled"):
-        return [LogInfo(msg="[stage3] !!! navigation_enabled:=true: DWB -> /cmd_vel_nav -> "
-                            "twist_mux -> MOTOR. Kê bánh / giữ E-stop. Dừng: ros2 service call "
-                            "/goal_path_bridge/cancel std_srvs/srv/Trigger (giữ deadman PS4 chỉ "
-                            "ghi đè tạm thời: thả ra là DWB chạy tiếp)")]
-    return [LogInfo(msg=f"[stage3] local planner '{planner}' ({LOCAL_PLANNERS[planner]}), "
-                        "test mode: vận tốc -> /cmd_vel_dwb (cách ly, không tới motor)")]
+        return warnings + [LogInfo(
+            msg="[stage3] !!! navigation_enabled:=true: DWB -> /cmd_vel_nav -> "
+                "twist_mux -> MOTOR. Kê bánh / giữ E-stop. Dừng: ros2 service call "
+                "/goal_path_bridge/cancel std_srvs/srv/Trigger (giữ deadman PS4 chỉ "
+                "ghi đè tạm thời: thả ra là DWB chạy tiếp)")]
+    return warnings + [LogInfo(
+        msg=f"[stage3] local planner '{planner}' ({LOCAL_PLANNERS[planner]}), "
+            "test mode: vận tốc -> /cmd_vel_dwb (cách ly, không tới motor)")]
 
 
 def generate_launch_description():
@@ -57,12 +114,6 @@ def generate_launch_description():
     # Cùng mặc định với planning.launch.py / stage2_slam localization.launch.py.
     default_map = Path.home() / "capstone_ws" / "capstone_project" / "maps" / "map.yaml"
 
-    # Đầu ra vận tốc của controller_server (topic "cmd_vel" của nó).
-    cmd_vel_topic = PythonExpression([
-        "'/cmd_vel_nav' if '", LaunchConfiguration("navigation_enabled"),
-        "'.lower() == 'true' else '/cmd_vel_dwb'",
-    ])
-
     # controller_id mà goal_path_bridge gửi trong FollowPath (chọn plugin của controller_server).
     controller_id = PythonExpression([
         "'FollowPath' if '", LaunchConfiguration("local_planner"),
@@ -73,6 +124,13 @@ def generate_launch_description():
     require_localized = PythonExpression([
         "'", LaunchConfiguration("mode"), "' == 'localization' and '",
         LaunchConfiguration("monitor"), "'.lower() == 'true'",
+    ])
+
+    # RViz ảnh camera: chỉ khi camera_view, camera và rviz đều true.
+    camera_view_on = PythonExpression([
+        "'", LaunchConfiguration("camera_view"), "'.lower() == 'true' and '",
+        LaunchConfiguration("camera"), "'.lower() == 'true' and '",
+        LaunchConfiguration("rviz"), "'.lower() == 'true'",
     ])
 
     planning_launch = stage3_share / "launch" / "planning.launch.py"
@@ -89,12 +147,12 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "serial_port",
-            default_value="/dev/ttyUSB2",
+            default_value="/dev/ttyUSB1",
             description="Cổng USB của RPLidar C1",
         ),
         DeclareLaunchArgument(
             "imu_port",
-            default_value="/dev/ttyUSB1",
+            default_value="/dev/ttyUSB0",
             description="Cổng USB-UART của ESP32 (IMU), truyền xuống Stage 2 / ekf.launch.py",
         ),
         DeclareLaunchArgument(
@@ -156,6 +214,24 @@ def generate_launch_description():
                         "false: -> /cmd_vel_dwb (cách ly)",
         ),
         DeclareLaunchArgument(
+            "camera",
+            default_value="false",
+            description="true: chạy driver RealSense D435 (camera.launch.py, THIẾT BỊ THẬT) "
+                        "và mặc định thêm lớp hợp nhất camera + LiDAR vào local_costmap",
+        ),
+        DeclareLaunchArgument(
+            "camera_view",
+            default_value="false",
+            description="true (cần camera:=true, rviz:=true): bật thêm ảnh màu RealSense và mở "
+                        "cửa sổ RViz2 riêng (camera.rviz) hiển thị ảnh màu + ảnh độ sâu",
+        ),
+        DeclareLaunchArgument(
+            "camera_layer",
+            default_value="auto",
+            description="Lớp camera trong local_costmap: auto (fusion nếu camera:=true, ngược lại "
+                        "none) | fusion (FusionLayer) | voxel (VoxelLayer, đối chứng) | none",
+        ),
+        DeclareLaunchArgument(
             "auto_follow",
             default_value="false",
             description="true: gửi FollowPath ngay khi A* tìm được đường. "
@@ -176,19 +252,26 @@ def generate_launch_description():
             ],
         ),
 
-        # ---- Stage 3.2: bộ điều khiển cục bộ ----
-        # controller_server (CustomDWB + FollowPath = dwb_core::DWBLocalPlanner)
-        # + local_costmap (obstacle + inflation).
-        # Action: /follow_path. Không có BT navigator: FollowPath chỉ do goal_path_bridge gửi.
-        Node(
-            package="nav2_controller",
-            executable="controller_server",
-            name="controller_server",
-            output="screen",
-            parameters=[params_file],
-            remappings=[("cmd_vel", cmd_vel_topic)],
-            arguments=["--ros-args", "--log-level", log_level],
+        # ---- Camera RealSense (M2), chỉ khi camera:=true: THIẾT BỊ THẬT ----
+        # camera_view:=true bật thêm ảnh màu (chỉ để xem; lớp camera chỉ dùng point cloud độ sâu).
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(str(stage3_share / "launch" / "camera.launch.py")),
+            launch_arguments={"enable_color": LaunchConfiguration("camera_view")}.items(),
+            condition=IfCondition(LaunchConfiguration("camera")),
         ),
+
+        # Cửa sổ RViz2 thứ hai chỉ xem ảnh camera (không đụng planning.rviz).
+        Node(
+            package="rviz2",
+            executable="rviz2",
+            name="rviz2_camera",
+            output="screen",
+            arguments=["-d", str(stage3_share / "rviz" / "camera.rviz")],
+            condition=IfCondition(camera_view_on),
+        ),
+
+        # ---- Stage 3.2: bộ điều khiển cục bộ (controller_server + local_costmap) ----
+        OpaqueFunction(function=_controller_server),
 
         # Lifecycle manager riêng cho controller_server
         # (planner_server thuộc lifecycle_manager_planning của planning.launch.py).

@@ -117,6 +117,12 @@ HealthReport evaluateHealth(const HealthInputs & in, const HealthConfig & cfg, H
     }
   }
 
+  // --- Vật cản chưa có trong bản đồ che quá nhiều tia ---
+  if (in.blocked_ratio && *in.blocked_ratio > cfg.blocked_ratio_warn) {
+    warn.push_back(fmt("scan blocked by unmapped objects", *in.blocked_ratio, ">",
+      cfg.blocked_ratio_warn));
+  }
+
   // --- Nhảy pose (AMCL dịch khác odom) ---
   if (in.jump_linear && *in.jump_linear > cfg.jump_linear_warn) {
     warn.push_back(fmt("pose jump", *in.jump_linear, "m >", cfg.jump_linear_warn));

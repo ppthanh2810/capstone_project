@@ -1,0 +1,11 @@
+<!-- Đăng ký plugin costmap: local_costmap nạp class này khi YAML ghi
+     plugin: "stage3_navigation::FusionLayer" (config/camera_fusion.yaml). Thư viện: lib/libfusion_layer.so -->
+<library path="fusion_layer">
+  <class type="stage3_navigation::FusionLayer" base_class_type="nav2_costmap_2d::Layer">
+    <description>
+      Camera (depth point cloud) + LiDAR fusion layer: camera-only obstacles after N consecutive frames,
+      immediate confirmation when the LiDAR also sees them (drawn at the LiDAR position by obstacle_layer),
+      cleared only when the camera sees through the cell or after a decay time.
+    </description>
+  </class>
+</library>

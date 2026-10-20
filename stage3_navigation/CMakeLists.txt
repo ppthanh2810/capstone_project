@@ -29,6 +29,8 @@ find_package(nav2_costmap_2d REQUIRED)
 find_package(nav2_util REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(visualization_msgs REQUIRED)
+# fusion_layer (plugin costmap camera + LiDAR, M2)
+find_package(sensor_msgs REQUIRED)
 
 # Bridge RViz Goal Pose -> ComputePathToPose -> /global_path; tùy chọn -> FollowPath (DWB) khi được kích hoạt.
 add_executable(goal_path_bridge src/goal_path_bridge.cpp)
@@ -63,6 +65,23 @@ ament_target_dependencies(dwb_controller
   nav2_costmap_2d nav2_util pluginlib tf2 tf2_ros tf2_geometry_msgs)
 pluginlib_export_plugin_description_file(nav2_core dwb_controller_plugin.xml)
 
+# Lõi hợp nhất camera + LiDAR (M2, không phụ thuộc ROS) + plugin costmap nav2_costmap_2d::Layer:
+# libfusion_layer.so, nạp bởi local_costmap qua pluginlib (fusion_layer_plugin.xml). Bật bằng
+# navigation.launch.py camera_layer:=fusion (hoặc camera:=true).
+add_library(camera_fusion SHARED src/camera_fusion.cpp)
+target_compile_features(camera_fusion PUBLIC cxx_std_17)
+target_include_directories(camera_fusion PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+add_library(fusion_layer SHARED src/fusion_layer.cpp)
+target_compile_features(fusion_layer PUBLIC cxx_std_17)
+target_link_libraries(fusion_layer camera_fusion)
+ament_target_dependencies(fusion_layer
+  rclcpp rclcpp_lifecycle nav2_costmap_2d pluginlib sensor_msgs diagnostic_msgs geometry_msgs tf2 tf2_ros
+  tf2_geometry_msgs)
+pluginlib_export_plugin_description_file(nav2_costmap_2d fusion_layer_plugin.xml)
+
 # Mô phỏng kín vòng KHÔNG cần ROS graph (động học có trễ + giới hạn gia tốc, costmap tổng hợp): benchmark lõi.
 add_executable(dwa_closed_loop_sim test/dwa_closed_loop_sim.cpp test/sim_world.cpp)
 target_include_directories(dwa_closed_loop_sim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/test)
@@ -70,7 +89,7 @@ target_link_libraries(dwa_closed_loop_sim dwa_core)
 ament_target_dependencies(dwa_closed_loop_sim nav2_costmap_2d)
 install(TARGETS dwa_closed_loop_sim DESTINATION lib/${PROJECT_NAME})
 
-install(TARGETS dwa_core dwb_controller
+install(TARGETS dwa_core dwb_controller camera_fusion fusion_layer
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -110,6 +129,10 @@ if(BUILD_TESTING)
   ament_target_dependencies(test_dwb_controller_plugin
     rclcpp rclcpp_lifecycle nav2_core nav2_costmap_2d nav2_util tf2_ros tf2_geometry_msgs nav_msgs
     geometry_msgs pluginlib)
+
+  # Unit test lõi hợp nhất camera + LiDAR (M2), không cần ROS graph.
+  ament_add_gtest(test_camera_fusion test/test_camera_fusion.cpp)
+  target_link_libraries(test_camera_fusion camera_fusion)
 endif()
 
 ament_package()

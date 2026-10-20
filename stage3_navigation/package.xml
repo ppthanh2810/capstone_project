@@ -30,6 +30,11 @@
   <depend>pluginlib</depend>
   <depend>visualization_msgs</depend>
 
+  <!-- fusion_layer: plugin costmap camera + LiDAR (M2) -->
+  <depend>sensor_msgs</depend>
+  <!-- camera.launch.py (camera:=true) -->
+  <exec_depend>realsense2_camera</exec_depend>
+
   <!-- planning.launch.py -->
   <!-- include stage2_slam localization/mapping.launch.py (LiDAR, motor/teleop, EKF, AMCL/SLAM, CSM) -->
   <exec_depend>stage2_slam</exec_depend>
@@ -54,5 +59,6 @@
   <export>
     <build_type>ament_cmake</build_type>
     <nav2_core plugin="${prefix}/dwb_controller_plugin.xml" />
+    <nav2_costmap_2d plugin="${prefix}/fusion_layer_plugin.xml" />
   </export>
 </package>

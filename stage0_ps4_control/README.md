@@ -19,7 +19,7 @@ File này nói về 4 file chính:
 Tay PS4 ──USB/BT──> joy_node ──/joy──> joy_teleop ──/cmd_vel_joy──┐  (ưu tiên 100)
                                          (ps4.yaml)               │
                                                                   ├──> twist_mux ──/cmd_vel_out──> zlac8015d_move ──Modbus──> ZLAC8015D ──> 2 bánh
-DWB (stage3, chỉ khi navigation_enabled:=true) ──/cmd_vel_nav─────┘  (twist_mux.yaml)              │       (/dev/ttyUSB0)
+DWB (stage3, chỉ khi navigation_enabled:=true) ──/cmd_vel_nav─────┘  (twist_mux.yaml)              │       (/dev/ttyUSB2)
                                                    (ưu tiên 10)                                    │
                                                                                                    └──/wheel_feedback──> zlac8015d_odom (stage1)
 ```
@@ -138,7 +138,7 @@ Hằng số viết trong code (không đổi được bằng tham số):
 
 | Hằng số | Giá trị |
 |---|---|
-| Cổng Modbus | `/dev/ttyUSB0` |
+| Cổng Modbus | `/dev/ttyUSB2` |
 | Baudrate / slave | 115200 / 1 (mặc định thư viện) |
 | Timeout lệnh (watchdog) | 0.5 s |
 | Chu kỳ kiểm tra watchdog | 100 ms |

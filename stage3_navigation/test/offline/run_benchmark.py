@@ -38,7 +38,8 @@ import time
 HERE = Path(__file__).resolve().parent
 PROFILES = {'custom': 'CustomDWB', 'nav2_dwb': 'FollowPath', 'nav2_dwb_la': 'FollowPathLA'}
 FORBIDDEN_NODES = ('zlac8015d_move', 'twist_mux', 'joy_node', 'joy_teleop', 'teleop', 'sllidar',
-                   'imu_odom', 'ekf_filter_node', 'amcl', 'slam_toolbox', 'zlac8015d_odom')
+                   'imu_odom', 'ekf_filter_node', 'amcl', 'slam_toolbox', 'zlac8015d_odom',
+                   'realsense')
 LIMITS = {'max_vel_x': 0.15, 'max_vel_theta': 0.5}
 
 
@@ -251,13 +252,14 @@ def run_job(job):
     launch_log = open(rd / 'launch.log', 'w')
     launch = subprocess.Popen(
         ['ros2', 'launch', 'stage3_navigation', 'navigation.launch.py', 'stage2:=false',
-         'rviz:=false', 'navigation_enabled:=false', 'auto_follow:=false',
-         f'params_file:={job["params"]}'],
+         'rviz:=false', 'navigation_enabled:=false', 'auto_follow:=false', 'camera:=false',
+         f'camera_layer:={job["camera_layer"]}', f'params_file:={job["params"]}'],
         stdout=launch_log, stderr=subprocess.STDOUT, env=env, start_new_session=True)
     sim = subprocess.Popen(
         [sys.executable, str(HERE / 'offline_sim.py'), '--ros-args',
          '-p', f'scenario:={job["scenario"]}', '-p', f'scenario_file:={HERE / "scenarios.json"}',
-         '-p', f'seed:={job["seed"]}', '-p', f'log_file:={rd / "sim.csv"}'],
+         '-p', f'seed:={job["seed"]}', '-p', f'log_file:={rd / "sim.csv"}',
+         '-p', f'camera:={job["camera_layer"] != "none"}'],
         stdout=open(rd / 'sim.log', 'w'), stderr=subprocess.STDOUT, env=env,
         start_new_session=True)
     try:
@@ -448,6 +450,8 @@ def main():
     ap.add_argument('--domain-base', type=int, default=150)
     ap.add_argument('--profiles', default='custom,nav2_dwb,nav2_dwb_la')
     ap.add_argument('--scenarios', default='')
+    # M2: lớp camera trong local_costmap (camera giả lập của offline_sim, KHÔNG chạy RealSense).
+    ap.add_argument('--camera-layer', default='none', choices=('none', 'fusion', 'voxel'))
     args = ap.parse_args()
     if args.client:
         client_main(args)
@@ -463,10 +467,12 @@ def main():
             for r in range(args.runs):
                 jobs.append({'scenario': name, 'profile': prof, 'run': r, 'seed': 1000 + r,
                              'sc': scen[name], 'params': str(params),
+                             'camera_layer': args.camera_layer,
                              'raw_dir': str(out / 'raw' / f'{name}__{prof}__{r}')})
     meta = {'started': time.strftime('%Y-%m-%dT%H:%M:%S'), 'params_source': str(src),
             'jobs': len(jobs),
-            'workers': args.workers, 'ros_distro': os.environ.get('ROS_DISTRO'),
+            'workers': args.workers, 'camera_layer': args.camera_layer,
+            'ros_distro': os.environ.get('ROS_DISTRO'),
             'machine': platform.node() + ' ' + platform.machine(), 'cpu_count': os.cpu_count(),
             'note': 'parallel workers share the CPU: timing metrics include that load'}
     (out / 'meta.json').write_text(json.dumps(meta, indent=1))

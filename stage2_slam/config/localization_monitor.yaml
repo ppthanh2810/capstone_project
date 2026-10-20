@@ -16,6 +16,17 @@ localization_monitor:
       max_range: 12.0
       max_points: 400
     min_valid_points: 60
+    # Distance filter (Fox et al. 1999): dò tia trên bản đồ; điểm scan NGẮN hơn bản đồ > short_margin
+    # và xa tường (score < match_score) = vật cản chưa có trong map (ghế, người) -> bỏ khỏi
+    # scan_consistency. Tia "xuyên tường" vẫn tính -> lạc thật vẫn bị phát hiện.
+    # enabled: false -> cách tính cũ (mọi điểm). /localization/status có cả scan_consistency_all
+    # (cách cũ) để so sánh. Ngưỡng chọn trên dữ liệu tổng hợp (test_scan_map_consistency) - NOT_VERIFIED.
+    distance_filter:
+      enabled: true
+      short_margin: 0.15
+      long_margin: 0.15
+      match_score: 0.5
+      min_counted_points: 40
     initializing_grace: 3.0        # s sau /initialpose
     scan_age_warn: 0.5
     scan_age_lost: 2.0
@@ -30,6 +41,9 @@ localization_monitor:
     consistency_warn: 0.45          # 0.55 -> 0.45 (2026-10-14): robot dao động 0.46-0.535 khi quay/đi rồi hồi lại
     consistency_lost: 0.30
     consistency_lost_count: 5
+    # Tỉ lệ tia bị vật lạ che > ngưỡng -> UNCERTAIN (còn quá ít tường để kiểm tra vị trí).
+    # Tấm 1.2 m cách 0.55 m đã che ~62% -> để cao.
+    blocked_ratio_warn: 0.85
     jump_linear_warn: 0.30
     jump_angular_warn: 0.26
     jump_hold: 5.0

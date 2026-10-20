@@ -36,6 +36,9 @@ struct HealthInputs
   std::optional<double> tf_stamp;           // stamp của TF map->base mới nhất (nullopt = lookup lỗi)
   std::optional<double> std_x, std_y, std_yaw;  // từ covariance /amcl_pose
   std::optional<double> scan_consistency;   // score [0,1] của scan tại pose TF (nullopt = không tính được)
+  // Tỉ lệ tia ngắn hơn bản đồ (vật cản chưa có trong map) đã bị loại khỏi consistency
+  // (nullopt = distance filter tắt).
+  std::optional<double> blocked_ratio;
   std::optional<double> jump_linear;        // |Δpose AMCL - Δodom| giữa hai /amcl_pose (m)
   std::optional<double> jump_angular;       // rad
 };
@@ -56,6 +59,9 @@ struct HealthConfig
   double consistency_warn{0.55};
   double consistency_lost{0.30};
   int consistency_lost_count{5};      // số lần liên tiếp dưới consistency_lost trước khi LOST
+  // Quá nhiều tia bị vật lạ che -> còn quá ít tường để kiểm tra vị trí -> WARN. Cao vì một vật lớn
+  // sát robot (tấm 1.2 m cách 0.55 m) đã che ~62% tia; lạc thật bị bắt bởi consistency đã lọc.
+  double blocked_ratio_warn{0.85};
   double jump_linear_warn{0.30};      // m
   double jump_angular_warn{0.26};     // rad (~15 deg)
 };

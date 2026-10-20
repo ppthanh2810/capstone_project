@@ -24,7 +24,7 @@ AMCL, slam_toolbox và bộ điều khiển DWB đều dùng hai đầu ra này.
 ```text
 stage0: zlac8015d_move ──/wheel_feedback (20 Hz)──> zlac8015d_odom ──/wheel_odom──┐  (vx, vy)
                                                                                  ├──> ekf_filter_node (30 Hz) ──> /odometry/filtered
-ESP32 + BNO055 ──/dev/ttyUSB1 (≈50 Hz)──> imu_odom ──/imu_odom───────────────────┘  (yaw, vyaw)        └──> TF odom → base_footprint
+ESP32 + BNO055 ──/dev/ttyUSB0 (≈50 Hz)──> imu_odom ──/imu_odom───────────────────┘  (yaw, vyaw)        └──> TF odom → base_footprint
                                               ├──> /imu/data
                                               └──> /imu/mag
 ```
@@ -128,7 +128,7 @@ Chi tiết phần cứng và firmware: `hardware/imu_bno055/README.md`.
 
 | Tham số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `port` | `/dev/ttyUSB1` | Cổng serial (115200, viết cứng) |
+| `port` | `/dev/ttyUSB0` | Cổng serial (115200, viết cứng) |
 | `frame_id` | `imu_link` | Frame của `/imu/data`, `/imu/mag` |
 | `zero_yaw_on_start` | `false` | `true`: hướng lúc khởi động = yaw 0 |
 
@@ -199,7 +199,7 @@ ros2 launch stage1_odom ekf.launch.py rviz:=false
 
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `imu_port` | `/dev/ttyUSB1` | Cổng IMU |
+| `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `rviz` | `true` | Mở RViz + `robot_state_publisher` (URDF) |
 
 | Node | Tham số |
@@ -232,7 +232,7 @@ ros2 launch stage1_odom wheel_odom_view.launch.py motor:=false # chỉ xem, khô
 |---|---|---|
 | `motor` | `true` | Chạy stage0 `move_twist_mux` (PS4 + motor) |
 | `imu` | `true` | Chạy `imu_odom` để so sánh hướng |
-| `imu_port` | `/dev/ttyUSB1` | Cổng IMU |
+| `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `rviz` | `true` | Mở RViz `odom.rviz` |
 
 Khác với `ekf.launch.py`:

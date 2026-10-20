@@ -1,0 +1,39 @@
+# M2 bước 2: lớp hợp nhất camera + LiDAR (stage3_navigation::FusionLayer) trong local costmap.
+# Nạp CHỒNG lên nav2_params.yaml (file sau ghi đè) khi navigation.launch.py camera_layer:=fusion
+# (hoặc camera:=true với camera_layer:=auto). Luật: doc/obstacle_perception_plan.md mục 2.
+# obstacle_layer (LiDAR) giữ nguyên; fusion_layer chỉ giữ bằng chứng camera, gộp bằng max -> tia xóa của camera
+# không xóa vật LiDAR thấy. NOT_VERIFIED trên robot: mọi giá trị dưới đây là giá trị khởi đầu.
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      plugins: ["obstacle_layer", "fusion_layer", "inflation_layer"]
+      fusion_layer:
+        plugin: "stage3_navigation::FusionLayer"
+        enabled: true
+        # realsense2_camera 4.x (camera.launch.py: namespace camera, name camera). Frame của cloud:
+        # camera_depth_optical_frame (URDF, publish_tf:=false ở driver).
+        cloud_topic: /camera/camera/depth/color/points
+        scan_topic: /scan_filtered
+        lidar_max_range: 2.5            # = obstacle_layer obstacle_max_range
+        # Không có cloud mới trong 1 s -> local costmap không "current" -> controller_server ngừng điều khiển
+        # (robot dừng qua timeout 0.5 s của twist_mux). 0 = tắt kiểm tra (KHÔNG khuyến nghị).
+        expected_update_rate: 1.0
+        max_cloud_wait: 0.5             # s chờ TF cho một cloud trước khi bỏ
+        # Dải độ cao vật cản (so với sàn). Robot (không laptop) cao ~0.37 m; max = robot + laptop + 0.1 m.
+        # NOT_VERIFIED: đo chiều cao thật kể cả laptop rồi sửa.
+        min_obstacle_height: 0.05       # sàn bóng/nhiễu sàn; kiểm tra trên robot
+        max_obstacle_height: 0.70
+        min_range: 0.30                 # m ngang từ camera (D435 ~0.28 m)
+        max_range: 2.5
+        horizontal_fov: 1.40            # rad (~80°, FOV thật 87°)
+        vertical_fov: 0.96              # rad (~55°, FOV thật 58°)
+        azimuth_bin: 0.0175
+        elevation_bin: 0.035
+        min_points_per_cell: 3
+        confirm_frames: 3               # vật chỉ camera thấy: 3 frame liên tiếp (~0.2 s ở 15 fps)
+        clear_frames: 2                 # nhìn xuyên 2 frame liên tiếp -> xóa
+        decay_time: 10.0                # s không thấy lại (ngoài tầm nhìn / lỗ độ sâu / quá gần) -> xóa
+        lidar_association_radius: 0.10  # ô camera gần điểm LiDAR: xác nhận ngay, vị trí theo LiDAR
+        lidar_max_age: 0.5
+        self_filter_radius: 0.25        # bỏ điểm trong 0.25 m quanh tâm robot (Ø0.40 m)
+        max_cell_distance: 3.0

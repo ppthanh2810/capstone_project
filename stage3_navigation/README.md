@@ -56,6 +56,12 @@ Tài liệu sâu hơn trong `doc/`:
 | `include/stage3_navigation/dwa_core.hpp` | Tham số mặc định `DwbParams`, khai báo thuật toán |
 | `include/stage3_navigation/dwb_controller.hpp` | Khai báo plugin |
 | `dwb_controller_plugin.xml` | Đăng ký plugin với pluginlib |
+| `src/camera_fusion.cpp` + `.hpp` | Luật hợp nhất camera + LiDAR (M2, không phụ thuộc ROS) |
+| `src/fusion_layer.cpp` + `.hpp` | Plugin costmap `FusionLayer` (vỏ ROS) |
+| `fusion_layer_plugin.xml` | Đăng ký `FusionLayer` với pluginlib |
+| `config/camera_fusion.yaml` | Thêm `fusion_layer` vào local costmap (nạp chồng) |
+| `config/camera_voxel.yaml` | Thêm `VoxelLayer` của Nav2 (đối chứng) |
+| `launch/camera.launch.py` | Driver RealSense D435 (point cloud, không TF) |
 | `rviz/planning.rviz` | RViz duy nhất của stage 3 |
 | `scripts/analyze_cmd_lag.py` | Đo độ trễ lệnh → vận tốc thật từ bag |
 | `test/` | gtest, mô phỏng kín vòng, benchmark offline |
@@ -149,8 +155,8 @@ ros2 launch stage3_navigation planning.launch.py mode:=mapping allow_unknown:=tr
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
 | `mode` | `localization` | `localization` (AMCL) hoặc `mapping` (slam_toolbox); khác → lỗi |
-| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
-| `imu_port` | `/dev/ttyUSB1` | Cổng IMU |
+| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
+| `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `map` | `~/capstone_ws/capstone_project/maps/map.yaml` | Bản đồ (localization) |
 | `csm` | **`true`** | 2D Pose Estimate qua CSM (localization) |
 | `monitor` | **`true`** | Chạy `localization_monitor` (localization) |
@@ -193,6 +199,9 @@ Có đủ đối số chung của `planning.launch.py` (truyền nguyên xuống
 | `local_planner` | `custom` | `custom` = CustomDWB; `nav2_dwb` = Nav2 DWB; khác → lỗi |
 | `navigation_enabled` | `false` | `true`: lệnh DWB → `/cmd_vel_nav` → motor |
 | `auto_follow` | `false` | `true`: A\* xong là bám đường ngay |
+| `camera` | `false` | `true`: chạy driver RealSense (**thiết bị thật**) |
+| `camera_layer` | `auto` | `fusion` / `voxel` / `none`; `auto` = `fusion` nếu `camera:=true` |
+| `camera_view` | `false` | `true` (cần `camera:=true`): bật ảnh màu + mở RViz `camera.rviz` (ảnh màu, ảnh độ sâu) |
 
 Những gì launch tự đặt:
 
@@ -435,6 +444,35 @@ Lý do chọn:
 - Nửa sau scan là NaN, mà `track_unknown_space: false` → vùng phía sau được coi là **trống**. Bảo vệ thực sự là
   **không cho lùi**.
 
+### 6.6b Lớp camera trong `local_costmap` (M2, tùy chọn)
+
+Bật bằng `camera:=true` (hoặc `camera_layer:=fusion|voxel`). Launch nạp thêm một file YAML **sau**
+`nav2_params.yaml`, file này ghi đè `plugins` của local costmap.
+
+| `camera_layer` | `plugins` |
+|---|---|
+| `none` (mặc định khi `camera:=false`) | `obstacle_layer`, `inflation_layer` |
+| `fusion` | `obstacle_layer`, `fusion_layer`, `inflation_layer` |
+| `voxel` | `obstacle_layer`, `camera_layer` (VoxelLayer), `inflation_layer` |
+
+Tham số chính của `fusion_layer` (`config/camera_fusion.yaml`, đều là giá trị khởi đầu):
+
+| Tham số | Giá trị |
+|---|---|
+| `cloud_topic` | `/camera/camera/depth/color/points` |
+| Dải độ cao vật cản | 0.05–0.70 m |
+| Tầm (ngang từ camera) | 0.30–2.5 m |
+| `confirm_frames` / `clear_frames` | 3 / 2 |
+| `decay_time` | 10 s |
+| `lidar_association_radius` | 0.10 m |
+| `expected_update_rate` | 1.0 s |
+
+- `max_obstacle_height` 0.70 m là **ước lượng** (robot 0.37 m + laptop + 0.1 m). Cần đo chiều cao thật.
+- Không có cloud mới trong 1 s → local costmap "không current" → controller_server ngừng điều khiển → robot dừng.
+  Camera chết thì robot dừng chứ không chạy mù.
+- Tham số chỉ đọc lúc khởi động (đổi → chạy lại launch).
+- Luật và giới hạn: mục 9b.
+
 ### 6.7 `goal_path_bridge`
 
 | Tham số | Giá trị | Ý nghĩa |
@@ -664,15 +702,66 @@ DWB **không đi vòng được** quanh vật cản chắn đường:
 Sau `ABORTED`: dọn vật cản rồi gửi lại 2D Goal Pose. A\* chỉ biết bản đồ tĩnh nên sẽ cho lại đường cũ.
 
 ### Cách thử né vật cản trên robot
-Vật cản lớn ngay trước robot làm `localization_monitor` tụt điểm khớp scan–bản đồ (điểm trên vật cản không khớp
-tường nào) → báo UNCERTAIN → bridge **hủy sau 2 s, trước khi DWB kịp xử lý**. Đã xảy ra nhiều lần trên robot (mục 11).
-Vì vậy khi thử né vật cản:
+Trước 2026-10-20: vật cản lớn ngay trước robot làm `localization_monitor` tụt điểm khớp scan–bản đồ → UNCERTAIN →
+bridge **hủy sau 2 s, trước khi DWB kịp xử lý** (mục 11). Từ 2026-10-20 monitor có **distance filter** (bỏ tia ngắn hơn
+bản đồ; xem `stage2_slam/README.md` mục 7), nên có thể thử **giữ `monitor:=true`** (chưa kiểm chứng trên robot):
 
 ```bash
-ros2 launch stage3_navigation navigation.launch.py navigation_enabled:=true monitor:=false auto_follow:=true
+ros2 launch stage3_navigation navigation.launch.py navigation_enabled:=true auto_follow:=true
+ros2 topic echo /localization/status   # xem scan_consistency, scan_consistency_all, blocked_ratio
 ```
 
-`monitor:=false` tắt luôn việc tự hủy khi mất định vị thật, nên **phải có người giám sát và E-stop**.
+Nếu vẫn bị hủy vì localization, dùng `monitor:=false`. Cách này tắt luôn việc tự hủy khi mất định vị thật, nên
+**phải có người giám sát và E-stop**.
+
+### 9b. Vật cản LiDAR không thấy: lớp camera (M2)
+
+LiDAR chỉ quét một mặt phẳng cao 0.347 m. Nó không thấy mặt bàn, mặt ghế, vật thấp dưới 0.35 m, chân đế ghế xoay.
+`FusionLayer` thêm vật cản do camera độ sâu D435 thấy vào local costmap. CustomDWB né chúng như né vật LiDAR thấy.
+
+Luật hợp nhất:
+
+| LiDAR | Camera | Kết quả |
+|---|---|---|
+| Thấy | Thấy | Vật cản ngay; vẽ theo vị trí LiDAR |
+| Không | Thấy | Vật cản sau 3 frame liên tiếp |
+| Thấy | Không | Vật cản (do `obstacle_layer` vẽ) |
+| Không | Không | Trống, được xóa |
+
+Cách làm:
+- `obstacle_layer` (LiDAR) giữ nguyên. `fusion_layer` chỉ giữ bằng chứng của camera. Hai lớp gộp bằng `max`, nên
+  camera không bao giờ xóa vật LiDAR thấy.
+- Ô camera nằm trong 0.10 m quanh một điểm LiDAR mới được xác nhận ngay nhưng **không vẽ**: LiDAR đã vẽ vật đó,
+  ở vị trí chính xác hơn.
+- **Xóa ô** chỉ khi camera nhìn xuyên qua ô ở mọi độ cao từng thấy vật, 2 frame liên tiếp. Không xóa khi:
+  - có lỗ độ sâu (vật đen, trong suốt);
+  - ô bị vật gần hơn che;
+  - vật ra khỏi góc nhìn đứng (robot quá gần mặt bàn);
+  - ô ra khỏi góc nhìn ngang.
+  Các ô đó hết hạn sau `decay_time` 10 s không thấy lại.
+- Trạng thái: `ros2 topic echo /local_costmap/fusion_layer/status` (số ô, thời gian xử lý, tuổi cloud).
+
+Kết quả offline (2026-10-20, camera giả lập, CustomDWB, 3 lần mỗi ô):
+
+| Kịch bản (CustomDWB, 3 lần) | `none` (chỉ LiDAR) | `fusion` |
+|---|---|---|
+| Mặt bàn 0.45–0.75 m trên đường | **3/3 đâm** | 3/3 dừng, hở 0.10 m |
+| Hộp thấp 0.12 m trên đường | **3/3 đâm** | 3/3 dừng, hở 0.10 m |
+| Hộp cao 0.8 m (cả hai thấy) | 3/3 dừng | 3/3 dừng |
+| Hộp thấp cạnh đường | 3/3 tới đích | 3/3 tới đích, hở 0.16 m |
+| `straight`, `obstacle_near_path` | 6/6 | 6/6 (không vật cản ma) |
+
+- `voxel` (đối chứng): cùng kết quả như `fusion` trên các kịch bản này (camera giả lập không nhiễu, nên chưa thấy
+  khác biệt về lọc nhiễu).
+- Thời gian tính CustomDWB p99 ~3 ms ở cả ba cấu hình; chu kỳ lệnh p99 ~102 ms (10 Hz giữ được).
+- "Dừng" = `holding position` rồi progress checker abort sau 10 s (hành vi đã biết, P4 sẽ xử lý đi vòng).
+
+Chạy trên robot (**thiết bị thật**, hỏi trước; lần đầu cách ly motor):
+```bash
+ros2 launch stage3_navigation navigation.launch.py camera:=true     # fusion
+ros2 launch stage3_navigation navigation.launch.py camera:=true camera_layer:=voxel   # đối chứng
+ros2 launch stage3_navigation navigation.launch.py camera:=true camera_view:=true   # + cửa sổ ảnh camera
+```
 
 ---
 
@@ -685,7 +774,7 @@ ros2 launch stage3_navigation navigation.launch.py navigation_enabled:=true moni
 | **Chế độ cách ly (C)** | Robot không chạy → sau 10 s `Failed to make progress` → `ABORTED`. Bình thường |
 | **Vật cản cạnh đường** | Lệch nhẹ né rồi về đường (mục 9) |
 | **Vật cản chắn hẳn đường** | Dừng, chờ 10 s → `ABORTED` nếu không thông. Không đi vòng |
-| **Vật cản lớn ngay trước (gần)** | Monitor báo UNCERTAIN → bridge **hủy vì localization** sau 2 s. Thử với `monitor:=false` |
+| **Vật cản lớn ngay trước (gần)** | Trước 2026-10-20: monitor báo UNCERTAIN → bridge hủy sau 2 s. Nay distance filter bỏ các tia trên vật (chỉ UNCERTAIN khi > 85% tia bị che). Chưa thử trên robot |
 | **Robot đứng sát tường / vật cản (< 0.30 m)** | `robot pose is in collision` → lệnh 0 → sau 0.3 s `ABORTED`. Cần lái PS4 ra |
 | **Khe hẹp 0.4–0.6 m** | A\* đi qua được, DWB không (nội tiếp 0.30 m) → dừng trước khe → `ABORTED` |
 | **Giữ deadman PS4** | twist_mux lấy lệnh PS4. DWB vẫn tính (gốc kẹp quanh vận tốc đo). Lệch > 0.8 m → abort. Thả tay: 0.5 s sau DWB lái tiếp |
@@ -774,6 +863,7 @@ python3 scripts/analyze_cmd_lag.py ~/obstacle_run --axis v
 | `test/dwa_closed_loop_sim.cpp` + `sim_world.*` | Benchmark kín vòng (`--robot nominal/sluggish/laggy`) |
 | `test/offline/offline_sim.py`, `run_benchmark.py`, `scenarios.json` | Benchmark trong `controller_server` thật, so với Nav2 DWB |
 | `scripts/analyze_cmd_lag.py` | Bag → độ trễ, gia tốc/phanh thực, quay lố |
+| `test/test_camera_fusion.cpp` | gtest luật hợp nhất camera + LiDAR (frame độ sâu tổng hợp) |
 
 ```bash
 cd ~/capstone_ws
@@ -781,7 +871,8 @@ colcon build --symlink-install --packages-select stage3_navigation
 colcon test --packages-select stage3_navigation && colcon test-result --verbose
 ```
 
-Kết quả sau khi gỡ replan (2026-10-19): **96 kết quả, 0 lỗi**, 10 bỏ qua (cppcheck, ament tự bỏ). Cách chạy benchmark
+Kết quả sau khi thêm lớp camera M2 (2026-10-20): **125 kết quả, 0 lỗi**, 15 bỏ qua (cppcheck, ament tự bỏ).
+Benchmark có camera: `python3 run_benchmark.py --camera-layer fusion|voxel|none --scenarios cam_table_on_path,...`. Cách chạy benchmark
 và test offline: `doc/offline_runbook.md`.
 
 ---
@@ -802,4 +893,7 @@ và test offline: `doc/offline_runbook.md`.
 - **Kiểm tra va chạm chỉ ở ô tâm:** đúng khi footprint tròn và tâm xoay trùng tâm thân (giả định, chưa kiểm chứng).
 - **`/local_plan` có hai publisher** (hai plugin); chỉ plugin đang chạy publish.
 - **Chưa đo trên robot:** giới hạn vận tốc/gia tốc, quãng phanh, trọng số. `control_latency` 0.2 s mới đo từ một bag.
+- **Lớp camera (M2) chưa chạy trên robot:** độ nghiêng camera (CAD = nằm ngang), vật cản ma từ sàn, chiều cao
+  robot kể cả laptop (`max_obstacle_height` 0.70 là ước lượng) đều chưa kiểm. Vật quá gần camera (< 0.3 m, hoặc
+  mặt bàn khi robot ở < ~0.8 m) không xóa được, chỉ hết hạn sau 10 s.
 - **Không có PS4 lock / E-stop phần mềm:** PS4 chỉ ghi đè tạm thời. Dừng thật: `cancel`, Ctrl+C, E-stop phần cứng.

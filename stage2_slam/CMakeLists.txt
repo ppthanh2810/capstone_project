@@ -33,6 +33,7 @@ install(TARGETS scan_rotate
 add_library(stage2_localization_core STATIC
   src/scan_match_initializer.cpp
   src/localization_health.cpp
+  src/scan_map_consistency.cpp
 )
 target_include_directories(stage2_localization_core PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -65,5 +66,12 @@ install(TARGETS scan_match_initializer localization_monitor
 install(DIRECTORY launch config rviz
   DESTINATION share/${PROJECT_NAME}
 )
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  # Test lõi thuần (không cần ROS graph): distance filter + health.
+  ament_add_gtest(test_scan_map_consistency test/test_scan_map_consistency.cpp)
+  target_link_libraries(test_scan_map_consistency stage2_localization_core)
+endif()
 
 ament_package()

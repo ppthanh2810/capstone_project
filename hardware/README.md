@@ -14,11 +14,11 @@ Chi tiết từng phần:
 
 ```text
                          ┌──────────── máy tính (ROS 2 Humble) ────────────┐
-RPLIDAR C1 ──/dev/ttyUSB2──> sllidar_node ──/scan_raw──> stage2_slam (xoay, lọc) ──> /scan_filtered ──> SLAM / AMCL / costmap
+RPLIDAR C1 ──/dev/ttyUSB1──> sllidar_node ──/scan_raw──> stage2_slam (xoay, lọc) ──> /scan_filtered ──> SLAM / AMCL / costmap
 
-BNO055 ─I2C─> ESP32-C3 ──/dev/ttyUSB1──> imu_odom (stage1_odom) ──/imu_odom──┐
+BNO055 ─I2C─> ESP32-C3 ──/dev/ttyUSB0──> imu_odom (stage1_odom) ──/imu_odom──┐
                                                                              ├─> EKF ──> /odometry/filtered, TF odom→base_footprint
-ZLAC8015D <──Modbus RS485 /dev/ttyUSB0──> zlac8015d_move (stage0) ──/wheel_feedback──> zlac8015d_odom ──/wheel_odom──┘
+ZLAC8015D <──Modbus RS485 /dev/ttyUSB2──> zlac8015d_move (stage0) ──/wheel_feedback──> zlac8015d_odom ──/wheel_odom──┘
      ▲                                          ▲
      └── bánh trái / phải                        └── /cmd_vel_out (twist_mux: PS4 hoặc DWB)
 
@@ -27,9 +27,9 @@ URDF (robot_description) ──> robot_state_publisher ──> TF base_footprint
 
 | Thiết bị | Cổng | Package trong `hardware/` | Node đọc/ghi |
 |---|---|---|---|
-| ZLAC8015D | `/dev/ttyUSB0` | `zlac8015d_hw` (thư viện) | `zlac8015d_move` (stage0) |
-| ESP32 + BNO055 | `/dev/ttyUSB1` | `imu_bno055` (bản cũ) | `imu_odom` (stage1) |
-| RPLIDAR C1 | `/dev/ttyUSB2` | `sllidar_ros2` | `sllidar_node` |
+| ZLAC8015D | `/dev/ttyUSB2` | `zlac8015d_hw` (thư viện) | `zlac8015d_move` (stage0) |
+| ESP32 + BNO055 | `/dev/ttyUSB0` | `imu_bno055` (bản cũ) | `imu_odom` (stage1) |
+| RPLIDAR C1 | `/dev/ttyUSB1` | `sllidar_ros2` | `sllidar_node` |
 
 Thứ tự ttyUSB có thể đổi khi cắm lại USB. Kiểm tra bằng `ls -l /dev/serial/by-id/`:
 - FTDI FT232R là motor;
@@ -81,7 +81,7 @@ Thanh ghi hay dùng:
 
 Phía node `zlac8015d_move`:
 - Tham số: `wheel_radius` 0.0535, `wheel_distance` 0.34, `accel_time_ms` và `decel_time_ms` (cùng 200).
-- Cổng `/dev/ttyUSB0` viết cứng trong code.
+- Cổng `/dev/ttyUSB2` viết cứng trong code.
 - Bánh phải bị đảo dấu khi gửi lệnh và khi đọc phản hồi.
 - Mất lệnh 0.5 s thì đặt RPM về 0.
 

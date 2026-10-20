@@ -1,20 +1,22 @@
 {
   "_comment": "Kịch bản cho fixture ROS offline (offline_sim.py + run_benchmark.py). Toạ độ frame map (= odom: localization lý tưởng). 'mapped': có trong /map (global costmap); 'unmapped': chỉ LiDAR mô phỏng thấy. Box = [xmin, ymin, xmax, ymax], circle = [x, y, r]. expect: success | stop (dừng/abort có lý do là đúng, thành công là SAI) | any.",
+  "_comment_3d": "M2: 'unmapped_3d' = hộp 3D [xmin, ymin, xmax, ymax, zmin, zmax] chưa có trong map; LiDAR (mặt quét 0.347 m) chỉ thấy khi zmin <= 0.347 <= zmax, camera giả lập (offline_sim camera:=true) thấy theo 3D. Va chạm tính khi zmin < robot_height (0.6). Chạy: run_benchmark.py --camera-layer fusion|voxel|none",
   "scenarios": {
     "straight": {"waypoints": [[0, 0], [3, 0]], "goal_yaw": 0.0, "expect": "success"},
     "l_turn": {"waypoints": [[0, 0], [2, 0], [2, 2]], "goal_yaw": 1.5708, "expect": "success"},
     "s_curve": {"s_curve": true, "goal_yaw": 0.0, "start_yaw": 0.808, "expect": "success"},
-    "corridor_ok": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "success",
-                    "mapped": {"boxes": [[0.6, 0.5, 3.4, 0.7], [0.6, -0.7, 3.4, -0.5]]}},
-    "obstacle_near_path": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "success",
-                           "unmapped": {"boxes": [[1.5, 0.36, 2.5, 1.0]]}},
-    "blocked_wall": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "stop",
-                     "unmapped": {"boxes": [[2.0, -2.0, 2.1, 2.0]]}},
+    "corridor_ok": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "success", "mapped": {"boxes": [[0.6, 0.5, 3.4, 0.7], [0.6, -0.7, 3.4, -0.5]]}},
+    "obstacle_near_path": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "success", "unmapped": {"boxes": [[1.5, 0.36, 2.5, 1.0]]}},
+    "blocked_wall": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "stop", "unmapped": {"boxes": [[2.0, -2.0, 2.1, 2.0]]}},
     "start_backwards": {"waypoints": [[0, 0], [2.5, 0]], "goal_yaw": 0.0, "start_yaw": 3.1316, "expect": "success"},
     "goal_yaw_pi": {"waypoints": [[0, 0], [2, 0]], "goal_yaw": 3.14159, "expect": "success"},
     "overspeed_start": {"waypoints": [[0, 0], [5, 0]], "goal_yaw": 0.0, "kick_v": 0.5, "expect": "success"},
     "cancel_midway": {"waypoints": [[0, 0], [3, 0]], "goal_yaw": 0.0, "cancel_after": 4.0, "expect": "stop"},
     "stale_odom": {"waypoints": [[0, 0], [3, 0]], "goal_yaw": 0.0, "odom_stop_after": 4.0, "expect": "stop"},
-    "stale_scan": {"waypoints": [[0, 0], [3, 0]], "goal_yaw": 0.0, "scan_stop_after": 4.0, "expect": "any"}
+    "stale_scan": {"waypoints": [[0, 0], [3, 0]], "goal_yaw": 0.0, "scan_stop_after": 4.0, "expect": "any"},
+    "cam_table_on_path": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "stop", "unmapped_3d": [[1.8, -0.5, 2.4, 0.5, 0.45, 0.75]]},
+    "cam_low_box_on_path": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "stop", "unmapped_3d": [[1.8, -0.3, 2.1, 0.3, 0.0, 0.12]]},
+    "cam_low_box_near_path": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "success", "unmapped_3d": [[1.5, 0.36, 2.5, 1.0, 0.0, 0.12]]},
+    "cam_tall_box_on_path": {"waypoints": [[0, 0], [4, 0]], "goal_yaw": 0.0, "expect": "stop", "unmapped_3d": [[1.8, -0.3, 2.1, 0.3, 0.0, 0.8]]}
   }
 }

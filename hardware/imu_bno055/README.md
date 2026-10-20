@@ -18,7 +18,7 @@ và IMU đóng vai trò gì trong định vị.
 | Vi điều khiển | ESP32-C3 Mini |
 | Kết nối BNO055 ↔ ESP32 | I2C, địa chỉ `0x29`, 100 kHz |
 | Kết nối ESP32 ↔ máy tính | UART 115200 8N1, qua adapter USB-UART |
-| Cổng trên máy tính | `/dev/ttyUSB1` (adapter Silicon Labs CP2102) |
+| Cổng trên máy tính | `/dev/ttyUSB0` (adapter Silicon Labs CP2102) |
 | Tần số dữ liệu | ≈ 50 Hz (đo từ bag `~/rot_debug`) |
 | Node đọc | `imu_odom` (package `stage1_odom`) |
 | Frame | `imu_link` |
@@ -48,7 +48,7 @@ Kết quả trên robot (2026-10-14): khi quay 135°, yaw của IMU và yaw tín
 ## 3. Luồng dữ liệu
 
 ```text
-BNO055 ──I2C 0x29──> ESP32-C3 Mini ──UART 115200──> USB-UART (CP2102) ──/dev/ttyUSB1──> imu_odom
+BNO055 ──I2C 0x29──> ESP32-C3 Mini ──UART 115200──> USB-UART (CP2102) ──/dev/ttyUSB0──> imu_odom
                                                                                        │
                        ┌───────────────────────┬─────────────────────┬─────────────────┘
                        ▼                       ▼                     ▼
@@ -133,7 +133,7 @@ Lỗi khởi tạo thì firmware in `BNO055 initialization failed` và đứng c
 
 | Tham số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `port` | `/dev/ttyUSB1` | Cổng serial |
+| `port` | `/dev/ttyUSB0` | Cổng serial |
 | `frame_id` | `imu_link` | Frame của `/imu/data`, `/imu/mag` |
 | `zero_yaw_on_start` | `false` | `true`: hướng lúc khởi động coi là yaw 0 |
 
@@ -229,7 +229,7 @@ Lệnh này đặt hướng hiện tại thành yaw 0 ở mẫu kế tiếp. Th�
 | `config/bno055.yaml` | Phần lớn tham số **không được node đọc** |
 
 Chi tiết về `bno055_node`:
-- Tham số thật chỉ có `port` (`/dev/ttyUSB1`) và `frame_id` (`imu_link`).
+- Tham số thật chỉ có `port` (`/dev/ttyUSB0`) và `frame_id` (`imu_link`).
 - Các trường I2C trong `bno055.yaml` (`device`, `address`, `publish_rate`, `operation_mode`, `calibration`) bị bỏ qua.
 - **Khối calibration** trong `bno055.yaml` (22 byte, thanh ghi `0x55`–`0x6A`) **không được nạp vào cảm biến** từ ROS.
   Đừng xóa khối này; nó là dữ liệu hiệu chuẩn đã lưu.
@@ -245,7 +245,7 @@ Chi tiết về `bno055_node`:
 Lệnh dưới **mở cổng serial IMU nhưng không bật motor**:
 
 ```bash
-ros2 launch stage1_odom ekf.launch.py imu_port:=/dev/ttyUSB1
+ros2 launch stage1_odom ekf.launch.py imu_port:=/dev/ttyUSB0
 ```
 
 Kiểm tra (chỉ đọc):
@@ -269,7 +269,7 @@ Xem dữ liệu thô của ESP32: chỉ làm khi **không** có node nào đang 
 
 | Triệu chứng | Nguyên nhân thường gặp |
 |---|---|
-| Log `Cannot open /dev/ttyUSB1` | Sai cổng (USB đổi thứ tự) hoặc thiếu quyền `dialout` |
+| Log `Cannot open /dev/ttyUSB0` | Sai cổng (USB đổi thứ tự) hoặc thiếu quyền `dialout` |
 | Đã kết nối nhưng không có topic | Dòng không đủ 15 trường (firmware khác), hoặc sai baudrate |
 | Yaw nhảy khi đến gần motor / sắt | NDOF dùng từ kế; nhiễu từ làm yaw lệch |
 | Yaw trôi chậm khi đứng yên | Cảm biến chưa tự hiệu chuẩn xong; xoay robot vài vòng |

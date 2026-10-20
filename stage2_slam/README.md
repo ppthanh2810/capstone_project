@@ -39,7 +39,7 @@ Bản đồ đang dùng: `capstone_project/maps/map.yaml` + `map.pgm`.
 ### Phần chung: scan (`scan.launch.py`)
 
 ```text
-RPLIDAR C1 ──/dev/ttyUSB2──> sllidar_node ──/scan_raw──> scan_rotate ──/scan──> laser_filters ──/scan_filtered
+RPLIDAR C1 ──/dev/ttyUSB1──> sllidar_node ──/scan_raw──> scan_rotate ──/scan──> laser_filters ──/scan_filtered
                             (frame laser_raw)          (+π, laser_frame)       (bỏ nửa sau)
 URDF ──> robot_state_publisher ──> TF base_footprint → base_link → laser_frame, imu_link, ...
 ```
@@ -81,7 +81,7 @@ ros2 launch stage2_slam scan.launch.py
 
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
+| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
 | `rviz` | `true` | Mở RViz |
 | `rviz_config` | `rviz/scan.rviz` | File RViz (mapping/localization tự đổi) |
 
@@ -123,8 +123,8 @@ ros2 launch stage2_slam mapping.launch.py
 
 | Đối số | Mặc định |
 |---|---|
-| `serial_port` | `/dev/ttyUSB2` |
-| `imu_port` | `/dev/ttyUSB1` |
+| `serial_port` | `/dev/ttyUSB1` |
+| `imu_port` | `/dev/ttyUSB0` |
 | `rviz` | `true` (`slam.rviz`) |
 
 ### Tham số slam_toolbox
@@ -164,8 +164,8 @@ ros2 launch stage2_slam localization.launch.py csm:=true monitor:=true
 
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
-| `imu_port` | `/dev/ttyUSB1` | Cổng IMU |
+| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
+| `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `map` | `~/capstone_ws/capstone_project/maps/map.yaml` | Bản đồ |
 | `rviz` | `true` | RViz `localization.rviz` |
 | `csm` | `false` | Bật CSM (mục 6) |
@@ -276,18 +276,39 @@ Các kiểm tra:
 | Tuổi TF `map → base` | > 0.5 s | > 2.0 s |
 | Độ lệch chuẩn xy của AMCL | > 0.25 m | > 1.0 m |
 | Độ lệch chuẩn yaw của AMCL | > 0.17 rad | > 0.5 rad |
-| Độ khớp scan–bản đồ | < 0.45 | < 0.30 trong 5 lần liên tiếp |
+| Độ khớp scan–bản đồ (đã lọc vật lạ) | < 0.45 | < 0.30 trong 5 lần liên tiếp |
+| Tỉ lệ tia bị vật lạ che | > 0.85 | – |
 | Nhảy pose (AMCL khác odom) | > 0.30 m hoặc > 0.26 rad | – |
 
-### Độ khớp scan–bản đồ (`consistency`)
+### Độ khớp scan–bản đồ (`consistency`) có distance filter (từ 2026-10-20)
 - Lấy tối đa 400 điểm scan (≤ 12 m), đặt lên bản đồ theo pose hiện tại.
-- Mỗi điểm cho điểm `exp(−d² / 2σ²)` (σ = 0.05 m), với d là khoảng cách tới tường gần nhất. Lấy trung bình.
-- Giá trị 1 = khớp hoàn hảo, 0 = không khớp.
-- Kết quả thực tế trên robot: khoảng 0.45–0.55 khi định vị tốt.
+- Mỗi điểm cho điểm `exp(−d² / 2σ²)` (σ = 0.05 m), với d là khoảng cách tới tường gần nhất.
+- **Distance filter** (Fox, Burgard, Thrun 1999): với mỗi tia, dò tia trên bản đồ để có khoảng cách kỳ vọng:
 
-> ⚠️ **Vật cản không có trong bản đồ cũng làm điểm này tụt**: điểm scan trên vật cản không gần tường nào, nên được 0
-> điểm. Một vật lớn đứng gần robot có thể làm monitor báo UNCERTAIN/LOST dù AMCL vẫn đúng (robot 2026-10-17). Khi thử
-> né vật cản ở stage 3, dùng `monitor:=false` và tự giám sát.
+| Tia đo so với bản đồ | Xử lý |
+|---|---|
+| Gần bằng | Tính điểm như thường |
+| Ngắn hơn > 0.15 m, xa tường | **Bỏ** (vật cản chưa có trong map) |
+| Dài hơn > 0.15 m ("xuyên tường") | Vẫn tính (≈ 0 điểm) → dấu hiệu lạc |
+
+- `scan_consistency` = trung bình trên các điểm còn lại (cần ≥ 40 điểm).
+- `blocked_ratio` = tỉ lệ điểm bị bỏ. > 0.85 → UNCERTAIN (còn quá ít tường để kiểm tra).
+- `/localization/status` có thêm `scan_consistency_all` (cách cũ), `blocked_ratio`, `through_wall_ratio`,
+  `counted_points` để so sánh trên robot.
+- Tắt bộ lọc (quay về cách cũ): `distance_filter.enabled: false` trong `config/localization_monitor.yaml`.
+- Code: `src/scan_map_consistency.cpp`. Test: `test/test_scan_map_consistency.cpp`
+  (`colcon test --packages-select stage2_slam`).
+
+Kết quả test tổng hợp (có nhiễu range 0.02 m, pose lệch 0.04 m / 0.03 rad):
+
+| Trường hợp | Cũ | Mới |
+|---|---|---|
+| Đúng vị trí + vật cản 0.9 m | 0.33–0.36 (UNCERTAIN) | 0.50–0.56 (OK) |
+| Lạc (yaw 0.15 / ngang 0.25 / dọc 0.3 m) | ≤ 0.10 | ≤ 0.22 (vẫn báo) |
+
+> ⚠️ Giới hạn: nếu bản đồ "tưởng" robot ở xa tường phía trước hơn thực tế, các tia tường đó thành "ngắn" và bị bỏ.
+> Trong phòng có tường hai bên thì vẫn bị bắt (test `backward_0.4`), nhưng ở chỗ trống chỉ có một bức tường phía
+> trước thì có thể không. Covariance và kiểm tra nhảy pose của AMCL vẫn còn để bù. Ngưỡng **chưa kiểm chứng trên robot**.
 
 Ngưỡng là giá trị khởi đầu, chỉ `consistency_warn` đã chỉnh theo robot (0.55 → 0.45 ngày 2026-10-14).
 
@@ -313,4 +334,4 @@ Trong RViz:
 - Sau khi bị hủy điều hướng vì định vị kém, robot đứng yên, AMCL không cập nhật, monitor có thể **kẹt ở UNCERTAIN**.
   Cách gỡ: đặt lại 2D Pose Estimate, hoặc nhích robot bằng PS4.
 - `package.xml` chưa khai báo các package mà launch include (`slam_toolbox`, `nav2_bringup`, `laser_filters`, …).
-- Repo không còn test cho CSM và monitor: sửa code hai phần này thì không có gì để kiểm tra lại.
+- Chưa có test cho CSM. Monitor chỉ có test cho distance filter và `blocked_ratio` (`test/test_scan_map_consistency.cpp`).

@@ -11,12 +11,20 @@ Thay thế Stage 2 khi chạy navigation.launch.py stage2:=false. Node này publ
   /odometry/filtered (30 Hz, twist có nhiễu Gauss theo seed),
   /scan_filtered (10 Hz, 360 tia, góc 0 = phía trước, nửa sau (pi-1.57, pi+1.57) = NaN như
   laser_filters),
+  tùy chọn camera:=true (M2): base_footprint->camera_depth_optical_frame (tĩnh, URDF) và
+  /camera/camera/depth/color/points (15 Hz, PointCloud2 không texture như camera.launch.py,
+  lưới tia 160x90 trong FOV 87x58 độ, tầm 6 m: sàn + vật cản 2D (cao 2 m) + hộp 3D 'unmapped_3d'),
 và subscribe topic lệnh (mặc định /cmd_vel_dwb). Mô hình robot: lệnh tới bánh sau `latency` giây,
 vận tốc bám lệnh với giới hạn gia tốc, lệnh cũ hơn `cmd_timeout` = 0 (mô phỏng timeout 0.5 s của
 twist_mux), tích phân 200 Hz.
 Ghi CSV quỹ đạo thật + khoảng hở (bán kính thân thật) ra `log_file`.
 
-Giới hạn: không trượt bánh, không động lực học, localization hoàn hảo, LiDAR không nhiễu/rơi tia.
+Hộp 3D (scenario 'unmapped_3d': [xmin, ymin, xmax, ymax, zmin, zmax]): LiDAR chỉ thấy khi mặt quét
+(0.347 m) nằm trong [zmin, zmax]; camera thấy theo hình học 3D;
+va chạm tính khi zmin < robot_height.
+
+Giới hạn: không trượt bánh, không động lực học, localization hoàn hảo,
+LiDAR/camera không nhiễu/rơi tia.
 KHÔNG dùng để kết luận an toàn trên robot.
 """
 
@@ -32,11 +40,15 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
-from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Float64
+from sensor_msgs.msg import LaserScan, PointCloud2
+from sensor_msgs_py import point_cloud2
+from std_msgs.msg import Float64, Header
 from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
 
 LASER_XYZ = (0.15, 0.0, 0.1135 + 0.23365)   # base_footprint -> laser_frame (URDF)
+CAMERA_XYZ = (0.17, 0.0, 0.1135 + 0.1625)    # base_footprint -> camera_link (URDF)
+# camera_link -> camera_depth_optical_frame: rpy (-pi/2, 0, -pi/2) -> quaternion (x, y, z, w)
+OPTICAL_Q = (-0.5, 0.5, -0.5, 0.5)
 
 
 def yaw_to_quat(yaw):
@@ -54,13 +66,39 @@ def step_toward(cur, target, acc, decel, h):
     return min(max(target, lo), hi)
 
 
+def ray_boxes_3d(o, d, boxes):
+    """Khoảng cách tia 3D (o: (3,), d: (N, 3) đơn vị) tới hộp gần nhất (slab); inf nếu trượt."""
+    best = np.full(d.shape[0], np.inf)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        for b in boxes:
+            lo, hi = b[[0, 1, 4]], b[[2, 3, 5]]
+            t0 = (lo - o) / d
+            t1 = (hi - o) / d
+            tmin = np.nanmax(np.minimum(t0, t1), axis=1)
+            tmax = np.nanmin(np.maximum(t0, t1), axis=1)
+            hit = (tmax >= np.maximum(tmin, 0.0)) & (tmin > 0.0)
+            best = np.minimum(best, np.where(hit, tmin, np.inf))
+    return best
+
+
 class World:
-    def __init__(self, circles, boxes):
+    def __init__(self, circles, boxes, boxes3d=()):
         self.circles = np.array(circles, dtype=float).reshape(-1, 3)
         self.boxes = np.array(boxes, dtype=float).reshape(-1, 4)
+        self.boxes3d = np.array(boxes3d, dtype=float).reshape(-1, 6)
 
-    def distance(self, x, y):
+    def distance(self, x, y, height=math.inf):
+        """Khoảng cách 2D tới vật cản; hộp 3D chỉ tính khi zmin < height (robot chạm được)."""
         best = math.inf
+        for x0, y0, x1, y1, z0, _ in self.boxes3d:
+            if z0 >= height:
+                continue
+            dx = max(x0 - x, 0.0, x - x1)
+            dy = max(y0 - y, 0.0, y - y1)
+            d = math.hypot(dx, dy)
+            if dx == 0.0 and dy == 0.0:
+                d = -min(x - x0, x1 - x, y - y0, y1 - y)
+            best = min(best, d)
         for cx, cy, r in self.circles:
             best = min(best, math.hypot(x - cx, y - cy) - r)
         for x0, y0, x1, y1 in self.boxes:
@@ -72,10 +110,19 @@ class World:
             best = min(best, d)
         return best
 
-    def raycast(self, ox, oy, angles, max_range):
-        """Khoảng cách tia (numpy) tới hình tròn/hình hộp gần nhất; inf nếu không chạm."""
+    def raycast(self, ox, oy, angles, max_range, z=None):
+        """
+        Khoảng cách tia (numpy) tới hình tròn/hình hộp gần nhất; inf nếu không chạm.
+
+        z: độ cao mặt quét; hộp 3D có zmin <= z <= zmax được tính (None: bỏ qua hộp 3D).
+        """
         dx, dy = np.cos(angles), np.sin(angles)
         best = np.full(angles.shape, np.inf)
+        if z is not None:
+            flat = [b for b in self.boxes3d if b[4] <= z <= b[5]]
+            if flat:
+                d3 = np.stack([dx, dy, np.zeros_like(dx)], axis=1)
+                best = np.minimum(best, ray_boxes_3d(np.array([ox, oy, z]), d3, flat))
         for cx, cy, r in self.circles:
             fx, fy = ox - cx, oy - cy
             b = fx * dx + fy * dy
@@ -112,6 +159,10 @@ class OfflineSim(Node):
         self.cmd_timeout = p('cmd_timeout', 0.5).value
         self.noise = p('odom_vel_noise', 0.002).value
         self.radius = p('robot_radius', 0.20).value
+        # Chiều cao robot kể cả laptop (va chạm với hộp 3D); NOT_VERIFIED,
+        # = max_obstacle_height - 0.1.
+        self.height = p('robot_height', 0.6).value
+        self.camera = p('camera', False).value
         self.log_file = p('log_file', '').value
         random.seed(p('seed', 1).value)
 
@@ -122,7 +173,8 @@ class OfflineSim(Node):
         unmapped = sc.get('unmapped', {})
         self.map_world = World(mapped.get('circles', []), mapped.get('boxes', []))
         self.world = World(mapped.get('circles', []) + unmapped.get('circles', []),
-                           mapped.get('boxes', []) + unmapped.get('boxes', []))
+                           mapped.get('boxes', []) + unmapped.get('boxes', []),
+                           sc.get('unmapped_3d', []))
         self.x, self.y = 0.0, 0.0
         self.th = sc.get('start_yaw', 0.0)
         self.v, self.w = 0.0, 0.0
@@ -146,7 +198,18 @@ class OfflineSim(Node):
         tr = st.transform.translation
         tr.x, tr.y, tr.z = LASER_XYZ
         st.transform.rotation.w = 1.0
-        self.static_pub.sendTransform(st)
+        statics = [st]
+        if self.camera:
+            ct = TransformStamped()
+            ct.header.stamp = st.header.stamp
+            ct.header.frame_id = 'base_footprint'
+            ct.child_frame_id = 'camera_depth_optical_frame'
+            tr = ct.transform.translation
+            tr.x, tr.y, tr.z = CAMERA_XYZ
+            r = ct.transform.rotation
+            r.x, r.y, r.z, r.w = OPTICAL_Q
+            statics.append(ct)
+        self.static_pub.sendTransform(statics)
 
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL,
                              reliability=ReliabilityPolicy.RELIABLE)
@@ -154,6 +217,15 @@ class OfflineSim(Node):
         self.odom_pub = self.create_publisher(Odometry, '/odometry/filtered', 10)
         self.scan_pub = self.create_publisher(LaserScan, '/scan_filtered', 10)
         self.create_subscription(Twist, self.cmd_topic, self.on_cmd, 10)
+        if self.camera:
+            self.cloud_pub = self.create_publisher(
+                PointCloud2, '/camera/camera/depth/color/points', 5)
+            naz, nel = 160, 90
+            hf, vf = math.radians(87.0), math.radians(58.0)
+            az = -hf / 2 + hf * (np.arange(naz) + 0.5) / naz
+            el = -vf / 2 + vf * (np.arange(nel) + 0.5) / nel
+            self.cam_az, self.cam_el = [a.ravel() for a in np.meshgrid(az, el)]
+            self.create_timer(1.0 / 15.0, self.publish_cloud)
         self.create_subscription(Float64, '/sim/kick', self.on_kick, 10)
         self.publish_map()
 
@@ -215,7 +287,7 @@ class OfflineSim(Node):
                 self.y -= vm / wm * (math.cos(self.th + wm * h) - math.cos(self.th))
                 self.th = math.atan2(math.sin(self.th + wm * h), math.cos(self.th + wm * h))
             self.v, self.w = v1, w1
-        clr = self.world.distance(self.x, self.y) - self.radius
+        clr = self.world.distance(self.x, self.y, self.height) - self.radius
         self.min_clear = min(self.min_clear, clr)
         if clr < 0.0:
             self.collisions += 1
@@ -224,7 +296,7 @@ class OfflineSim(Node):
     def log_row(self):
         if self.csv:
             tgt = getattr(self, 'target', (0.0, 0.0))
-            clr = self.world.distance(self.x, self.y) - self.radius
+            clr = self.world.distance(self.x, self.y, self.height) - self.radius
             self.csv.writerow([
                 f'{time.monotonic():.3f}', f'{self.x:.4f}', f'{self.y:.4f}', f'{self.th:.4f}',
                 f'{self.v:.4f}', f'{self.w:.4f}', f'{tgt[0]:.4f}', f'{tgt[1]:.4f}',
@@ -276,7 +348,7 @@ class OfflineSim(Node):
         ang = np.arange(n) * (2.0 * math.pi / n)
         lx = self.x + LASER_XYZ[0] * math.cos(self.th)
         ly = self.y + LASER_XYZ[0] * math.sin(self.th)
-        r = self.world.raycast(lx, ly, ang + self.th, 12.0)
+        r = self.world.raycast(lx, ly, ang + self.th, 12.0, z=LASER_XYZ[2])
         rear = (ang > math.pi - 1.57) & (ang < math.pi + 1.57)
         r[rear] = np.nan
         s = LaserScan()
@@ -291,6 +363,33 @@ class OfflineSim(Node):
         s.range_max = 12.0
         s.ranges = [float(v) for v in r]
         self.scan_pub.publish(s)
+
+    def publish_cloud(self):
+        """Point cloud độ sâu (frame camera_depth_optical_frame) như RealSense không texture."""
+        c, s_ = math.cos(self.th), math.sin(self.th)
+        o = np.array([self.x + CAMERA_XYZ[0] * c, self.y + CAMERA_XYZ[0] * s_, CAMERA_XYZ[2]])
+        ce, se = np.cos(self.cam_el), np.sin(self.cam_el)
+        ang = self.cam_az + self.th
+        # Tường / vật 2D (cao 2 m): khoảng cách ngang -> 3D, chỉ khi điểm chạm cao 0..2 m.
+        th_ = self.world.raycast(o[0], o[1], ang, 6.0)
+        t = th_ / ce
+        zt = o[2] + t * se
+        t = np.where((zt >= 0.0) & (zt <= 2.0), t, np.inf)
+        d = np.stack([ce * np.cos(ang), ce * np.sin(ang), se], axis=1)
+        if len(self.world.boxes3d):
+            t = np.minimum(t, ray_boxes_3d(o, d, self.world.boxes3d))
+        with np.errstate(divide='ignore'):
+            t = np.minimum(t, np.where(se < 0.0, -o[2] / se, np.inf))   # sàn
+        ok = np.isfinite(t) & (t <= 6.0)
+        # Hướng tia trong frame robot (x trước, y trái, z lên) -> frame quang học (x phải, y xuống,
+        # z trước).
+        rx, ry, rz = ce * np.cos(self.cam_az), ce * np.sin(self.cam_az), se
+        tt = t[ok]
+        pts = np.stack([-ry[ok] * tt, -rz[ok] * tt, rx[ok] * tt], axis=1).astype(np.float32)
+        hdr = Header()
+        hdr.stamp = self.get_clock().now().to_msg()
+        hdr.frame_id = 'camera_depth_optical_frame'
+        self.cloud_pub.publish(point_cloud2.create_cloud_xyz32(hdr, pts))
 
     def publish_map(self):
         res, x0, y0, w, h = 0.05, -3.0, -3.0, 240, 160
