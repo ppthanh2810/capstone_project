@@ -307,7 +307,7 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 
 - Đổi 0.55 → 0.40 m (2026-10-20): ngoài 0.40 m A\* không còn bị đẩy ra xa tường. Đường ngắn hơn, đi sát tường hơn
   ở lối rộng.
-- Khe hẹp nhất A\* đi được **không đổi** (≥ 0.40 m, do `robot_radius`). CustomDWB vẫn cần khe ≥ ~0.6 m (mục 6.6).
+- Khe hẹp nhất A\* đi được **không đổi** (≥ 0.40 m, do `robot_radius`). CustomDWB cần khe ≥ ~0.55–0.6 m (nội tiếp 0.25 m, mục 6.6).
 
 ### 6.3 `controller_server`
 
@@ -336,22 +336,22 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 
 | Tham số | Giá trị |
 |---|---|
-| `max_vel_x` | 0.15 m/s |
+| `max_vel_x` | 0.3 m/s (cũ 0.15) |
 | `min_vel_x` | 0.0 (**không lùi**: phía sau không có LiDAR) |
-| `max_vel_theta` | 0.5 rad/s |
+| `max_vel_theta` | 1.0 rad/s (cũ 0.5) |
 | `min_in_place_vel_theta` | 0.1 rad/s |
 | `acc_lim_x` / `decel_lim_x` | 0.5 / 0.5 m/s² |
-| `acc_lim_theta` / `decel_lim_theta` | 1.0 / 1.0 rad/s² |
+| `acc_lim_theta` / `decel_lim_theta` | 2.0 / 2.0 rad/s² (cũ 1.0) |
 
 **Lấy mẫu và mô phỏng:**
 
 | Tham số | Giá trị | Ý nghĩa |
 |---|---|---|
 | `vx_samples` × `vtheta_samples` | 20 × 21 | ≈ 420–440 ứng viên mỗi chu kỳ |
-| `sim_time` | 1.7 s | Nhìn trước (0.15 m/s → ~0.26 m) |
+| `sim_time` | 2.0 s | Nhìn trước (0.3 m/s → ~0.6 m) |
 | `sim_granularity` | 0.05 s | Bước mô phỏng tối đa |
 | `control_latency` | 0.2 s | Trễ lệnh → bánh (đo từ bag 2026-10-14, driver tăng/giảm tốc 200 ms; nay driver mặc định 500 ms) |
-| `stopping_margin` | 0.05 m | Khoảng trống thêm sau khi phanh |
+| `stopping_margin` | 0.02 m | Khoảng trống thêm sau khi phanh (cũ 0.05) |
 
 **Vận tốc gốc của cửa sổ:**
 
@@ -366,29 +366,29 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | Tham số | Giá trị | Ý nghĩa |
 |---|---|---|
 | `local_plan_length` | 1.5 m | Đoạn đường phía trước được xét |
-| `carrot_distance` | 0.6 m | Điểm dẫn hướng ("cà rốt") |
+| `carrot_distance` | 0.8 m | Điểm dẫn hướng ("cà rốt") |
 | `closest_search_distance` | 1.0 m | Cửa sổ tìm tiến trình |
-| `max_path_deviation` | 0.8 m | Lệch đường hơn → dừng |
+| `max_path_deviation` | 1.0 m | Lệch đường hơn → dừng |
 
 **Pha xoay và đích:**
 
 | Tham số | Giá trị | Ý nghĩa |
 |---|---|---|
-| `rotate_to_heading_angle` | 0.8 rad | Lệch hơn → xoay tại chỗ (ra khi < 0.4) |
+| `rotate_to_heading_angle` | 2.5 rad | Lệch hơn → xoay tại chỗ (ra khi < 1.25) |
 | `rotate_gain` | 1.5 | ω = gain × sai số góc |
 | `xy_goal_tolerance` / `yaw_goal_tolerance` | 0.15 / 0.25 | Dự phòng (thật lấy từ goal checker) |
 | `goal_tolerance_fraction` | 0.9 | Dùng 0.9 × dung sai bên trong |
 | `goal_latch_release_margin` | 0.05 m | Trôi ra ngoài xy + 0.05 → tiếp cận lại |
 
-**Trọng số chi phí** (nhỏ hơn = tốt hơn):
+**Trọng số chi phí** (nhỏ hơn = tốt hơn; tuning né vật cản 2026-10-21, xem mục 9):
 
 | Tham số | Giá trị |
 |---|---|
-| `path_distance_scale` | 4.0 |
+| `path_distance_scale` | 0.5 |
 | `carrot_distance_scale` | 2.0 |
-| `heading_scale` | 1.0 |
-| `obstacle_scale` | 0.5 |
-| `speed_scale` | 0.3 |
+| `heading_scale` | 0.3 |
+| `obstacle_scale` | 4.0 |
+| `speed_scale` | 1.5 |
 | `oscillation_scale` | 1.0 |
 
 **Chống dao động:** reset sau `oscillation_reset_dist` 0.05 m, `oscillation_reset_angle` 0.2 rad, hoặc
@@ -419,8 +419,8 @@ ros2 param set /controller_server CustomDWB.max_vel_x 0.12
 ```
 
 ### 6.5 `FollowPath` (Nav2 DWB, để so sánh)
-- Cùng giới hạn: `max_vel_x` 0.15, `max_vel_theta` 0.5, `acc_lim_x` 0.5, `decel_lim_x` −0.5 (Nav2 dùng số âm),
-  `acc_lim_theta` 1.0, `sim_time` 1.7, `vx_samples` 20, `vtheta_samples` 20.
+- Giới hạn **cũ** của CustomDWB (không tuning theo 2026-10-21): `max_vel_x` 0.15, `max_vel_theta` 0.5, `acc_lim_x` 0.5,
+  `decel_lim_x` −0.5 (Nav2 dùng số âm), `acc_lim_theta` 1.0, `sim_time` 1.7, `vx_samples` 20, `vtheta_samples` 20.
 - Critics mặc định Humble: `RotateToGoal, Oscillation, BaseObstacle, GoalAlign, PathAlign, PathDist, GoalDist`.
 - Trọng số: `PathAlign` 32, `GoalAlign` 24, `PathDist` 32, `GoalDist` 24, `RotateToGoal` 32, `BaseObstacle` 0.02.
 - Khác CustomDWB: không có watchdog odometry, không mô phỏng trễ và đuôi phanh. Benchmark offline cũ (đã xoá): khi
@@ -433,14 +433,14 @@ ros2 param set /controller_server CustomDWB.max_vel_x 0.12
 | `global_frame` | `odom` |
 | Kích thước | 2 × 2 m (40 × 40 ô), rolling window quanh robot |
 | `resolution` | 0.05 m |
-| `robot_radius` + `footprint_padding` | 0.20 + 0.10 m (nội tiếp **0.30 m**) |
+| `robot_radius` + `footprint_padding` | 0.20 + 0.05 m (nội tiếp **0.25 m**; cũ 0.10 / 0.30) |
 | `update_frequency` / `publish_frequency` | 5.0 / 2.0 Hz |
 | `transform_tolerance` | 0.3 s |
 | `track_unknown_space` | `false` |
 | `plugins` | `obstacle_layer`, (`fusion_layer`), `inflation_layer` |
 | obstacle: nguồn | `/scan_filtered`, đánh dấu 2.5 m / xóa 3.0 m, `inf_is_valid: false` |
 | obstacle: `expected_update_rate` | 0.5 s (scan cũ hơn → costmap "không current") |
-| inflation | `inflation_radius 0.45`, `cost_scaling_factor 3.0` |
+| inflation | `inflation_radius 0.30` (cũ 0.45), `cost_scaling_factor 3.0` |
 
 `fusion_layer` (camera) chỉ có khi `camera:=true` hoặc `camera_layer:=fusion` (mục 6.6b). Không có camera thì chỉ
 có LiDAR.
@@ -452,7 +452,7 @@ Mỗi ô là một số 0–255:
 | Giá trị | Ý nghĩa |
 |---|---|
 | 254 `LETHAL` | Có vật cản trong ô |
-| 253 `INSCRIBED` | Tâm robot ở đây là thân chạm vật (≤ 0.30 m) |
+| 253 `INSCRIBED` | Tâm robot ở đây → thân cách vật < 0.05 m (≤ 0.25 m) |
 | 1–252 | Gần vật cản, càng gần càng cao |
 | 0 `FREE` | Trống |
 
@@ -493,7 +493,7 @@ Luồng cập nhật của `local_costmap` chạy độc lập với controller:
 4. updateCosts theo thứ tự plugins:
      obstacle_layer : chép lưới của nó vào master, lấy max; xóa ô dưới thân robot
      fusion_layer   : ghi LETHAL vào ô camera đã xác nhận (chỉ tăng, không bao giờ hạ)
-     inflation_layer: từ mọi ô LETHAL, tô chi phí giảm dần tới 0.45 m
+     inflation_layer: từ mọi ô LETHAL, tô chi phí giảm dần tới 0.30 m
 5. Kiểm tra "current": scan ≤ 0.5 s và (nếu có camera) cloud ≤ 1.0 s
 ```
 
@@ -516,7 +516,7 @@ Với mỗi tia trong scan mới nhất (`/scan_filtered`, 720 tia, chỉ nửa 
 
 - Xóa chạy **trước** đánh dấu trong cùng chu kỳ. Ô vừa bị tia khác xóa vẫn được đánh dấu lại nếu có điểm cuối
   nằm trong nó.
-- `footprint_clearing_enabled: true`: ô nằm trong vòng 0.30 m dưới robot bị xóa. Robot không tự thấy mình là vật cản.
+- `footprint_clearing_enabled: true`: ô nằm trong vòng 0.25 m dưới robot bị xóa. Robot không tự thấy mình là vật cản.
 - `combination_method: 1` (max): lớp này chỉ nâng giá trị của master, không hạ.
 - LiDAR chỉ quét **một mặt phẳng cao 0.347 m**. Vật thấp hơn hoặc nhô ra phía trên (mặt bàn) không được đánh dấu.
 
@@ -600,14 +600,13 @@ Với khoảng cách `d` từ tâm ô tới ô LETHAL gần nhất:
 | `d` | Chi phí |
 |---|---|
 | 0 | 254 LETHAL |
-| ≤ 0.30 m | 253 INSCRIBED |
-| 0.35 m | ~217 |
-| 0.40 m | ~187 |
-| 0.45 m | ~160 |
-| > 0.45 m | 0 |
+| ≤ 0.25 m | 253 INSCRIBED |
+| 0.30 m | ~217 |
+| > 0.30 m | 0 |
 
-- Công thức: `252 · exp(−3.0 · (d − 0.30))` cho 0.30 < d ≤ 0.45.
-- CustomDWB loại cứng mọi quỹ đạo có ô ≥ 253 (tâm robot cách vật < 0.30 m). Vùng 1–252 chỉ bị phạt mềm (mục 8).
+- Công thức: `252 · exp(−3.0 · (d − 0.25))` cho 0.25 < d ≤ 0.30 (chỉ ~1 vòng ô quanh vùng cấm).
+- CustomDWB loại cứng mọi quỹ đạo có ô ≥ 253 (tâm robot cách vật < 0.25 m). Vùng 1–252 chỉ bị phạt mềm (mục 8).
+- Trước 2026-10-21: nội tiếp 0.30 m, inflation 0.45 m (0.35 m ~217, 0.40 m ~187, 0.45 m ~160).
 
 #### 6.6.8 Xem bộ nhớ costmap khi chạy
 
@@ -623,12 +622,15 @@ ros2 service call /local_costmap/clear_entirely_local_costmap nav2_msgs/srv/Clea
 
 - **2 × 2 m (không phải 3 × 3):** Nav2 DWB lấy đích cục bộ = điểm cuối đường A\* còn trong costmap. Với 3 × 3 m, ở
   đầu tường đích cục bộ nằm sau tường → robot đứng yên → abort (tái hiện offline).
-- **Padding 0.10 m:** không có padding thì khi test offline DWB lái sát tới chạm vật cản chưa có trong bản đồ.
-- **Đánh đổi:** DWB không qua được khe < ~0.6 m, trong khi A\* vẫn lập đường qua khe ≥ 0.4 m.
+- **Padding 0.05 m, inflation 0.30 m, `stopping_margin` 0.02 m (2026-10-21, user):** đi sát và qua khe hẹp hơn.
+  Mô phỏng: khe 0.58 / 0.64 m từ 0/5 → 5/5 (khe 0.54 m vẫn dừng), né vật cản vẫn 35/35, 0 va chạm, nhưng khoảng hở
+  thân nhỏ nhất 0.14 → **0.05 m** (robot trễ 0.7 s: 0.03 m). Trước đó dùng 0.10 / 0.45 / 0.05 vì offline padding 0
+  làm DWB chạm vật cản. Quay về an toàn hơn: padding 0.10, inflation 0.45, margin 0.05.
+- **Đánh đổi:** DWB vẫn không qua được khe < ~0.55 m, trong khi A\* lập đường qua khe ≥ 0.4 m.
 - Nửa sau scan là NaN, mà `track_unknown_space: false` → vùng phía sau được coi là **trống**. Bảo vệ thực sự là
   **không cho lùi**.
 - **Giới hạn của `fusion_layer`:** nó không xóa ô dưới thân robot (khác `obstacle_layer`). Một ô ma của camera sát
-  robot (< 0.30 m từ camera, không nhìn xuyên được) chỉ mất sau 10 s. Nếu nó nằm trong vùng 0.30 m quanh tâm,
+  robot (< 0.30 m từ camera, không nhìn xuyên được) chỉ mất sau 10 s. Nếu nó nằm trong vùng 0.25 m quanh tâm,
   CustomDWB báo BLOCKED và đứng yên trong lúc đó.
 
 ### 6.6b Lớp camera trong `local_costmap` (M2, tùy chọn)
@@ -793,7 +795,7 @@ FOLLOW_PATH ───────────> ROTATE_TO_GOAL     FOLLOW_PATH �
 ```
 
 Trước khi chọn pha:
-- Ô dưới tâm robot ≥ 253 (cách vật cản < 0.30 m), unknown, hoặc ngoài costmap → `BLOCKED`, lỗi.
+- Ô dưới tâm robot ≥ 253 (cách vật cản < 0.25 m), unknown, hoặc ngoài costmap → `BLOCKED`, lỗi.
 - **Robot đứng quá sát vật cản thì không ra lệnh nào, kể cả xoay.** Không lùi được nên không tự thoát.
 
 **Vận tốc gốc** (`velocity_reference: command`):
@@ -809,15 +811,15 @@ Trước khi chọn pha:
 - Đúng hướng nhưng 0.135 < d ≤ 0.20, hoặc trôi ra > 0.20 m → quay lại tiếp cận.
 
 **Pha 2: `ROTATE_TO_PATH`**
-- "Cà rốt" = điểm cách đầu đường cục bộ 0.6 m.
-- Hướng tới cà rốt lệch > 0.8 rad → xoay tại chỗ, tới khi < 0.4 rad.
+- "Cà rốt" = điểm cách đầu đường cục bộ 0.8 m.
+- Hướng tới cà rốt lệch > 2.5 rad (~143°) → xoay tại chỗ, tới khi < 1.25 rad (cũ 0.8 / 0.4). Lệch nhỏ hơn → đi theo cung.
 - Ví dụ: đích ở sau lưng → xoay ~180° trước rồi mới đi.
 
 **Cách xoay** (chung cho hai pha xoay):
 - Gần ±π: **giữ chiều đã chọn**, để nhiễu không làm robot lật trái/phải.
 - `còn lại = |sai số| − phần đã quay do trễ (0.2 s + 0.05 s)`.
-- `|ω| = min(1.5 × còn lại, √(2 × 1.0 × còn lại), 0.5)`, tối thiểu 0.1.
-- Thực tế: chạy 0.5 rad/s tới khi còn ~0.33 rad thì chậm dần. ω đổi tối đa 0.1 rad/s mỗi chu kỳ.
+- `|ω| = min(1.5 × còn lại, √(2 × 2.0 × còn lại), 1.0)`, tối thiểu 0.1.
+- Thực tế: chạy 1.0 rad/s tới khi còn ~0.67 rad thì chậm dần. ω đổi tối đa 0.2 rad/s mỗi chu kỳ (cũ 0.5 rad/s, 0.1).
 - v giảm dần về 0 theo `decel_lim_x`.
 - Lệnh xoay cũng được **mô phỏng và kiểm tra va chạm** như mọi quỹ đạo khác.
 
@@ -866,27 +868,89 @@ A\* không biết vật cản mới, nên **việc né vật cản hoàn toàn d
 2 × 2 m quanh robot, chỉ phía trước ±90°).
 
 ### Cơ chế
-1. **Loại cứng:** quỹ đạo nào (kể cả đuôi phanh) chạm vùng cách vật cản < 0.30 m thì bị loại. Robot không bao giờ
+1. **Loại cứng:** quỹ đạo nào (kể cả đuôi phanh) chạm vùng cách vật cản < 0.25 m thì bị loại. Robot không bao giờ
    chọn vận tốc mà không kịp phanh.
 2. **Chấm điểm mềm:**
-   - quỹ đạo đi gần vùng inflation (≤ 0.45 m quanh vật cản) bị phạt (`obstacle_scale` 0.5);
-   - quỹ đạo lệch khỏi đường A\* cũng bị phạt (`path_distance_scale` 4.0, `carrot_distance_scale` 2.0).
-3. Hai lực kéo này cân bằng nhau, cho ra hành vi bên dưới.
+   - quỹ đạo đi gần vùng inflation (≤ 0.30 m quanh vật cản) bị phạt (`obstacle_scale` 4.0);
+   - quỹ đạo lệch khỏi đường A\* bị phạt nhẹ (`path_distance_scale` 0.5), cà rốt kéo về đích (`carrot_distance_scale` 2.0);
+   - đứng yên / đi chậm bị phạt (`speed_scale` 1.5).
+3. Từ 2026-10-21 trọng số **ưu tiên né hơn bám đường** (trước: bám đường 4.0 ≫ vật cản 0.5).
+
+### Tuning 2026-10-21 (mô phỏng, chưa thử trên robot)
+Ba nguyên nhân khiến bộ cũ **không bao giờ né** (tìm bằng mô phỏng kín vòng lõi DWA):
+
+| Nguyên nhân | Sửa |
+|---|---|
+| Cửa sổ ω chỉ ±0.1 rad/s/chu kỳ → mọi ứng viên có cùng chi phí vật cản | `acc/decel_lim_theta` 2.0 |
+| Đang vòng né, lệch hướng cà rốt > 0.8 rad → xoay tại chỗ quay lại vật cản | `rotate_to_heading_angle` 2.5, cà rốt 0.8 m |
+| Bám đường 4.0 ≫ vật cản 0.5; đứng yên không bị tính chi phí vật cản | path 0.5, obstacle 4.0, speed 1.5 |
+
+Kết quả (7 kịch bản vật cản chắn đường × 5 seed, robot trễ 0.2 s):
+- bộ cũ: 0/35 né được (dừng → abort); chỉ tăng tốc 0.3 / 1.0: vẫn 0/35;
+- bộ mới: 35/35 (robot quay chậm hơn giả định: 35/35; robot trễ 0.7 s: 27/35);
+- 0 va chạm, khoảng hở thân ≥ 0.14 m (robot trễ 0.7 s: ≥ 0.09 m); kịch bản thường vẫn 100 %.
+- Sau khi giảm padding 0.05 / inflation 0.30 / margin 0.02 (cùng ngày): né vẫn 35/35 (trễ 0.7 s: 28/35), khoảng hở
+  thân ≥ 0.05 m (trễ 0.7 s: ≥ 0.03 m).
+
+Đánh đổi:
+- robot lệch đường A\* nhiều hơn (vòng né tới ~0.8 m; khúc cua 135° đi theo cung lệch ~0.5 m thay vì xoay tại chỗ);
+- tường chắn hẳn: robot men theo tường ~1 m rồi abort `robot too far from the plan` (vẫn không chạm);
+- ở 0.2 m/s cần `sim_time` 3.0 (cùng trọng số, 0.2 m/s + 2.0 s chỉ né 21/35).
+- Mô phỏng thấy mọi vật cản (không che khuất, không nhiễu LiDAR); gia tốc góc thật của robot chưa đo.
 
 ### Né được và không né được
 
 | Trường hợp | Hành vi |
 |---|---|
-| Vật cản **cạnh đường**, còn đủ lối (tâm robot cách vật ≥ 0.30 m) | Lệch nhẹ để giữ khoảng cách, rồi quay về đường. Offline: 5/5 thành công, khoảng hở thân ≥ 0.16 m |
-| Vật cản **chắn hẳn đường** | Dừng cách ~0.1 m (`holding position`). Vật cản đi khỏi trong 10 s → đi tiếp. Không → `Failed to make progress` → `ABORTED` |
+| Vật cản **cạnh đường**, còn đủ lối (tâm robot cách vật ≥ 0.25 m) | Lệch nhẹ để giữ khoảng cách, rồi quay về đường. Offline: 5/5 thành công, khoảng hở thân ≥ 0.16 m |
+| Vật cản **chắn đường**, nhỏ/vừa, bên cạnh còn lối ≥ ~0.55 m | Từ 2026-10-21: vòng qua rồi về đường (mô phỏng; chưa thử trên robot) |
+| Vật cản **chắn hẳn đường** (tường, không còn lối) | Giảm tốc, có thể men theo một đoạn, rồi `Failed to make progress` / `robot too far from the plan` → `ABORTED` |
 | Vật cản **di chuyển cắt ngang** | Dừng hoặc giảm tốc khi nó vào vùng nguy hiểm, đi tiếp khi nó qua (chưa thử trên robot) |
 | Vật cản **phía sau / bên hông ngoài ±90°** | Không thấy (nửa sau scan bị lọc). Không ảnh hưởng vì robot không lùi |
 
-DWB **không đi vòng được** quanh vật cản chắn đường:
-- nó chỉ nhìn trước khoảng 0.26 m (0.15 m/s × 1.7 s);
-- nó luôn bị kéo về đường A\*.
+Trước 2026-10-21 DWB **không đi vòng được** (nhìn trước 0.26 m, bị kéo mạnh về đường A\*). Bộ mới đi vòng được vật cản
+nhỏ/vừa (≤ ~0.4 m) khi bên cạnh còn lối ≥ ~0.55 m; vật cản rộng hoặc tường chắn hẳn vẫn dừng → abort.
 
 Sau `ABORTED`: dọn vật cản rồi gửi lại 2D Goal Pose. A\* chỉ biết bản đồ tĩnh nên sẽ cho lại đường cũ.
+
+### Tham số chỉnh được để robot vượt vật cản tốt hơn
+**13 tham số `CustomDWB.*`** có tác dụng (↑ tăng, ↓ giảm). Tất cả đổi được khi đang chạy
+(`ros2 param set /controller_server CustomDWB.<tên> <giá trị>`). ✓ = đã kiểm chứng bằng mô phỏng 2026-10-21.
+
+| Tham số | Hướng | Vai trò |
+|---|---|---|
+| `acc_lim_theta` ✓ | ↑ | Nới cửa sổ ω mỗi chu kỳ → có quỹ đạo rẽ đủ mạnh để thấy khác biệt chi phí vật cản (**quan trọng nhất**) |
+| `decel_lim_theta` ✓ | ↑ | Bẻ lái ngược / trả lái nhanh khi vòng xong |
+| `max_vel_theta` ✓ | ↑ | Rẽ gắt hơn, đường vòng ngắn hơn |
+| `max_vel_x` ✓ | ↑ | Cung nhìn trước dài hơn (= `max_vel_x × sim_time`); một mình nó **không** giúp né |
+| `sim_time` ✓ | ↑ | Thấy vật cản sớm hơn, kịp rẽ từ xa |
+| `rotate_to_heading_angle` ✓ | ↑ | Không bị ép xoay tại chỗ quay lại vật cản giữa lúc vòng |
+| `carrot_distance` ✓ | ↑ | Cà rốt nằm sau vật cản → kéo robot đi tiếp |
+| `max_path_deviation` ✓ | ↑ | Cho phép đường vòng lệch xa đường A\* mà không bị dừng |
+| `obstacle_scale` ✓ | ↑ | Lực đẩy khỏi vùng inflation mạnh hơn |
+| `speed_scale` ✓ | ↑ | Phạt đứng yên (v = 0 không bị tính chi phí vật cản) |
+| `path_distance_scale` ✓ | ↓ | Bớt kéo về đường A\* → dám lệch để né |
+| `heading_scale` ✓ | ↓ | Bớt ép đầu xe hướng thẳng về cà rốt |
+| `vtheta_samples` | ↑ | Lưới ω mịn hơn (chưa kiểm chứng, tốn tính toán) |
+
+Cần chỉnh **theo cặp**, chỉnh lẻ dễ phản tác dụng:
+- `obstacle_scale` ↑ mà `speed_scale` không ↑ → robot đứng im trước vật cản;
+- `max_vel_x` ↓ thì phải `sim_time` ↑ (0.2 m/s → 3.0 s), nếu không tầm nhìn ngắn lại;
+- `rotate_to_heading_angle` ↑ thì `carrot_distance` ↑ theo.
+
+Ràng buộc (giá trị sai → cả lô bị từ chối): `carrot_distance ≤ local_plan_length` (1.5 m), `rotate_to_heading_angle ≤ π`,
+`max_vel_x ≤ 1.0`, `sim_time ≤ 5.0`, tải mô phỏng ≤ 100 000 pose/chu kỳ (`sim_time`, `vtheta_samples` ↑ làm tăng tải).
+
+**Ngoài `CustomDWB`** (ảnh hưởng cả Nav2 DWB, chỉnh có cân nhắc):
+
+| Tham số | Hướng | Vai trò / rủi ro |
+|---|---|---|
+| `progress_checker.movement_time_allowance` | ↑ | Thêm thời gian trước khi abort khi đang lách |
+| `local_costmap` `width`/`height` | ↑ | Thấy vật cản xa hơn 1 m; Nav2 DWB từng kẹt với 3 × 3 m |
+| `local_costmap` `footprint_padding` | ↓ | Lọt khe hẹp hơn (đang 0.05 → khe ≥ ~0.55 m) nhưng **giảm khoảng an toàn** |
+| `inflation_layer.inflation_radius` | ↓ (đang 0.30) | Đi sát hơn; 0.6 làm né **kém** hơn (vùng phạt phủ kín hai bên) |
+
+**Không nên giảm thêm** để "dễ qua": `stopping_margin` (đã 0.02), `control_latency`, `decel_lim_x` (tham số an toàn phanh).
 
 ### Cách thử né vật cản trên robot
 Trước 2026-10-20: vật cản lớn ngay trước robot làm `localization_monitor` tụt điểm khớp scan–bản đồ → UNCERTAIN →
@@ -957,13 +1021,13 @@ ros2 launch stage3_navigation navigation.launch.py camera:=true camera_layer:=vo
 | Tình huống | Diễn biến |
 |---|---|
 | **Bình thường, đích phía trước** | FOLLOW_PATH, v tăng 0.05 m/s mỗi chu kỳ tới 0.15. Gần đích: ROTATE_TO_GOAL → đúng hướng → dừng → `SUCCEEDED` |
-| **Đích ở sau lưng** | ROTATE_TO_PATH ~180° (~6 s ở 0.5 rad/s) → FOLLOW_PATH. Xoay > 10 s → `Failed to make progress` |
+| **Đích ở sau lưng** | ROTATE_TO_PATH ~180° (~3–4 s ở 1.0 rad/s) → FOLLOW_PATH. Xoay > 10 s → `Failed to make progress` |
 | **Chế độ cách ly (C)** | Robot không chạy → sau 10 s `Failed to make progress` → `ABORTED`. Bình thường |
 | **Vật cản cạnh đường** | Lệch nhẹ né rồi về đường (mục 9) |
 | **Vật cản chắn hẳn đường** | Dừng, chờ 10 s → `ABORTED` nếu không thông. Không đi vòng |
 | **Vật cản lớn ngay trước (gần)** | Trước 2026-10-20: monitor báo UNCERTAIN → bridge hủy sau 2 s. Nay distance filter bỏ các tia trên vật (chỉ UNCERTAIN khi > 85% tia bị che). Chưa thử trên robot |
-| **Robot đứng sát tường / vật cản (< 0.30 m)** | `robot pose is in collision` → lệnh 0 → sau 0.3 s `ABORTED`. Cần lái PS4 ra |
-| **Khe hẹp 0.4–0.6 m** | A\* đi qua được, DWB không (nội tiếp 0.30 m) → dừng trước khe → `ABORTED` |
+| **Robot đứng sát tường / vật cản (< 0.25 m)** | `robot pose is in collision` → lệnh 0 → sau 0.3 s `ABORTED`. Cần lái PS4 ra |
+| **Khe hẹp 0.4–0.55 m** | A\* đi qua được, DWB không (nội tiếp 0.25 m) → dừng trước khe → `ABORTED` |
 | **Giữ deadman PS4** | twist_mux lấy lệnh PS4. DWB vẫn tính (gốc kẹp quanh vận tốc đo). Lệch > 0.8 m → abort. Thả tay: 0.5 s sau DWB lái tiếp |
 | **Gửi goal mới khi đang chạy** | Hủy FollowPath → lệnh 0 → A\* mới → phải gọi `follow` lại (trừ `auto_follow`) |
 | **EKF / odom chết** | > 0.5 s: CustomDWB lỗi → lệnh 0 → sau 0.3 s `ABORTED` |
@@ -1062,7 +1126,7 @@ ros2 bag record -o ~/obstacle_run /cmd_vel_out /cmd_vel_nav /odometry/filtered /
 - **Đường dài bị hủy giữa chừng:** điểm khớp scan–bản đồ tụt dần khi đi xa (đích 8.82 m bị hủy sau ~3.5 m).
   Nguyên nhân chưa rõ, cần bag.
 - **Không có hành vi phục hồi:** không lùi, không xoay thoát khi đứng sát vật cản.
-- **Global vs local khác nhau:** A\* (nội tiếp 0.20 m) đi được khe mà DWB (0.30 m) không qua được.
+- **Global vs local khác nhau:** A\* (nội tiếp 0.20 m) đi được khe mà DWB (0.25 m) không qua được.
 - **controller_server treo khi scan đứng** (giới hạn của Nav2 Humble): không gọi controller, không publish gì; robot chỉ dừng nhờ timeout 0.5 s của twist_mux / watchdog driver.
 - **Feedback `distance_to_goal`** mà bridge log không phản ánh tiến độ. Xem `progress` / `dist_to_goal` trong
   `/CustomDWB/state`.
