@@ -10,7 +10,7 @@ Package này giúp robot **tự đi tới một đích** chọn trên RViz, theo
 - **Không có replanning.** Đường A\* không đổi trong cả lần bám. Vật cản mới chỉ do DWB xử lý (mục 9).
 - Bộ điều khiển mặc định là **CustomDWB** (`stage3_navigation::DwbController`, tự viết). Nav2 DWB vẫn giữ để so sánh.
 - Tính năng replan (commit `0d553eb`, 2026-10-15) đã được gỡ ngày 2026-10-19. Code và tham số CustomDWB = bản trước đó
-  (`a7c59a1`), cộng cổng serial mới. Từ 2026-10-20 có thêm lớp camera (M2, `camera:=true`) và `camera_view`.
+  (`a7c59a1`), cộng cổng serial mới. Từ 2026-10-20 có thêm lớp camera (M2, `camera:=true`); ảnh camera hiện ngay trong `planning.rviz`.
 
 > ⚠️ **Mọi launch ở đây đều include Stage 2**, nên bật LiDAR, IMU, **motor** và tay PS4 (trừ `stage2:=false`).
 > `navigation_enabled:=false` (mặc định) chỉ ngắt **lệnh của DWB** khỏi motor; tay PS4 vẫn lái được.
@@ -55,8 +55,7 @@ Package này giúp robot **tự đi tới một đích** chọn trên RViz, theo
 | `config/camera_fusion.yaml` | Thêm `fusion_layer` vào local costmap (nạp chồng) |
 | `config/camera_voxel.yaml` | Thêm `VoxelLayer` của Nav2 (đối chứng) |
 | `launch/camera.launch.py` | Driver RealSense D435 (point cloud, không TF) |
-| `rviz/planning.rviz` | RViz chính của stage 3 |
-| `rviz/camera.rviz` | Cửa sổ ảnh camera (`camera_view:=true`) |
+| `rviz/planning.rviz` | RViz duy nhất: map, costmap, đường đi + ảnh màu, point cloud camera |
 
 ---
 
@@ -190,9 +189,8 @@ Có đủ đối số chung của `planning.launch.py` (truyền nguyên xuống
 | `local_planner` | `custom` | `custom` = CustomDWB; `nav2_dwb` = Nav2 DWB; khác → lỗi |
 | `navigation_enabled` | `false` | `true`: lệnh DWB → `/cmd_vel_nav` → motor |
 | `auto_follow` | `false` | `true`: A\* xong là bám đường ngay |
-| `camera` | `false` | `true`: chạy driver RealSense (**thiết bị thật**) |
+| `camera` | `false` | `true`: chạy driver RealSense (**thiết bị thật**), ảnh màu 424×240@15 bật luôn |
 | `camera_layer` | `auto` | `fusion` / `voxel` / `none`; `auto` = `fusion` nếu `camera:=true` |
-| `camera_view` | `false` | `true` (cần `camera:=true`): bật ảnh màu + mở RViz `camera.rviz` (ảnh màu, ảnh độ sâu) |
 
 Những gì launch tự đặt:
 
@@ -948,9 +946,8 @@ Kết quả offline lúc phát triển (2026-10-20, camera giả lập, CustomDW
 
 Chạy trên robot (**thiết bị thật**, hỏi trước; lần đầu cách ly motor):
 ```bash
-ros2 launch stage3_navigation navigation.launch.py camera:=true     # fusion
+ros2 launch stage3_navigation navigation.launch.py camera:=true     # fusion; ảnh camera + point cloud hiện trong planning.rviz
 ros2 launch stage3_navigation navigation.launch.py camera:=true camera_layer:=voxel   # đối chứng
-ros2 launch stage3_navigation navigation.launch.py camera:=true camera_view:=true   # + cửa sổ ảnh camera
 ```
 
 ---

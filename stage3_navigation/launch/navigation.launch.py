@@ -92,8 +92,6 @@ def _check_args(context):
             f"local_planner:={planner} không hợp lệ, chọn một trong {tuple(LOCAL_PLANNERS)}")
     _camera_layer(context)
     warnings = []
-    if _is_true(context, "camera_view") and not _is_true(context, "camera"):
-        warnings.append(LogInfo(msg="[stage3] camera_view:=true bị bỏ qua: cần camera:=true"))
     if _is_true(context, "navigation_enabled"):
         return warnings + [LogInfo(
             msg="[stage3] !!! navigation_enabled:=true: DWB -> /cmd_vel_nav -> "
@@ -124,13 +122,6 @@ def generate_launch_description():
     require_localized = PythonExpression([
         "'", LaunchConfiguration("mode"), "' == 'localization' and '",
         LaunchConfiguration("monitor"), "'.lower() == 'true'",
-    ])
-
-    # RViz ảnh camera: chỉ khi camera_view, camera và rviz đều true.
-    camera_view_on = PythonExpression([
-        "'", LaunchConfiguration("camera_view"), "'.lower() == 'true' and '",
-        LaunchConfiguration("camera"), "'.lower() == 'true' and '",
-        LaunchConfiguration("rviz"), "'.lower() == 'true'",
     ])
 
     planning_launch = stage3_share / "launch" / "planning.launch.py"
@@ -192,7 +183,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "rviz",
             default_value="true",
-            description="Mở RViz2 (planning.rviz). RViz của Stage 2 luôn tắt",
+            description="Mở RViz2 (planning.rviz: map, costmap, đường đi; "
+                        "+ ảnh màu và point cloud camera khi camera:=true). "
+                        "RViz của Stage 2 luôn tắt",
         ),
         DeclareLaunchArgument(
             "log_level",
@@ -218,12 +211,6 @@ def generate_launch_description():
             default_value="false",
             description="true: chạy driver RealSense D435 (camera.launch.py, THIẾT BỊ THẬT) "
                         "và mặc định thêm lớp hợp nhất camera + LiDAR vào local_costmap",
-        ),
-        DeclareLaunchArgument(
-            "camera_view",
-            default_value="false",
-            description="true (cần camera:=true, rviz:=true): bật thêm ảnh màu RealSense và mở "
-                        "cửa sổ RViz2 riêng (camera.rviz) hiển thị ảnh màu + ảnh độ sâu",
         ),
         DeclareLaunchArgument(
             "camera_layer",
@@ -253,21 +240,11 @@ def generate_launch_description():
         ),
 
         # ---- Camera RealSense (M2), chỉ khi camera:=true: THIẾT BỊ THẬT ----
-        # camera_view:=true bật thêm ảnh màu (chỉ để xem; lớp camera chỉ dùng point cloud độ sâu).
+        # Ảnh màu luôn bật để xem trong planning.rviz (lớp camera chỉ dùng point cloud độ sâu).
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(stage3_share / "launch" / "camera.launch.py")),
-            launch_arguments={"enable_color": LaunchConfiguration("camera_view")}.items(),
+            launch_arguments={"enable_color": "true"}.items(),
             condition=IfCondition(LaunchConfiguration("camera")),
-        ),
-
-        # Cửa sổ RViz2 thứ hai chỉ xem ảnh camera (không đụng planning.rviz).
-        Node(
-            package="rviz2",
-            executable="rviz2",
-            name="rviz2_camera",
-            output="screen",
-            arguments=["-d", str(stage3_share / "rviz" / "camera.rviz")],
-            condition=IfCondition(camera_view_on),
         ),
 
         # ---- Stage 3.2: bộ điều khiển cục bộ (controller_server + local_costmap) ----

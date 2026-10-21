@@ -156,7 +156,7 @@ URDF; nó dùng `robot_radius` trong `nav2_params.yaml`.
 |---|---|---|---|---|
 | RPLIDAR C1 | `laser_frame` | (0.150, 0, 0.34715) | `/dev/ttyUSB1`, 460800 baud → `/scan_raw` → `/scan` → `/scan_filtered` | Driver cho góc 0 = **phía sau**; `scan_rotate` cộng π vào dữ liệu (không sửa TF). `laser_filters` bỏ nửa sau (π−1.57, π+1.57) vì laptop che |
 | BNO055 (qua ESP32-C3) | `imu_link` | (0.110, 0, 0.2343) | `/dev/ttyUSB0`, 115200 → `/imu/data`, `/imu_odom` | Frame không xoay so với `base_link` |
-| RealSense D435 | `camera_link`, `camera_*_optical_frame` | (0.170, 0, 0.2760) | USB 3 → `/camera/camera/depth/color/points` (+ ảnh khi `camera_view:=true`) | Chạy qua `stage3_navigation/launch/camera.launch.py` với `publish_tf:=false` (TF lấy từ URDF). Độ nghiêng chưa đo |
+| RealSense D435 | `camera_link`, `camera_*_optical_frame` | (0.170, 0, 0.2760) | USB 3 → `/camera/camera/depth/color/points` + `/camera/camera/color/image_raw` (xem trong `planning.rviz`) | Chạy qua `stage3_navigation/launch/camera.launch.py` với `publish_tf:=false` (TF lấy từ URDF). Độ nghiêng chưa đo |
 
 Motor driver ZLAC8015D: Modbus RTU qua `/dev/ttyUSB2` (không có frame). Thứ tự ttyUSB có thể đổi khi cắm lại USB, nên
 kiểm tra bằng `ls -l /dev/serial/by-id/`.

@@ -27,7 +27,12 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "enable_color",
             default_value="false",
-            description="Bật ảnh màu (cần cho YOLO ở P3; M2 chỉ dùng độ sâu)",
+            description="Bật ảnh màu (để xem trong RViz / YOLO ở P3; M2 chỉ dùng độ sâu)",
+        ),
+        DeclareLaunchArgument(
+            "color_profile",
+            default_value="424,240,15",
+            description="Ảnh màu D435: rộng,cao,fps (nhỏ để giảm tải USB)",
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(rs_launch)),
@@ -37,6 +42,7 @@ def generate_launch_description():
                 "publish_tf": "false",
                 "enable_depth": "true",
                 "enable_color": LaunchConfiguration("enable_color"),
+                "rgb_camera.color_profile": LaunchConfiguration("color_profile"),
                 "enable_infra1": "false",
                 "enable_infra2": "false",
                 "enable_gyro": "false",
