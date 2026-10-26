@@ -11,7 +11,7 @@ class Move (Node):
     def __init__ (self):
         super().__init__("move")
 
-        self.motors = Controller (port='/dev/ttyUSB2')
+        self.motors = Controller (port='/dev/ttyUSB1')
         self.motors.disable_motor()
         self.motors.set_accel_time(500, 500)
         self.motors.set_decel_time(500, 500)

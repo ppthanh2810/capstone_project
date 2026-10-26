@@ -39,7 +39,7 @@ Bản đồ đang dùng: `capstone_project/maps/map.yaml` + `map.pgm`.
 ### Phần chung: scan (`scan.launch.py`)
 
 ```text
-RPLIDAR C1 ──/dev/ttyUSB1──> sllidar_node ──/scan_raw──> scan_rotate ──/scan──> laser_filters ──/scan_filtered
+RPLIDAR C1 ──/dev/ttyUSB2──> sllidar_node ──/scan_raw──> scan_rotate ──/scan──> laser_filters ──/scan_filtered
                             (frame laser_raw)          (+π, laser_frame)       (bỏ nửa sau)
 URDF ──> robot_state_publisher ──> TF base_footprint → base_link → laser_frame, imu_link, ...
 ```
@@ -81,7 +81,7 @@ ros2 launch stage2_slam scan.launch.py
 
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
+| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
 | `rviz` | `true` | Mở RViz |
 | `rviz_config` | `rviz/scan.rviz` | File RViz (mapping/localization tự đổi) |
 
@@ -123,7 +123,7 @@ ros2 launch stage2_slam mapping.launch.py
 
 | Đối số | Mặc định |
 |---|---|
-| `serial_port` | `/dev/ttyUSB1` |
+| `serial_port` | `/dev/ttyUSB2` |
 | `imu_port` | `/dev/ttyUSB0` |
 | `rviz` | `true` (`slam.rviz`) |
 
@@ -164,7 +164,7 @@ ros2 launch stage2_slam localization.launch.py csm:=true monitor:=true
 
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
-| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
+| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
 | `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `map` | `~/capstone_ws/capstone_project/maps/map.yaml` | Bản đồ |
 | `rviz` | `true` | RViz `localization.rviz` |

@@ -76,7 +76,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "serial_port",
-            default_value="/dev/ttyUSB1",
+            default_value="/dev/ttyUSB2",
             description="Cổng USB của RPLidar C1",
         ),
         DeclareLaunchArgument(

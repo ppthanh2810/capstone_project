@@ -145,7 +145,7 @@ ros2 launch stage3_navigation planning.launch.py mode:=mapping allow_unknown:=tr
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
 | `mode` | `localization` | `localization` (AMCL) hoặc `mapping` (slam_toolbox); khác → lỗi |
-| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
+| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
 | `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `map` | `~/capstone_ws/capstone_project/maps/map.yaml` | Bản đồ (localization) |
 | `csm` | **`true`** | 2D Pose Estimate qua CSM (localization) |
@@ -343,6 +343,24 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `acc_lim_x` / `decel_lim_x` | 0.5 / 0.5 m/s² |
 | `acc_lim_theta` / `decel_lim_theta` | 2.0 / 2.0 rad/s² (cũ 1.0) |
 
+Tăng / giảm thì sao (nên đặt **≤ khả năng thật** của robot; chưa đo):
+- `max_vel_x` — tốc độ tiến tối đa, cũng quyết định độ dài cung dò vật cản (`max_vel_x × sim_time`).
+  - ↑: nhanh hơn, nhìn xa hơn; nhưng quãng phanh dài hơn (v²/2·decel), ít thời gian phản ứng với vật cản bất ngờ.
+  - ↓: an toàn, êm; cung dò ngắn lại → phải tăng `sim_time` theo (0.2 m/s → 3.0 s), nếu không né kém.
+- `min_vel_x` — giữ 0.0. Âm = cho lùi, nhưng phía sau không có LiDAR (vùng sau luôn FREE) → **không được** đổi.
+- `max_vel_theta` — tốc độ quay tối đa (cả khi xoay tại chỗ).
+  - ↑: rẽ gắt, đường vòng ngắn; lớn quá thì AMCL/EKF dễ mất chính xác khi quay nhanh, dễ overshoot.
+  - ↓: quay êm, định vị ổn hơn; nhưng bán kính rẽ lớn → khó né trong chỗ hẹp.
+- `min_in_place_vel_theta` — ω nhỏ nhất khi xoay tại chỗ (để thắng ma sát / vùng chết của bánh).
+  - ↑: không bị "kẹt" khi còn lệch ít, nhưng dễ vượt qua góc đích rồi quay ngược.
+  - ↓: dừng xoay chính xác hơn; quá nhỏ thì bánh không nhúc nhích (lệnh 0.1 rad/s ≈ vài bước RPM).
+- `acc_lim_x` / `decel_lim_x` — độ rộng cửa sổ v mỗi chu kỳ (± acc·dt = ±0.05 m/s ở 10 Hz). `decel_lim_x` còn dùng để tính đuôi phanh khi kiểm tra va chạm.
+  - ↑: tăng/giảm tốc nhanh hơn. Nếu lớn hơn khả năng thật (driver ramp 500 ms) → mô phỏng tin rằng phanh kịp nhưng thực tế không → **nguy hiểm**.
+  - ↓: êm hơn; `decel_lim_x` nhỏ = giả định phanh chậm → dừng xa vật cản hơn (an toàn hơn, nhưng thận trọng quá thì khó đi qua chỗ hẹp).
+- `acc_lim_theta` / `decel_lim_theta` — độ rộng cửa sổ ω mỗi chu kỳ (2.0 → ±0.2 rad/s/chu kỳ). **Quan trọng nhất cho né vật cản** (mục 9).
+  - ↑: có quỹ đạo rẽ đủ mạnh để chi phí vật cản khác nhau → né được; lớn hơn thực tế thì robot không theo kịp lệnh.
+  - ↓ (1.0 cũ = ±0.1 rad/s): mọi ứng viên gần giống nhau → không né được, chỉ dừng.
+
 **Lấy mẫu và mô phỏng:**
 
 | Tham số | Giá trị | Ý nghĩa |
@@ -353,6 +371,23 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `control_latency` | 0.2 s | Trễ lệnh → bánh (đo từ bag 2026-10-14, driver tăng/giảm tốc 200 ms; nay driver mặc định 500 ms) |
 | `stopping_margin` | 0.02 m | Khoảng trống thêm sau khi phanh (cũ 0.05) |
 
+Tăng / giảm thì sao:
+- `vx_samples` × `vtheta_samples` — số ứng viên v × ω trong cửa sổ (cộng thêm v = 0, ω = 0).
+  - ↑: chọn được lệnh tinh hơn (nhất là ω khi lách), nhưng tốn CPU; tải bị chặn ≤ 100 000 pose/chu kỳ, vượt → bị từ chối.
+  - ↓: nhanh hơn, nhưng lưới thô → có thể bỏ lỡ khe né duy nhất, lệnh giật bậc.
+- `sim_time` — thời gian nhìn trước của mỗi quỹ đạo.
+  - ↑: thấy vật cản sớm, rẽ từ xa; nhưng quỹ đạo dài dễ "đụng" vật cản ở xa → loại bỏ cứng nhiều ứng viên, khó đi qua chỗ hẹp/khúc cua; tốn CPU.
+  - ↓: linh hoạt ở chỗ hẹp, nhưng thấy vật cản muộn → phanh gấp hoặc đứng im.
+- `sim_granularity` — bước mô phỏng tối đa (thật sự còn bị chặn ≤ nửa ô costmap).
+  - ↑: nhẹ CPU; vì bước còn bị chặn theo nửa ô nên không bỏ sót ô (ở 0.3 m/s, 0.05 s ≈ 0.015 m < 0.025 m).
+  - ↓: chính xác hơn rất ít, tốn CPU.
+- `control_latency` — trễ từ lúc gửi lệnh tới lúc bánh thực hiện; mô phỏng giữ lệnh cũ trong khoảng này.
+  - ↑ (so với thực): thận trọng hơn, dừng/rẽ sớm hơn; quá lớn → robot phản ứng chậm, xoay thiếu góc.
+  - ↓ (so với thực): mô phỏng lạc quan hơn thực tế → phanh muộn, xoay lố. **Không nên giảm** khi chưa đo lại (driver nay 500 ms, có thể trễ thật > 0.2 s).
+- `stopping_margin` — khoảng trống bắt buộc phía trước sau khi phanh xong.
+  - ↑: dừng xa vật cản hơn, an toàn hơn; nhưng khó đi qua khe hẹp, dễ `holding position`.
+  - ↓ (đã 0.02): đi sát hơn — **không nên giảm thêm**.
+
 **Vận tốc gốc của cửa sổ:**
 
 | Tham số | Giá trị |
@@ -360,6 +395,14 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `velocity_reference` | `command` |
 | `max_feedback_gap_x` | 0.15 m/s |
 | `max_feedback_gap_theta` | 0.5 rad/s |
+
+Cửa sổ động (v ± acc·dt, ω ± acc·dt) được đặt quanh một "vận tốc gốc":
+- `velocity_reference`
+  - `command`: gốc = lệnh trước (kẹp quanh vận tốc đo). Lệnh đổi đúng `acc/decel_lim` mỗi chu kỳ, không bị trễ odometry làm chậm → không xoay lố.
+  - `measured`: gốc = vận tốc đo từ `/odometry/filtered`. Vì odom trễ ~0.2 s, lệnh chỉ nhích dần → phanh/giảm quay rất chậm (robot 2026-10-14: xoay lố ~50°). Chỉ dùng để so sánh.
+- `max_feedback_gap_x` / `max_feedback_gap_theta` — lệnh trước được phép cách vận tốc đo tối đa bao nhiêu (chỉ khi `command`). Bảo vệ khi robot không theo lệnh (PS4 chiếm `twist_mux`, bánh kẹt, nâng bánh).
+  - ↑: gốc bám lệnh hơn, đổi tốc nhanh; nhưng khi robot thật không chạy, gốc trôi xa thực tế → lệnh nhảy lớn khi robot được thả.
+  - ↓: gốc bám vận tốc đo hơn → an toàn khi robot bị chặn, nhưng tiến dần về kiểu `measured` (chậm, dễ lố). Nên ≥ vài lần `acc·dt` (0.05 m/s, 0.2 rad/s).
 
 **Bám đường:**
 
@@ -370,6 +413,20 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `closest_search_distance` | 1.0 m | Cửa sổ tìm tiến trình |
 | `max_path_deviation` | 1.0 m | Lệch đường hơn → dừng |
 
+Tăng / giảm thì sao:
+- `local_plan_length` — đoạn đường A\* cắt ra để tính `path_distance` và đặt cà rốt (bị cắt thêm ở mép local costmap 2 × 2 m).
+  - ↑: thấy khúc cua sớm hơn, nhưng trên 1 m thường bị mép costmap cắt nên ít tác dụng.
+  - ↓: robot chỉ "nhìn" đoạn ngắn → bám sát đường hơn nhưng dễ lắc ở khúc cua. Phải luôn ≥ `carrot_distance`.
+- `carrot_distance` — điểm robot cố hướng tới.
+  - ↑: đi mượt, cắt góc nhiều hơn; khi né, cà rốt nằm sau vật cản nên kéo robot đi tiếp.
+  - ↓: bám sát đường A\* (ít cắt góc), nhưng hay lắc trái/phải và dễ bị kéo ngược về vật cản khi đang vòng.
+- `closest_search_distance` — robot chỉ tìm "mình đang ở đâu trên đường" trong cửa sổ này phía trước tiến trình hiện tại.
+  - ↑: không mất dấu khi robot bị đẩy lệch xa hoặc tiến nhanh, nhưng dễ nhảy tắt sang nhánh khác của đường chữ U / tự cắt.
+  - ↓: chống nhảy nhánh tốt hơn, nhưng sau một đường vòng dài tiến trình có thể bị "kẹt lại" phía sau.
+- `max_path_deviation` — lệch khỏi đường A\* quá mức này → `PlannerException` → abort.
+  - ↑: cho phép đường vòng né rộng hơn; nhưng robot có thể đi khá xa đường đã duyệt trước khi bị dừng.
+  - ↓: an toàn, dừng sớm khi lạc; quá nhỏ (< ~0.6 m) thì mọi lần né đều bị abort.
+
 **Pha xoay và đích:**
 
 | Tham số | Giá trị | Ý nghĩa |
@@ -379,6 +436,22 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `xy_goal_tolerance` / `yaw_goal_tolerance` | 0.15 / 0.25 | Dự phòng (thật lấy từ goal checker) |
 | `goal_tolerance_fraction` | 0.9 | Dùng 0.9 × dung sai bên trong |
 | `goal_latch_release_margin` | 0.05 m | Trôi ra ngoài xy + 0.05 → tiếp cận lại |
+
+Tăng / giảm thì sao:
+- `rotate_to_heading_angle` — ngưỡng vào pha ROTATE_TO_PATH (xoay tại chỗ); ra khi lệch < ½ ngưỡng.
+  - ↑ (tối đa π): gần như luôn rẽ bằng cung vừa đi vừa quay; không bị ép quay đầu về vật cản giữa lúc vòng. Đổi lại cua gắt (135°) đi thành cung rộng, cần chỗ.
+  - ↓ (ví dụ 0.8 cũ): xoay tại chỗ nhiều hơn → gọn ở chỗ hẹp, nhưng giữa lúc né dễ quay lại phía vật cản.
+- `rotate_gain` — độ "gắt" khi xoay tại chỗ (ω vẫn bị chặn bởi `max_vel_theta` và đường phanh √(2·decel·sai số)).
+  - ↑: xoay nhanh hơn khi còn lệch ít, nguy cơ vượt quá đích (overshoot) nếu trễ lớn.
+  - ↓: dừng xoay êm hơn nhưng chậm; quá nhỏ thì ω chạm `min_in_place_vel_theta` 0.1 và bò rất lâu ở cuối.
+- `xy_goal_tolerance` / `yaw_goal_tolerance` — chỉ dùng khi không đọc được goal checker (bình thường lấy 0.15 / 0.25 của `general_goal_checker`).
+  - ↑: tới đích sớm, kém chính xác. ↓: chính xác hơn nhưng dễ lượn quanh đích / hết thời gian.
+- `goal_tolerance_fraction` — CustomDWB nhắm vào 0.9 × dung sai, để goal checker chắc chắn cũng thấy "đạt".
+  - ↑ (→ 1.0): dừng sát mép dung sai, có thể goal checker chưa công nhận (do sai số) → robot đứng mà chưa SUCCEEDED.
+  - ↓: chắc chắn hơn nhưng phải đi/xoay chính xác hơn, lâu hơn.
+- `goal_latch_release_margin` — vùng trễ (hysteresis) để không nhảy qua lại giữa ROTATE_TO_GOAL và FOLLOW_PATH.
+  - ↑: ít nhảy pha hơn, nhưng robot trôi xa hơn mới chịu tiến lại.
+  - ↓ (→ 0): phản ứng sớm, dễ dao động pha ngay mép dung sai.
 
 **Trọng số chi phí** (nhỏ hơn = tốt hơn; tuning né vật cản 2026-10-21, xem mục 9):
 
@@ -391,8 +464,32 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `speed_scale` | 1.5 |
 | `oscillation_scale` | 1.0 |
 
+Tổng chi phí = Σ trọng số × thành phần. Chỉ **tỉ lệ giữa các trọng số** là quan trọng (nhân tất cả × 2 → không đổi gì).
+Lưu ý đơn vị: `path` và `carrot` tính bằng mét, các thành phần còn lại chuẩn hóa 0..1.
+- `path_distance_scale` — phạt điểm cuối quỹ đạo xa đường A\*.
+  - ↑: bám sát đường, nhưng ngại lệch → khó né (dễ `holding position`).
+  - ↓: dám lệch để né; quá nhỏ thì robot cắt góc, đi lệch đường nhiều.
+- `carrot_distance_scale` — phạt điểm cuối xa cà rốt (lực "kéo về phía trước"). Phải có `path + carrot > 0`.
+  - ↑: tiến về đích dứt khoát, ưu tiên đi nhanh và thẳng tới cà rốt.
+  - ↓: kéo yếu, robot dễ đi chậm / lưỡng lự.
+- `heading_scale` — phạt hướng đầu xe cuối quỹ đạo lệch so với hướng tới cà rốt.
+  - ↑: đầu xe luôn chĩa về cà rốt, đi thẳng thớm; nhưng chống lại việc quay ngang để vòng vật cản.
+  - ↓: cho phép đầu xe lệch tạm thời khi né; quá nhỏ thì có thể lượn rắn.
+- `obstacle_scale` — phạt ô costmap đắt nhất dọc cung nhìn trước (vùng inflation).
+  - ↑: tránh xa vật cản sớm và rộng hơn. Nếu không tăng `speed_scale` theo → chọn v = 0 (đứng im, vì v = 0 không bị tính chi phí này).
+  - ↓: đi sát vật cản hơn, chỉ còn loại bỏ cứng (va chạm) bảo vệ.
+- `speed_scale` — phạt đi chậm: (max_vel_x − v) / max_vel_x.
+  - ↑: luôn cố chạy nhanh, không chịu đứng im trước vật cản; quá lớn thì lao nhanh cả ở chỗ hẹp.
+  - ↓: chịu đi chậm / dừng → an toàn hơn nhưng dễ đứng yên rồi bị abort (`Failed to make progress`).
+- `oscillation_scale` — phạt đổi chiều quay (trái ↔ phải) ngay sau một lần đổi chiều.
+  - ↑: ít lắc trái-phải, nhưng có thể khóa chiều quay sai lâu hơn.
+  - ↓ (0 = tắt): phản ứng linh hoạt hơn nhưng dễ lắc trước vật cản đối xứng.
+
 **Chống dao động:** reset sau `oscillation_reset_dist` 0.05 m, `oscillation_reset_angle` 0.2 rad, hoặc
 `oscillation_reset_time` 2.0 s.
+- Sau một lần đổi chiều quay, phạt đổi chiều tiếp được giữ tới khi robot đi > dist **hoặc** quay > angle **hoặc** hết time.
+- ↑ các ngưỡng: khóa chiều quay lâu hơn → ít lắc, nhưng chậm sửa nếu đã chọn sai bên để né.
+- ↓ các ngưỡng: phạt hết sớm → gần như tắt chống dao động.
 
 **An toàn dữ liệu:**
 
@@ -405,7 +502,24 @@ Chi phí theo khoảng cách `d` tới tường (`252 · exp(−3.0 · (d − 0.
 | `collision_check` | `auto` | Footprint tròn → chỉ xét ô tâm |
 | `unknown_is_obstacle` | `true` | Không có tác dụng (local costmap không theo dõi unknown) |
 
+Tăng / giảm thì sao (đây là tham số **an toàn**, chỉ nới khi có lý do rõ):
+- `transform_tolerance` — thời gian chờ TF mới nhất trong một chu kỳ.
+  - ↑: chịu được TF đến trễ, nhưng một chu kỳ có thể bị kéo dài (chu kỳ 0.1 s ở 10 Hz).
+  - ↓: chu kỳ đúng hạn hơn, nhưng hay báo lỗi TF khi máy bận.
+- `max_tf_age` — TF `map → odom` (AMCL) cũ hơn mức này → từ chối.
+  - ↑: chịu được AMCL / LiDAR gián đoạn ngắn (AMCL gửi lại TF theo mỗi scan), nhưng dùng vị trí cũ lâu hơn.
+  - ↓: dễ dừng oan khi AMCL bị chậm một nhịp.
+- `max_pose_age` — TF `odom → base_footprint` (EKF 30 Hz) cũ hơn → từ chối.
+  - ↑: chịu EKF giật, nhưng điều khiển theo vị trí cũ. ↓: dừng ngay khi EKF chậm.
+- `odom_timeout` — không có `/odometry/filtered` lâu hơn → dừng.
+  - ↑: ít dừng oan, nhưng nếu odom chết robot chạy "mù" lâu hơn. ↓: dừng nhanh, có thể dừng oan khi tải cao.
+- `collision_check` — `auto` (tròn → `center`), `center` (chỉ ô tâm, nhanh; đúng khi inflation đã ≥ bán kính), `footprint` (xét cả viền; cần cho footprint đa giác, chậm hơn).
+- `unknown_is_obstacle` — `true` = ô chưa biết là vật cản. Chỉ có tác dụng nếu bật `track_unknown_space` cho local costmap; khi đó `false` sẽ cho đi vào vùng chưa thấy (nguy hiểm, nhất là phía sau).
+
 **Debug:** `publish_trajectories: true`, `trajectory_marker_stride: 4`, `debug_publish_rate: 5.0` Hz.
+- `publish_trajectories` `false` → không vẽ quỹ đạo ứng viên trong RViz (bớt tải).
+- `trajectory_marker_stride` ↑ → vẽ thưa hơn (1/4 ứng viên), nhẹ RViz; ↓ (1) → vẽ hết, dễ xem nhưng nặng.
+- `debug_publish_rate` ↑ → `/CustomDWB/state` và marker cập nhật dày hơn (tốn CPU/băng thông); 0 → tắt (vẫn publish `/local_plan`). Không ảnh hưởng điều khiển.
 
 Cả 45 tham số được kiểm tra khi configure và khi `ros2 param set`:
 - phải hữu hạn và nằm trong miền giá trị;

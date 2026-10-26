@@ -15,7 +15,7 @@ class Controller
 {
 public:
   explicit Controller(
-    const std::string & port = "/dev/ttyUSB2",
+    const std::string & port = "/dev/ttyUSB1",
     int baudrate = 115200,
     int slave_id = 1);
 
