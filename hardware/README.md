@@ -121,7 +121,7 @@ Thông số chính:
 
 > ⚠️ Sau khi cắm lại ESP32, có lúc nó **không gửi dòng `IMU,…` nào** (robot 2026-10-20, 13:48 → ~14:16) mà không có
 > lỗi nào trong log. Khi đó yaw của EKF đứng yên. Kiểm tra `ros2 topic hz /imu_odom` (≈ 50 Hz); nếu 0 thì nhấn RESET
-> ESP32 hoặc cắm lại, rồi xem dữ liệu thô (`stage1_odom/README.md` mục 8).
+> ESP32 hoặc cắm lại, rồi xem dữ liệu thô (`stage1_odom/README.md` mục 9).
 
 ---
 

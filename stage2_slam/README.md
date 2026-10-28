@@ -329,7 +329,70 @@ yên khi robot quay) → consistency tụt 0.07 → `LOST` là đúng. Cần ch�
 
 ---
 
-## 8. Kiểm tra nhanh (chỉ đọc, khi launch đang chạy)
+## 8. Thời gian truyền và phản hồi
+
+Nhịp lấy từ code và cấu hình. Thời gian xử lý là **ước lượng**, **chưa đo trên robot** (trừ CSM, đo từ log).
+Phần odometry (`odom → base_footprint`) xem `stage1_odom/README.md` mục 7.
+
+**LiDAR (vật thật → `/scan_filtered`)**, tối đa:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| LiDAR quét 1 vòng (10 Hz) | 100 ms |
+| Driver chờ đủ vòng rồi phát | ≤ ~100 ms sau stamp |
+| Serial (460800 baud) + `angle_compensate` | vài ms |
+| `scan_rotate` + `laser_filters` | ≤ 2 ms |
+| **Có `/scan_filtered`** | **≤ ~0.1 s sau stamp** |
+
+- Stamp = lúc driver bắt đầu chờ vòng quét (`start_scan_time` trong `sllidar_node`). `scan_rotate` và
+  `laser_filters` giữ nguyên stamp.
+- Một vòng trải dài 100 ms, nên tia cũ nhất có thể đã ~0.2 s khi tới node phía sau.
+
+**AMCL (`/scan_filtered` → TF `map → odom`)**:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| Chờ TF `odom → base_footprint` tại stamp scan (EKF 30 Hz) | ≤ ~33 ms |
+| Cập nhật bộ lọc hạt (500–2000 hạt) | vài ms (chưa đo) |
+| Chỉ cập nhật khi đã đi 0.05 m / quay 0.05 rad | ở 0.3 m/s: ~0.17 s (≈ mỗi 2 scan) |
+
+- Khi không cập nhật, AMCL vẫn **phát lại TF cũ** mỗi scan (10 Hz), nên TF không bị "già".
+- TF `map → odom` đóng dấu = stamp scan + `transform_tolerance` 1.0 s (vào tương lai) → node khác luôn tra được.
+- `/amcl_pose` chỉ phát khi bộ lọc cập nhật. **Robot đứng yên → không có `/amcl_pose` mới.**
+
+**slam_toolbox (chế độ vẽ bản đồ)**:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| Xử lý scan khi đi 0.2 m / quay 0.2 rad | ở 0.3 m/s: ~0.7 s |
+| Phát TF `map → odom` (`transform_publish_period`) | 50 Hz |
+| Cập nhật `/map` (`map_update_interval`) | 1 s |
+
+**CSM (click 2D Pose Estimate → `/initialpose`)**, đo từ log `~/.ros/log` (162 lần, có thể gồm cả chạy offline):
+
+| Kết quả | Thời gian |
+|---|---|
+| `ACCEPTED` / `AMBIGUOUS` (106 lần) | trung vị 0.66 s, tối đa 1.95 s |
+| Lỗi (56 lần) | trung vị 0.57 s, tối đa ~5.1 s (`timeout` 5 s) |
+
+- Gồm chờ 3 scan (~0.3 s) + tìm kiếm (`time_budget` 3 s mỗi scan).
+
+**Monitor (`/localization/status`, 2 Hz)**:
+
+| Sự kiện | Thời gian tới khi trạng thái đổi |
+|---|---|
+| Chu kỳ đánh giá | ≤ 0.5 s |
+| Sau `/initialpose` (`initializing_grace`) | giữ `INITIALIZING` 3 s |
+| Mất scan / TF / odom | WARN sau 0.5 / 0.5 / 0.3 s, LOST sau 2 / 2 / 1 s (+ ≤ 0.5 s) |
+| Consistency < 0.30 (`consistency_lost_count` 5) | LOST sau ≥ 2.5 s |
+| Nhảy pose (`jump_hold`) | giữ WARN 5 s |
+
+- Tuổi scan tính từ stamp, nên lúc bình thường đã ~0.1 s (xem bảng LiDAR).
+- Phản ứng của stage 3 với trạng thái này (grace 2 s, hủy): `stage3_navigation/README.md` mục 11.
+
+---
+
+## 9. Kiểm tra nhanh (chỉ đọc, khi launch đang chạy)
 
 ```bash
 ros2 topic hz /scan_filtered                          # ≈ 10 Hz
@@ -342,7 +405,7 @@ Trong RViz:
 - Điểm `/scan_filtered` phải nằm trùng tường của `/map`.
 - `/particle_cloud` có thể không hiện do khác QoS (lỗi đã biết, chưa sửa).
 
-## 9. Lưu ý / giới hạn
+## 10. Lưu ý / giới hạn
 
 - Vị trí LiDAR trên robot lấy từ CAD, chưa hiệu chuẩn.
 - Robot không thấy phía sau (nửa sau bị lọc).

@@ -205,6 +205,39 @@ Kiểu `std_msgs/Float64MultiArray`, gồm 4 số:
 - `stage1_odom/zlac8015d_odom` đọc topic này để tính `/wheel_odom`.
 - Dữ liệu không hợp lệ (NaN) thì bỏ, cảnh báo `Invalid motor feedback`.
 
+### Thời gian truyền và phản hồi
+
+Nhịp lấy từ code. Thời gian Modbus là **ước lượng** (115200 baud, bộ chuyển USB FTDI có latency timer ~16 ms mặc
+định), **chưa đo trên robot**.
+
+**Chiều lệnh (PS4 → motor)**, tối đa:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| `joy_node` → `/joy` (20 Hz khi giữ nút) | ≤ 50 ms |
+| `joy_teleop` + `twist_mux` (chuyển tiếp ngay) | ≤ 2 ms |
+| Chờ node đọc phản hồi xong (1 luồng) | ≤ 32 ms |
+| Ghi `setRpm` qua Modbus | ≤ 16 ms |
+| **Lệnh tới driver** | **≤ ~100 ms** |
+| Driver tăng tốc (`accel_time_ms`) | ≤ 500 ms |
+
+**Chiều phản hồi (motor → `/wheel_feedback`)**, tối đa:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| Chờ chu kỳ đọc kế tiếp (20 Hz) | ≤ 50 ms |
+| 2 lần đọc Modbus (RPM + encoder) | ≤ 32 ms |
+| **Phản hồi về** | **≤ ~82 ms** |
+
+**Tổng tối đa** (gạt cần → thấy tốc độ mới trên `/wheel_feedback`):
+- Không tính ramp: 100 + 82 ≈ **0.18 s**.
+- Tính ramp driver 500 ms: 100 + 500 + 82 ≈ **0.7 s**. Ramp là phần trễ lớn nhất.
+- Khi Modbus lỗi: mỗi lần đọc thử lại tối đa 5 lần × timeout 20 ms → thêm tới ~100 ms mỗi lần đọc.
+- Số đo duy nhất (bag `~/rot_debug`, 2026-10-14, accel 200 ms): `/cmd_vel_out` → `/odometry/filtered` ≈ 0.2 s
+  (gồm cả bộ lọc odom của `stage1`). Với 500 ms hiện tại có thể chậm hơn.
+- Đo lại (kê bánh, E-stop): `ros2 bag record -o ~/teleop_lag /cmd_vel_out /wheel_feedback`, so thời điểm lệnh đổi
+  với thời điểm RPM đổi.
+
 ### Khi tắt node
 
 Destructor đặt RPM = 0 rồi `disableMotor`. Nếu tắt kiểu đột ngột (rút nguồn máy tính, `kill -9`), bước này không

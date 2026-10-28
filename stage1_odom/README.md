@@ -245,7 +245,64 @@ Khác với `ekf.launch.py`:
 
 ---
 
-## 7. Kiểm tra nhanh (chỉ đọc, khi launch đang chạy)
+## 7. Thời gian truyền và phản hồi
+
+Nhịp lấy từ code. Thời gian serial/Modbus là **ước lượng**, **chưa đo trên robot**. Phần lệnh → motor (PS4,
+`twist_mux`, ramp driver) xem `stage0_ps4_control/README.md` mục 5.
+
+**Bánh xe (tốc độ bánh đổi → `/wheel_odom`)**, tối đa:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| Chờ chu kỳ đọc của stage0 (20 Hz) | ≤ 50 ms |
+| 2 lần đọc Modbus (RPM + encoder) | ≤ 32 ms |
+| DDS → `zlac8015d_odom`, tính toán | ≤ 2 ms |
+| **Có mẫu mới trên `/wheel_odom`** | **≤ ~84 ms** |
+| Bộ lọc vận tốc (α 0.2, 20 Hz), tính từ lúc nhận mẫu | 63 % sau ~0.22 s, 90 % sau ~0.5 s |
+
+- Bộ lọc chỉ làm chậm **vận tốc** (`vx`). Vị trí từ encoder không bị lọc, nhưng EKF không dùng vị trí này mà tích
+  phân `vx`, nên x, y của EKF cũng chậm theo bộ lọc.
+- Stamp = giờ máy tính lúc `zlac8015d_odom` nhận (`now()`), muộn hơn lúc đọc RPM thật khoảng ≤ 34 ms.
+
+**IMU (robot quay → `/imu_odom`)**, tối đa:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| BNO055 tính hướng (NDOF, 100 Hz) | ≤ 10 ms |
+| Chờ ESP32 gửi mẫu kế tiếp (≈ 50 Hz) | ≤ 20 ms |
+| Truyền 1 dòng (~100 ký tự, 115200 baud) | ~9 ms |
+| USB CP2102 + timer đọc 5 ms | ≤ ~6 ms |
+| **Có mẫu mới trên `/imu_odom`** | **≤ ~45 ms** |
+
+- Yaw không qua bộ lọc nào trong `imu_odom`.
+- Stamp = giờ máy tính lúc nhận dòng, không dùng `millis` của ESP32 → muộn hơn lúc đo thật khoảng 20–45 ms.
+- Firmware đang nạp trên ESP32 không có trong repo (mục 9), nên nhịp 50 Hz và độ dài dòng là theo bag
+  `~/rot_debug`, không theo code.
+
+**EKF (`/wheel_odom`, `/imu_odom` → `/odometry/filtered` + TF)**:
+
+| Giai đoạn | Thời gian |
+|---|---|
+| Chờ chu kỳ EKF kế tiếp (30 Hz) | ≤ 33 ms |
+| Tính toán + phát | ≤ 1 ms |
+
+**Tổng tối đa** (chuyển động thật → thấy trên `/odometry/filtered`):
+- Hướng (yaw): 45 + 33 ≈ **~80 ms**.
+- Vận tốc tiến: mẫu đầu tiên 84 + 33 ≈ **~0.12 s** (chỉ đường truyền). Cộng thêm bộ lọc ở bảng bánh xe:
+  đạt 63 % giá trị thật sau 0.12 + 0.22 ≈ **~0.34 s**, 90 % sau 0.12 + 0.5 ≈ **~0.6 s**.
+  (Bộ lọc: sau n mẫu đạt 1 − 0.8ⁿ; 63 % ≈ 4.5 mẫu, 90 % ≈ 10 mẫu, mỗi mẫu 50 ms.)
+- Tính từ lệnh `/cmd_vel_out`: cộng thêm phần stage0 (lệnh tới driver ≤ ~100 ms + ramp driver 500 ms).
+- `sensor_timeout` 0.2 s lớn hơn khoảng cách giữa 2 mẫu (50 ms bánh, 20 ms IMU), nên EKF không báo mất dữ liệu khi
+  chạy bình thường.
+- Số đo duy nhất (bag `~/rot_debug`, 2026-10-14, accel 200 ms): `/cmd_vel_out` → `/odometry/filtered` ≈ 0.2 s.
+  CustomDWB dùng giá trị này (`control_latency` 0.2 s).
+- Đo lại phần stage1 (chỉ đọc, khi launch đang chạy): `ros2 topic delay /odometry/filtered` (giờ hiện tại − stamp;
+  không tính phần trước khi gắn stamp). Đo đầy đủ (kê bánh, E-stop): `ros2 bag record -o ~/odom_lag /cmd_vel_out
+  /wheel_feedback /wheel_odom /imu_odom /odometry/filtered`, so thời điểm lệnh đổi với lúc từng topic đổi.
+
+---
+
+## 8. Kiểm tra nhanh (chỉ đọc, khi launch đang chạy)
 
 ```bash
 ros2 topic hz /wheel_odom              # ≈ 20 Hz (khi stage0 chạy)
@@ -258,7 +315,7 @@ Thử bằng tay:
 - Đẩy robot tiến 1 m: `x` của `/odometry/filtered` tăng khoảng 1.0.
 - Xoay robot ngược chiều kim đồng hồ (nhìn từ trên): yaw tăng.
 
-## 8. Lưu ý / giới hạn
+## 9. Lưu ý / giới hạn
 
 - Bán kính bánh 0.0535 m và track 0.34 m là giá trị danh nghĩa theo CAD, **chưa hiệu chuẩn** bằng phép đo quãng đường
   và quay tại chỗ.
