@@ -120,13 +120,13 @@ def launch_setup(context):
     init_pose = arg('init_pose').strip().lower()
     send_init = localization and init_pose in ('true', '1', 'yes')
 
-    common = ['gui', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms']
+    common = ['gui', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'camera']
     s1_args = {k: arg(k) for k in common}
     s1_args.update({
         'x': str(spawn[0]), 'y': str(spawn[1]), 'yaw': str(spawn[2]),
         'world': world,
         'rviz': 'false',  # RViz mở ở dưới (cần remap /initialpose khi csm)
-        'bridge_config': os.path.join(pkg, 'config', 's2_slam', 'bridge_s2.yaml'),
+        'bridge_config': arg('bridge_config') or os.path.join(pkg, 'config', 's2_slam', 'bridge_s2.yaml'),
     })
     # GroupAction(scoped): ở Humble launch_arguments của include rò ra scope ngoài (vd. rviz:=false)
     s1 = GroupAction(scoped=True, actions=[IncludeLaunchDescription(
@@ -277,5 +277,8 @@ def generate_launch_description():
         DeclareLaunchArgument('joy', default_value='true'),
         DeclareLaunchArgument('accel_time_ms', default_value='500'),
         DeclareLaunchArgument('decel_time_ms', default_value='500'),
+        DeclareLaunchArgument('camera', default_value='false', description='true: depth camera D435 (S3)'),
+        DeclareLaunchArgument('bridge_config', default_value='',
+                              description='ros_gz_bridge config; rỗng = config/s2_slam/bridge_s2.yaml (S3 truyền file riêng)'),
         OpaqueFunction(function=launch_setup),
     ])

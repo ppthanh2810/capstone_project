@@ -35,6 +35,7 @@ def generate_launch_description():
             'follow': LaunchConfiguration('follow'),
             'rviz_config': LaunchConfiguration('rviz_config'),
             'bridge_config': LaunchConfiguration('bridge_config'),
+            'camera': LaunchConfiguration('camera'),
             'included': 'true',
         }.items(),
     )
@@ -93,6 +94,7 @@ def generate_launch_description():
                               description='true: joy_node + joy_teleop (PS4 thật); false: không tay cầm'),
         DeclareLaunchArgument('accel_time_ms', default_value='500'),
         DeclareLaunchArgument('decel_time_ms', default_value='500'),
+        DeclareLaunchArgument('camera', default_value='false', description='true: depth camera D435 (S3)'),
         sim_world,
         zlac_sim,
         joy_node,

@@ -25,7 +25,7 @@ def generate_launch_description():
     sim_time = {'use_sim_time': True}
 
     common_args = ['gui', 'world', 'x', 'y', 'yaw', 'rviz', 'follow', 'joy',
-                   'accel_time_ms', 'decel_time_ms', 'rviz_config', 'bridge_config']
+                   'accel_time_ms', 'decel_time_ms', 'rviz_config', 'bridge_config', 'camera']
     s0 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg, 'launch', 's0_control.launch.py')),
         launch_arguments={k: LaunchConfiguration(k) for k in common_args}.items(),
@@ -69,6 +69,7 @@ def generate_launch_description():
         DeclareLaunchArgument('decel_time_ms', default_value='500'),
         DeclareLaunchArgument('bridge_config',
                               default_value=os.path.join(pkg, 'config', 's1_odom', 'bridge_s1.yaml')),
+        DeclareLaunchArgument('camera', default_value='false', description='true: depth camera D435 (S3)'),
         s0,
         imu_sim_odom,
         wheel_odom,

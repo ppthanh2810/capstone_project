@@ -41,9 +41,14 @@ install(TARGETS zlac_driver_model
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-install(TARGETS zlac_sim imu_sim_odom lidar_sim_adapter DESTINATION lib/${PROJECT_NAME})
+# S3: depth_camera Gazebo -> /camera/camera/depth/color/points (camera_depth_optical_frame)
+add_executable(cloud_sim_adapter src/s3_navigation/cloud_sim_adapter_node.cpp)
+ament_target_dependencies(cloud_sim_adapter rclcpp sensor_msgs)
+target_compile_features(cloud_sim_adapter PUBLIC cxx_std_17)
 
-install(PROGRAMS test/s0_check.py test/s1_check.py test/s2_check.py scripts/map_to_world.py
+install(TARGETS zlac_sim imu_sim_odom lidar_sim_adapter cloud_sim_adapter DESTINATION lib/${PROJECT_NAME})
+
+install(PROGRAMS test/s0_check.py test/s1_check.py test/s2_check.py test/s3_check.py scripts/map_to_world.py
   scripts/fetch_aws_warehouse.sh scripts/aws_warehouse_to_world.py scripts/route_drive.py
   scripts/save_pose.py scripts/initial_pose.py
   DESTINATION lib/${PROJECT_NAME})

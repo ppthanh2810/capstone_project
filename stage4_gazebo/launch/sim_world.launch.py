@@ -63,7 +63,8 @@ def generate_launch_description():
     bridge_config = LaunchConfiguration('bridge_config')
 
     robot_description = ParameterValue(
-        Command(['xacro ', os.path.join(pkg, 'urdf', 'robot_sim.urdf.xacro')]),
+        Command(['xacro ', os.path.join(pkg, 'urdf', 'robot_sim.urdf.xacro'),
+                 ' camera:=', LaunchConfiguration('camera')]),
         value_type=str)
 
     # Server và GUI là 2 tiến trình riêng, gọi thẳng `ign gazebo` (không qua gz_sim.launch.py: bản đó
@@ -155,6 +156,8 @@ def generate_launch_description():
         DeclareLaunchArgument('bridge_config',
                               default_value=PathJoinSubstitution([pkg, 'config', 's0_control', 'bridge_s0.yaml']),
                               description='File cấu hình ros_gz_bridge (mỗi giai đoạn dùng file riêng)'),
+        DeclareLaunchArgument('camera', default_value='false',
+                              description='true: thêm depth camera D435 vào robot (S3, tốn GPU)'),
         DeclareLaunchArgument('included', default_value='false',
                               description='true khi được launch giai đoạn include (ẩn lời nhắc)'),
         # Gazebo tìm mesh package://robot_description/meshes/... trong các thư mục share này
