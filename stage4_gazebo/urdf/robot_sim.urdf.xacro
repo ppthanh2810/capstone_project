@@ -1,0 +1,283 @@
+<?xml version="1.0"?>
+<!-- Mô hình sim của AMR. Mọi frame và pose cố định GIỐNG HỆT hardware/robot_description/urdf/robot.urdf
+     (không sửa file đó). Hình dáng (visual) chép từ robot.urdf, dùng chung mesh STL của robot_description.
+     Khác robot.urdf:
+       - 2 bánh chủ động là link riêng với joint continuous (left_wheel_joint / right_wheel_joint),
+         mesh bánh nằm trong link bánh nên quay theo;
+       - có <inertial>; collision caster là cầu ma sát ~0 (bánh caster vẽ như thật nhưng không xoay);
+       - không có laptop (theo yêu cầu người dùng 2026-11-02).
+     Quy ước REP-103, đơn vị m / rad. Giá trị khối lượng / quán tính / ma sát: TBD – cần đo (docs/PROGRESS.md). -->
+<robot name="ace492" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ===== Hình học (từ robot.urdf) ===== -->
+  <xacro:property name="base_height" value="0.1135"/>    <!-- base_footprint -> base_link -->
+  <xacro:property name="wheel_radius" value="0.0535"/>
+  <xacro:property name="wheel_width" value="0.0415"/>
+  <xacro:property name="wheel_y" value="0.17"/>           <!-- track 0.34 -->
+  <xacro:property name="wheel_z" value="-0.06"/>
+  <xacro:property name="caster_x" value="0.068"/>
+  <xacro:property name="caster_z" value="-0.076"/>
+  <xacro:property name="caster_radius" value="0.0375"/>
+  <xacro:property name="mesh" value="package://robot_description/meshes"/>
+
+  <!-- ===== Khối lượng tạm (TBD – cần đo; xe chưa cân) ===== -->
+  <xacro:property name="base_mass" value="8.0"/>
+  <xacro:property name="wheel_mass" value="0.5"/>
+  <!-- Mô-men tối đa mỗi bánh (giới hạn lực của joint khi bám vận tốc). TBD theo datasheet motor -->
+  <xacro:property name="wheel_effort" value="20.0"/>
+
+  <!-- Màu giống robot.urdf. Ghi màu ngay trong từng visual (xacro:color): trình chuyển URDF->SDF chỉ giữ
+       màu tham chiếu theo tên cho visual ĐẦU TIÊN của mỗi link, các visual sau thành đen trong Gazebo. -->
+  <xacro:property name="colors" value="${dict(
+      chassis_gray='0.44 0.46 0.49 1', silver='0.76 0.79 0.82 1', gold='0.80 0.65 0.20 1',
+      white='0.94 0.94 0.94 1', steel_blue='0.28 0.49 0.75 1', dark_black='0.13 0.14 0.16 1',
+      rubber='0.20 0.20 0.22 1', imu_blue='0.10 0.16 0.46 1')}"/>
+  <xacro:macro name="color" params="name">
+    <material name="${name}"><color rgba="${colors[name]}"/></material>
+  </xacro:macro>
+
+  <!-- Trụ Ø12 (trụ nối 2 tầng, trụ đỡ tấm LiDAR) -->
+  <xacro:macro name="standoff" params="x y z material">
+    <visual>
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.006" length="0.1"/></geometry>
+      <xacro:color name="${material}"/>
+    </visual>
+  </xacro:macro>
+
+  <!-- Motor + tấm gá một bên (s = +1 trái, -1 phải) -->
+  <xacro:macro name="motor_side" params="s">
+    <visual>
+      <origin xyz="0 ${s * 0.1} -0.02" rpy="0 0 0"/>
+      <geometry><box size="0.11 0.025 0.04"/></geometry>
+      <xacro:color name="white"/>
+    </visual>
+    <visual>
+      <origin xyz="0 ${s * 0.1175} -0.04" rpy="0 0 0"/>
+      <geometry><mesh filename="${mesh}/motor_plate.stl" scale="0.001 0.001 0.001"/></geometry>
+      <xacro:color name="silver"/>
+    </visual>
+  </xacro:macro>
+
+  <!-- Caster: tấm gá, khớp xoay, càng, bánh Ø75 (s = +1 trước, -1 sau). Collision là cầu (ma sát ~0). -->
+  <xacro:macro name="caster" params="s">
+    <visual>
+      <origin xyz="${s * 0.12} 0 -0.0015" rpy="0 0 0"/>
+      <geometry><box size="0.055 0.075 0.003"/></geometry>
+      <xacro:color name="silver"/>
+    </visual>
+    <visual>
+      <origin xyz="${s * 0.12} 0 -0.0085" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.02" length="0.007"/></geometry>
+      <xacro:color name="gold"/>
+    </visual>
+    <visual>
+      <origin xyz="${s * 0.108} 0 -0.0425" rpy="0 0 0"/>
+      <geometry><box size="0.05 0.035 0.048"/></geometry>
+      <xacro:color name="silver"/>
+    </visual>
+    <visual>
+      <origin xyz="${s * caster_x} 0 ${caster_z}" rpy="${pi / 2} 0 0"/>
+      <geometry><cylinder radius="${caster_radius}" length="0.03"/></geometry>
+      <xacro:color name="rubber"/>
+    </visual>
+    <collision>
+      <origin xyz="${s * caster_x} 0 ${caster_z}" rpy="0 0 0"/>
+      <geometry><sphere radius="${caster_radius}"/></geometry>
+    </collision>
+  </xacro:macro>
+
+  <!-- ===== base_footprint ===== -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <origin xyz="0 0 ${base_height}" rpy="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
+
+  <!-- ===== base_link: thân + motor + caster (một link, không thêm frame so với robot.urdf) ===== -->
+  <link name="base_link">
+    <inertial>
+      <!-- TBD: trọng tâm giả định ở tâm, cao 0.05 m trên base_link -->
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <mass value="${base_mass}"/>
+      <inertia ixx="0.12" ixy="0" ixz="0" iyy="0.12" iyz="0" izz="0.16"/>
+    </inertial>
+
+    <!-- [Tầng dưới] Đế tròn Ø400 dày 5 mm: z 0 → 0.005 -->
+    <visual>
+      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.2" length="0.005"/></geometry>
+      <xacro:color name="chassis_gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0025" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.2" length="0.005"/></geometry>
+    </collision>
+
+    <!-- [Trụ nối 2 tầng] 4 trụ Ø12 cao 100 mm tại (±0.12, ±0.10) -->
+    <xacro:standoff x="-0.12" y="-0.1" z="0.055" material="gold"/>
+    <xacro:standoff x="-0.12" y="0.1" z="0.055" material="gold"/>
+    <xacro:standoff x="0.12" y="-0.1" z="0.055" material="gold"/>
+    <xacro:standoff x="0.12" y="0.1" z="0.055" material="gold"/>
+    <!-- Va chạm khoang giữa 2 tầng: gộp thành trụ Ø400 (vật cản chạm mép đế trước) -->
+    <collision>
+      <origin xyz="0 0 0.055" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.2" length="0.1"/></geometry>
+    </collision>
+
+    <!-- [Tầng trên] Đế tròn Ø400 dày 5 mm: z 0.105 → 0.110 -->
+    <visual>
+      <origin xyz="0 0 0.1075" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.2" length="0.005"/></geometry>
+      <xacro:color name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.1075" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.2" length="0.005"/></geometry>
+    </collision>
+
+    <!-- [Breadboard] 170×63×10 mm, xoay 90°, tâm (0.11, 0, 0.115). IMU gắn trên mặt này -->
+    <visual>
+      <origin xyz="0.11 0 0.115" rpy="0 0 ${pi / 2}"/>
+      <geometry><box size="0.17 0.063 0.01"/></geometry>
+      <xacro:color name="white"/>
+    </visual>
+
+    <!-- [Giá camera] đáy tại mặt tầng trên (0.17, 0, 0.11), cao 40 mm -->
+    <visual>
+      <origin xyz="0.17 0 0.11" rpy="0 0 0"/>
+      <geometry><mesh filename="${mesh}/camera_mount_photo.stl" scale="0.001 0.001 0.001"/></geometry>
+      <xacro:color name="silver"/>
+    </visual>
+
+    <!-- [Tấm LiDAR] 90×170×3 mm, tâm dày z 0.2115 + 2 trụ đỡ tại (0.17, ±0.06) -->
+    <visual>
+      <origin xyz="0 0 0.2115" rpy="0 0 0"/>
+      <geometry><mesh filename="${mesh}/lidar_plate.stl" scale="0.001 0.001 0.001"/></geometry>
+      <xacro:color name="steel_blue"/>
+    </visual>
+    <xacro:standoff x="0.17" y="-0.06" z="0.16" material="steel_blue"/>
+    <xacro:standoff x="0.17" y="0.06" z="0.16" material="steel_blue"/>
+
+    <!-- Motor + tấm gá hai bên (bánh nằm ở link riêng) -->
+    <xacro:motor_side s="1"/>
+    <xacro:motor_side s="-1"/>
+
+    <!-- Caster trước / sau -->
+    <xacro:caster s="1"/>
+    <xacro:caster s="-1"/>
+  </link>
+
+  <!-- ===== Bánh chủ động =====
+       Trục joint chọn theo quy ước motor thật (lệnh raw > 0):
+         trái:  trục (0, 1,0) -> quay dương = xe tiến
+         phải:  trục (0,-1,0) -> quay dương = xe lùi (motor phải lắp ngược, zlac8015d_move đảo dấu)
+       Mesh drive_wheel.stl có gốc tại tâm trục, phần moay-ơ theo +Y: bánh trái xoay yaw π để moay-ơ hướng vào thân
+       (giống robot.urdf). -->
+  <xacro:macro name="drive_wheel" params="side y axis_y mesh_yaw">
+    <link name="${side}_wheel">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${wheel_mass}"/>
+        <!-- trụ đặc: trục Y = m r^2 / 2, X/Z = m (3 r^2 + h^2) / 12 -->
+        <inertia ixx="${wheel_mass * (3 * wheel_radius**2 + wheel_width**2) / 12}" ixy="0" ixz="0"
+                 iyy="${wheel_mass * wheel_radius**2 / 2}" iyz="0"
+                 izz="${wheel_mass * (3 * wheel_radius**2 + wheel_width**2) / 12}"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${mesh_yaw}"/>
+        <geometry><mesh filename="${mesh}/drive_wheel.stl" scale="0.001 0.001 0.001"/></geometry>
+        <xacro:color name="dark_black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      </collision>
+    </link>
+
+    <joint name="${side}_wheel_joint" type="continuous">
+      <origin xyz="0 ${y} ${wheel_z}" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="${side}_wheel"/>
+      <axis xyz="0 ${axis_y} 0"/>
+      <limit effort="${wheel_effort}" velocity="100.0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:drive_wheel side="left" y="${wheel_y}" axis_y="1" mesh_yaw="${pi}"/>
+  <xacro:drive_wheel side="right" y="${-wheel_y}" axis_y="-1" mesh_yaw="0"/>
+
+  <!-- ===== Frame cảm biến (y hệt robot.urdf; cảm biến mô phỏng thêm ở S1–S3) ===== -->
+  <link name="imu_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${pi / 2}"/>
+      <geometry><box size="0.021 0.012 0.0016"/></geometry>
+      <xacro:color name="imu_blue"/>
+    </visual>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <origin xyz="0.11 0 0.1208" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+  </joint>
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="${mesh}/camera_d435.stl" scale="0.001 0.001 0.001"/></geometry>
+      <xacro:color name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.025 0.09 0.025"/></geometry>
+    </collision>
+  </link>
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="0.17 0 0.1625" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <link name="camera_color_optical_frame"/>
+  <joint name="camera_color_optical_frame_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963"/>
+    <parent link="camera_link"/>
+    <child link="camera_color_optical_frame"/>
+  </joint>
+
+  <link name="camera_depth_optical_frame"/>
+  <joint name="camera_depth_optical_frame_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963"/>
+    <parent link="camera_link"/>
+    <child link="camera_depth_optical_frame"/>
+  </joint>
+
+  <link name="lidar_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="${mesh}/rplidar.stl" scale="0.001 0.001 0.001"/></geometry>
+      <xacro:color name="dark_black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0278" length="0.0418"/></geometry>
+    </collision>
+  </link>
+  <joint name="lidar_joint" type="fixed">
+    <origin xyz="0.15 0 0.23365" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+  </joint>
+
+  <link name="laser_frame"/>
+  <joint name="laser_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="lidar_link"/>
+    <child link="laser_frame"/>
+  </joint>
+
+  <xacro:include filename="$(find stage4_gazebo)/urdf/sim_gazebo.xacro"/>
+
+</robot>

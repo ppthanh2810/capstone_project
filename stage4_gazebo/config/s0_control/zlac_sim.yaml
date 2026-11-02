@@ -1,0 +1,29 @@
+zlac_sim:
+  ros__parameters:
+    # ---- giống zlac8015d_move ----
+    wheel_radius: 0.0535
+    wheel_distance: 0.34
+    accel_time_ms: 500          # mặc định code driver thật (thanh ghi 0x2080/0x2081)
+    decel_time_ms: 500          # 0x2082/0x2083
+    command_timeout: 0.5        # watchdog (hằng số trong driver thật)
+
+    # ---- mô hình firmware (TBD – cần đo, xem docs/PROGRESS.md) ----
+    # time_to_target: mỗi lần đổi lệnh tới đích trong đúng accel/decel time (khớp nhận xét log robot)
+    # rate: độ dốc ramp_reference_rpm / accel_time
+    ramp_mode: time_to_target
+    ramp_reference_rpm: 3000.0
+    # Trễ lệnh -> firmware. Bag ~/rot_debug (2026-10-14, accel 200 ms): RPM bắt đầu đổi 0.11–0.16 s
+    # sau /cmd_vel_out, nhưng con số đó gồm cả thời gian đọc feedback qua Modbus. Cấu hình lý tưởng = 0.
+    command_delay: 0.0
+    speed_loop_tau: 0.0
+
+    # ---- giao tiếp Gazebo ----
+    control_rate: 200.0         # Hz, cập nhật ramp + lệnh joint
+    feedback_rate: 20.0         # Hz, /wheel_feedback (driver thật: timer 50 ms)
+    left_joint: left_wheel_joint
+    right_joint: right_wheel_joint
+    left_cmd_topic: /sim/left_wheel/cmd_vel
+    right_cmd_topic: /sim/right_wheel/cmd_vel
+    joint_state_topic: /sim/wheel_joint_states
+    publish_joint_states: true  # /joint_states 20 Hz cho robot_state_publisher (bánh quay trong RViz)
+    publish_debug: true         # /sim/zlac/debug

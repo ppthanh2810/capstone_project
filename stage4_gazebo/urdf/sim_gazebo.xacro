@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!-- Plugin Gazebo Fortress + ma sát cho robot_sim.urdf.xacro.
+     Nguyên tắc: Gazebo KHÔNG phát TF/odom cho ROS. Bánh được điều khiển vận tốc từng joint
+     (JointController), ramp/watchdog nằm ở zlac_sim; encoder đọc từ chuyển động thật của joint. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Ma sát (TBD – cần đo). Bánh cao su trên sàn: mu 1.0. base_link gồm cả 2 cầu caster: mu ~0
+       (thay cho bánh caster xoay tự do; thân xe không chạm sàn). -->
+  <gazebo reference="left_wheel">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+  <gazebo reference="right_wheel">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+  <gazebo reference="base_link">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+
+  <gazebo>
+    <!-- Vận tốc joint từng bánh (rad/s, std_msgs/Float64 qua bridge) — tương ứng "motor bám tốc độ đặt" -->
+    <plugin filename="ignition-gazebo-joint-controller-system"
+            name="ignition::gazebo::systems::JointController">
+      <joint_name>left_wheel_joint</joint_name>
+      <topic>/sim/left_wheel/cmd_vel</topic>
+      <initial_velocity>0.0</initial_velocity>
+    </plugin>
+    <plugin filename="ignition-gazebo-joint-controller-system"
+            name="ignition::gazebo::systems::JointController">
+      <joint_name>right_wheel_joint</joint_name>
+      <topic>/sim/right_wheel/cmd_vel</topic>
+      <initial_velocity>0.0</initial_velocity>
+    </plugin>
+
+    <!-- Vị trí/vận tốc joint bánh -> zlac_sim (encoder). Không bridge thẳng sang /joint_states. -->
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+            name="ignition::gazebo::systems::JointStatePublisher">
+      <topic>/sim/wheel_joint_states</topic>
+      <joint_name>left_wheel_joint</joint_name>
+      <joint_name>right_wheel_joint</joint_name>
+    </plugin>
+
+    <!-- Ground truth CHỈ để đánh giá: /sim/ground_truth/odom. Không vào EKF/costmap/controller,
+         tf_topic để trong /sim/ và không bridge. -->
+    <plugin filename="ignition-gazebo-odometry-publisher-system"
+            name="ignition::gazebo::systems::OdometryPublisher">
+      <odom_frame>sim_world</odom_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+      <odom_topic>/sim/ground_truth/odom</odom_topic>
+      <tf_topic>/sim/ground_truth/tf</tf_topic>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <dimensions>3</dimensions>
+    </plugin>
+  </gazebo>
+
+</robot>
