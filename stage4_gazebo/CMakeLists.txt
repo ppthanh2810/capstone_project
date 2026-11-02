@@ -44,6 +44,8 @@ install(TARGETS zlac_driver_model
 install(TARGETS zlac_sim imu_sim_odom lidar_sim_adapter DESTINATION lib/${PROJECT_NAME})
 
 install(PROGRAMS test/s0_check.py test/s1_check.py test/s2_check.py scripts/map_to_world.py
+  scripts/fetch_aws_warehouse.sh scripts/aws_warehouse_to_world.py scripts/route_drive.py
+  scripts/save_pose.py scripts/initial_pose.py
   DESTINATION lib/${PROJECT_NAME})
 
 install(

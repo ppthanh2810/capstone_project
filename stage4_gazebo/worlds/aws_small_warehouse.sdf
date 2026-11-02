@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<!-- World kho AWS RoboMaker Small Warehouse (không mái) cho Gazebo Fortress — SINH bởi
+     stage4_gazebo/scripts/aws_warehouse_to_world.py từ worlds/no_roof_small_warehouse/no_roof_small_warehouse.world (nhánh ros2, MIT-0).
+     Model nằm ngoài repo (scripts/fetch_aws_warehouse.sh). Toạ độ giữ nguyên của AWS (kho ~14 x 21 m quanh gốc).
+     Sàn: visual GroundB + collision mặt phẳng. Không sửa tay: chạy lại script. -->
+<sdf version="1.8">
+  <world name="aws_small_warehouse">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
+    <!-- Cảm biến: IMU (S1), gpu_lidar (S2, cần render engine) -->
+    <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu"/>
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <gravity>0 0 -9.81</gravity>
+    <scene>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <grid>false</grid>
+    </scene>
+
+    <!-- Đèn trần của AWS (point, cao 9 m) + đèn hướng nhẹ không bóng để kho không tối -->
+    <light name="Warehouse_CeilingLight_003" type="point">
+      <pose>0 0 9 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>80</range>
+        <constant>0.3</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>true</cast_shadows>
+    </light>
+    <light type="directional" name="fill">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <direction>-0.3 0.2 -0.9</direction>
+    </light>
+
+    <model name="warehouse_floor">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>40 40</size></plane></geometry>
+          <surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction></surface>
+        </collision>
+        <!-- Mesh sàn GroundB: mặt trên ở z = 0.124 m (đơn vị cm trong DAE). AWS đặt z = -0.090 -> mặt sàn +3.4 cm
+             so với các model khác. Ở đây hạ visual -0.125 để mặt sàn trùng collision z = 0 (x/y/yaw giữ của AWS:
+             0.0 0.0 -0.090092 0 0 0). -->
+        <visual name="visual">
+          <pose>0.0 0.0 -0.125 0 0 0</pose>
+          <geometry><mesh><uri>model://aws_robomaker_warehouse_GroundB_01/meshes/aws_robomaker_warehouse_GroundB_01_visual.DAE</uri></mesh></geometry>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ===== Model AWS: cùng tên + pose với no_roof_small_warehouse.world ===== -->
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfF_01</uri>
+      <name>aws_robomaker_warehouse_ShelfF_01_001</name>
+      <pose>-5.795143 -0.956635 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_WallB_01</uri>
+      <name>aws_robomaker_warehouse_WallB_01_001</name>
+      <pose>0.0 0.0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>aws_robomaker_warehouse_ShelfE_01_001</name>
+      <pose>4.73156 0.57943 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>aws_robomaker_warehouse_ShelfE_01_002</name>
+      <pose>4.73156 -4.827049 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>aws_robomaker_warehouse_ShelfE_01_003</name>
+      <pose>4.73156 -8.6651 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>aws_robomaker_warehouse_ShelfD_01_001</name>
+      <pose>4.73156 -1.242668 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>aws_robomaker_warehouse_ShelfD_01_002</name>
+      <pose>4.73156 -3.038551 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>aws_robomaker_warehouse_ShelfD_01_003</name>
+      <pose>4.73156 -6.750542 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_Lamp_01</uri>
+      <name>aws_robomaker_warehouse_Lamp_01_005</name>
+      <pose>0 0 -4 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_Bucket_01</uri>
+      <name>aws_robomaker_warehouse_Bucket_01_020</name>
+      <pose>0.433449 9.631706 0 0 0 -1.563161</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_Bucket_01</uri>
+      <name>aws_robomaker_warehouse_Bucket_01_021</name>
+      <pose>-1.8321 -6.3752 0 0 0 -1.563161</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_Bucket_01</uri>
+      <name>aws_robomaker_warehouse_Bucket_01_022</name>
+      <pose>0.433449 8.59 0 0 0 -1.563161</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringA_01_016</name>
+      <pose>5.708138 8.616844 -0.017477 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringA_01_017</name>
+      <pose>3.408638 8.616844 -0.017477 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringA_01_018</name>
+      <pose>-1.491287 5.222435 -0.017477 0 0 -1.583185</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_027</name>
+      <pose>3.324959 3.822449 -0.012064 0 0 1.563871</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_028</name>
+      <pose>5.54171 3.816475 -0.015663 0 0 -1.583191</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_029</name>
+      <pose>5.384239 6.137154 0 0 0 3.150000</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_030</name>
+      <pose>3.236 6.137154 0 0 0 3.150000</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_031</name>
+      <pose>-1.573677 2.301994 -0.015663 0 0 -3.133191</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_032</name>
+      <pose>-1.2196 9.407 -0.015663 0 0 1.563871</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringD_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringD_01_005</name>
+      <pose>-1.634682 -7.811813 -0.319559 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_TrashCanC_01</uri>
+      <name>aws_robomaker_warehouse_TrashCanC_01_002</name>
+      <pose>-1.592441 7.715420 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_PalletJackB_01</uri>
+      <name>aws_robomaker_warehouse_PalletJackB_01_001</name>
+      <pose>-0.276098 -9.481944 0.023266 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

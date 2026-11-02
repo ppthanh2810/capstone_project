@@ -12,8 +12,15 @@ Không include launch stage2 (chúng mở LiDAR / motor / IMU thật).
   mapping:      /scan_filtered -> slam_toolbox -> /map + TF map->odom
   localization: map_server /map + AMCL (TF map->odom); RViz 2D Pose Estimate -> /initialpose_guess (csm:=true)
                 -> scan_match_initializer -> /initialpose; localization_monitor -> /localization/status
+Vị trí spawn: lưu vị trí hiện tại bằng `ros2 run stage4_gazebo save_pose.py --env <env>` -> lần sau mở env đó
+robot spawn tại đó (x/y/yaw truyền tay vẫn ưu tiên). Định vị vẫn bằng 2D Pose Estimate trong RViz như xe thật;
+init_pose:=true để tự gửi pose spawn thay cho thao tác đó (mặc định false).
 Lưu map (mapping): ros2 run nav2_map_server map_saver_cli -f <stage4_gazebo/maps/tên>
                    --ros-args -p use_sim_time:=true
+
+env:=warehouse: world kho AWS RoboMaker Small Warehouse (worlds/aws_small_warehouse.sdf, model ngoài repo:
+scripts/fetch_aws_warehouse.sh -> ~/capstone_ws/third_party/aws_small_warehouse, đổi bằng aws_dir:=).
+Map định vị mặc định stage4_gazebo/maps/warehouse.yaml (vẽ bằng mode:=mapping env:=warehouse rồi lưu tên đó).
 """
 
 import importlib.util
@@ -22,7 +29,8 @@ from pathlib import Path
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, LogInfo, OpaqueFunction
+from launch.actions import (DeclareLaunchArgument, ExecuteProcess, GroupAction, IncludeLaunchDescription, LogInfo,
+                            OpaqueFunction)
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -30,6 +38,20 @@ from launch_ros.actions import Node
 REPO = Path.home() / 'capstone_ws' / 'capstone_project'
 DEFAULT_MAP = REPO / 'maps' / 'map.yaml'          # giống default của stage2 localization.launch.py
 SIM_MAPS_DIR = REPO / 'stage4_gazebo' / 'maps'    # map vẽ trong sim lưu ở đây (không ghi đè maps/map.yaml)
+WAREHOUSE_MAP = SIM_MAPS_DIR / 'warehouse.yaml'    # map chính của world kho AWS
+DEFAULT_AWS_DIR = Path.home() / 'capstone_ws' / 'third_party' / 'aws_small_warehouse'
+SPAWN_STATE_DIR = Path.home() / '.ros' / 'stage4_gazebo'   # vị trí spawn đã lưu (scripts/save_pose.py)
+
+
+def load_saved_pose(env):
+    """(x, y, yaw) lưu bằng `ros2 run stage4_gazebo save_pose.py --env <env>`, hoặc None."""
+    import yaml
+    path = SPAWN_STATE_DIR / f'spawn_{env}.yaml'
+    try:
+        d = yaml.safe_load(path.read_text()) or {}
+        return float(d['x']), float(d['y']), float(d['yaw'])
+    except (OSError, KeyError, TypeError, ValueError, yaml.YAMLError):
+        return None
 
 
 def load_map_to_world():
@@ -60,15 +82,48 @@ def launch_setup(context):
     csm = localization and is_true(arg('csm'))
     monitor = localization and is_true(arg('monitor'))
 
-    world_map = os.path.expanduser(arg('world_map'))
+    env = arg('env')
     world = arg('world')
-    if not world:
-        world = load_map_to_world().generate(world_map, height=float(arg('wall_height')))
-    loc_map = os.path.expanduser(arg('map')) or world_map
+    if env == 'map':
+        world_map = os.path.expanduser(arg('world_map'))
+        if not world:
+            world = load_map_to_world().generate(world_map, height=float(arg('wall_height')))
+        loc_map = os.path.expanduser(arg('map')) or world_map
+    elif env == 'warehouse':
+        aws = os.path.expanduser(arg('aws_dir'))
+        if not os.path.isdir(os.path.join(aws, 'models')):
+            raise RuntimeError(f'Chưa có model kho AWS ở {aws}. Chạy: '
+                               f'{os.path.join(get_package_prefix("stage4_gazebo"), "lib", "stage4_gazebo")}'
+                               '/fetch_aws_warehouse.sh')
+        # Model AWS dùng URI mesh `file://models/...` -> cần cả <aws> lẫn <aws>/models. sim_world.launch.py
+        # (include bên dưới) ghép thêm giá trị đang có của biến này.
+        os.environ['IGN_GAZEBO_RESOURCE_PATH'] = os.pathsep.join(
+            [aws, os.path.join(aws, 'models'), os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')])
+        world = world or os.path.join(pkg, 'worlds', 'aws_small_warehouse.sdf')
+        loc_map = os.path.expanduser(arg('map')) or str(WAREHOUSE_MAP)
+        if localization and not os.path.isfile(loc_map):
+            raise RuntimeError(f'Chưa có map {loc_map}. Vẽ trước: ros2 launch stage4_gazebo s2_slam.launch.py '
+                               f'env:=warehouse mode:=mapping, rồi lưu bằng map_saver_cli -f {WAREHOUSE_MAP.with_suffix("")}')
+    else:
+        raise RuntimeError(f"env phải là 'map' hoặc 'warehouse' (nhận '{env}')")
 
-    common = ['gui', 'x', 'y', 'yaw', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms']
+    # Vị trí spawn: x/y/yaw truyền tay > vị trí đã lưu cho env (save_pose.py) > (0, 0, 0)
+    given = [arg(k) for k in ('x', 'y', 'yaw')]
+    saved = load_saved_pose(env)
+    if any(given):
+        spawn = tuple(float(v) if v else 0.0 for v in given)
+        spawn_src = 'x/y/yaw'
+    elif saved:
+        spawn, spawn_src = saved, f'đã lưu {SPAWN_STATE_DIR}/spawn_{env}.yaml'
+    else:
+        spawn, spawn_src = (0.0, 0.0, 0.0), 'mặc định'
+    init_pose = arg('init_pose').strip().lower()
+    send_init = localization and init_pose in ('true', '1', 'yes')
+
+    common = ['gui', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms']
     s1_args = {k: arg(k) for k in common}
     s1_args.update({
+        'x': str(spawn[0]), 'y': str(spawn[1]), 'yaw': str(spawn[2]),
         'world': world,
         'rviz': 'false',  # RViz mở ở dưới (cần remap /initialpose khi csm)
         'bridge_config': os.path.join(pkg, 'config', 's2_slam', 'bridge_s2.yaml'),
@@ -79,7 +134,10 @@ def launch_setup(context):
         launch_arguments=s1_args.items())])
 
     actions = [
-        LogInfo(msg=f'[s2_slam] mode={mode} | world={world} | ' +
+        LogInfo(msg=f'[s2_slam] spawn ({spawn[0]:+.3f}, {spawn[1]:+.3f}, {spawn[2]:+.3f} rad) từ {spawn_src}'
+                    + (' | tự gửi pose ban đầu' if send_init
+                       else (' | đặt 2D Pose Estimate trong RViz' if localization else ''))),
+        LogInfo(msg=f'[s2_slam] env={env} | mode={mode} | world={world} | ' +
                 (f'map={loc_map} | csm={csm} | monitor={monitor}' if localization else
                  f'lưu map: ros2 run nav2_map_server map_saver_cli -f {SIM_MAPS_DIR}/<tên> '
                  '--ros-args -p use_sim_time:=true')),
@@ -163,6 +221,14 @@ def launch_setup(context):
                 parameters=[os.path.join(stage2, 'config', 'localization_monitor.yaml'), sim_time],
             ))
 
+    if send_init:
+        # Thay thao tác 2D Pose Estimate: world Gazebo = frame map nên vị trí spawn chính là pose ban đầu
+        actions.append(ExecuteProcess(
+            cmd=[os.path.join(get_package_prefix('stage4_gazebo'), 'lib', 'stage4_gazebo', 'initial_pose.py'),
+                 '--x', str(spawn[0]), '--y', str(spawn[1]), '--yaw', str(spawn[2]),
+                 '--topic', '/initialpose_guess' if csm else '/initialpose'],
+            name='initial_pose', output='screen'))
+
     if is_true(arg('rviz')):
         actions.append(Node(
             package='rviz2',
@@ -180,10 +246,15 @@ def generate_launch_description():
     stage2 = get_package_share_directory('stage2_slam')
     return LaunchDescription([
         DeclareLaunchArgument('mode', default_value='localization', description='localization | mapping'),
+        DeclareLaunchArgument('env', default_value='map',
+                              description='map: world sinh từ world_map | warehouse: kho AWS Small Warehouse'),
+        DeclareLaunchArgument('aws_dir', default_value=str(DEFAULT_AWS_DIR),
+                              description='Thư mục repo AWS small warehouse (env:=warehouse)'),
         DeclareLaunchArgument('world_map', default_value=str(DEFAULT_MAP),
-                              description='Bản đồ (.yaml) dùng để SINH world Gazebo'),
+                              description='env:=map: bản đồ (.yaml) dùng để SINH world Gazebo'),
         DeclareLaunchArgument('map', default_value='',
-                              description='Bản đồ cho map_server/AMCL (mode:=localization); rỗng = world_map'),
+                              description='Bản đồ cho map_server/AMCL (mode:=localization); rỗng = world_map '
+                                          '(env:=map) hoặc stage4_gazebo/maps/warehouse.yaml (env:=warehouse)'),
         DeclareLaunchArgument('world', default_value='',
                               description='File world .sdf; rỗng = sinh từ world_map'),
         DeclareLaunchArgument('wall_height', default_value='1.0',
@@ -193,9 +264,12 @@ def generate_launch_description():
         DeclareLaunchArgument('monitor', default_value='true',
                               description='true: localization_monitor -> /localization/status'),
         DeclareLaunchArgument('gui', default_value='true'),
-        DeclareLaunchArgument('x', default_value='0.0'),
-        DeclareLaunchArgument('y', default_value='0.0'),
-        DeclareLaunchArgument('yaw', default_value='0.0'),
+        DeclareLaunchArgument('x', default_value='', description='Spawn x (m); rỗng = vị trí đã lưu hoặc 0'),
+        DeclareLaunchArgument('y', default_value='', description='Spawn y (m)'),
+        DeclareLaunchArgument('yaw', default_value='', description='Spawn yaw (rad)'),
+        DeclareLaunchArgument('init_pose', default_value='false',
+                              description='localization: false = tự đặt 2D Pose Estimate trong RViz (như xe thật); '
+                                          'true = tự gửi pose spawn thay thao tác đó'),
         DeclareLaunchArgument('rviz', default_value='true'),
         DeclareLaunchArgument('rviz_config', default_value=os.path.join(stage2, 'rviz', 'localization.rviz'),
                               description='Mặc định RViz localization của stage2 (Fixed Frame map)'),

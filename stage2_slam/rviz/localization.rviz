@@ -103,7 +103,17 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        left_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         lidar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -135,9 +145,15 @@ Visualization Manager:
           Value: true
         laser_frame:
           Value: true
+        left_wheel:
+          Value: true
         lidar_link:
           Value: true
+        map:
+          Value: true
         odom:
+          Value: true
+        right_wheel:
           Value: true
       Marker Scale: 0.5
       Name: TF
@@ -145,7 +161,24 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          odom:
+            base_footprint:
+              base_link:
+                camera_link:
+                  camera_color_optical_frame:
+                    {}
+                  camera_depth_optical_frame:
+                    {}
+                imu_link:
+                  {}
+                left_wheel:
+                  {}
+                lidar_link:
+                  laser_frame:
+                    {}
+                right_wheel:
+                  {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -299,7 +332,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 100
+      Distance: 17.86080551147461
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

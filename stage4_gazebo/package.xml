@@ -3,7 +3,7 @@
 <package format="3">
   <name>stage4_gazebo</name>
   <version>0.0.0</version>
-  <description>Mô phỏng Gazebo Fortress thay lớp phần cứng của AMR, chạy lại thuật toán stage0-3 (S0: điều khiển, S1: odometry, S2: LiDAR/SLAM/định vị)</description>
+  <description>Mô phỏng Gazebo Fortress thay lớp phần cứng của AMR, chạy lại thuật toán stage0-3 (S0: điều khiển, S1: odometry, S2: LiDAR/SLAM/định vị; world bản đồ thật + kho AWS Small Warehouse)</description>
   <maintainer email="pphuongthanh0805@gmail.com">thanhpham</maintainer>
   <license>TODO: License declaration</license>
 
@@ -34,6 +34,8 @@
   <exec_depend>slam_toolbox</exec_depend>
   <exec_depend>nav2_bringup</exec_depend>
   <exec_depend>nav2_map_server</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>lifecycle_msgs</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-yaml</exec_depend>
   <exec_depend>python3-pil</exec_depend>

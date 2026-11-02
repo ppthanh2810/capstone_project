@@ -51,6 +51,21 @@ class GridRaycaster:
         self.occ, self.res, self.ox, self.oy, _ = map_to_world.load_map(yaml_path)
         self.h, self.w = self.occ.shape
 
+    def hit_ratio(self, xs, ys, tol_cells=1):
+        """Tỷ lệ điểm (x, y) rơi vào ô occupied, cho phép lệch tol_cells ô."""
+        occ = self.occ
+        if tol_cells > 0:
+            occ = occ.copy()
+            for dy in range(-tol_cells, tol_cells + 1):
+                for dx in range(-tol_cells, tol_cells + 1):
+                    occ |= np.roll(np.roll(self.occ, dy, 0), dx, 1)
+        col = np.floor((np.asarray(xs) - self.ox) / self.res).astype(int)
+        row = self.h - 1 - np.floor((np.asarray(ys) - self.oy) / self.res).astype(int)
+        ok = (row >= 0) & (row < self.h) & (col >= 0) & (col < self.w)
+        hit = np.zeros(len(col), dtype=bool)
+        hit[ok] = occ[row[ok], col[ok]]
+        return float(hit.mean()) if len(hit) else 0.0
+
     def cast(self, x, y, angle, max_range=16.0, step=0.005):
         c, s = math.cos(angle), math.sin(angle)
         r = 0.0
@@ -79,6 +94,7 @@ class S2Check(S0Check):
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL,
                              reliability=ReliabilityPolicy.RELIABLE)
         self.loc_status = None      # (t, message, consistency)
+        self.loc_since = None       # thời điểm bắt đầu chuỗi LOCALIZED liên tục hiện tại
         self.csm_status = None
         self.amcl = None            # (t, x, y, yaw)
         self.map_msg = None
@@ -102,6 +118,10 @@ class S2Check(S0Check):
     def on_loc(self, msg):
         vals = {v.key: v.value for v in msg.values}
         self.loc_status = (self.now_s(), msg.message, vals.get('scan_consistency', 'n/a'))
+        if msg.message != 'LOCALIZED':
+            self.loc_since = None
+        elif self.loc_since is None:
+            self.loc_since = self.now_s()
 
     def on_csm(self, msg):
         self.csm_status = (self.now_s(), msg.message, {v.key: v.value for v in msg.values})
@@ -219,14 +239,19 @@ class S2Check(S0Check):
         e_mir = errors(lambda ai: yaw - ai)
         med = float(np.median(np.abs(e)))
         within = float(np.mean(np.abs(e) < 0.05))
-        # Tia lệch > 5 cm nằm ở chỗ khoảng cách nhảy (mép góc, khe chéo giữa 2 ô tường dày 1 ô, tầm xa):
-        # dưới 2 m ~97 % < 5 cm, 10–16 m ~69 % (đo 2026-11-02) -> tiêu chí theo trung vị + 85 %.
-        ok = (len(e) > 50 and med < 0.03 and within > 0.85
-              and np.median(np.abs(e_rot)) > 0.5 and np.median(np.abs(e_mir)) > 0.5)
+        # Tiêu chí chính: điểm cuối tia rơi vào ô occupied (lệch ≤ 1 ô). Sai số dọc tia chỉ để tham khảo: ở
+        # mép góc / khe chéo / chân kệ mảnh (kho AWS) lệch vài cm là tia lọt qua, chạm vật phía sau -> sai lớn.
+        fin = np.isfinite(r)
+
+        def hits(world_angle):
+            return caster.hit_ratio(lx + r[fin] * np.cos(world_angle[fin]), ly + r[fin] * np.sin(world_angle[fin]))
+
+        h, h_rot, h_mir = hits(yaw + a), hits(yaw + a + math.pi), hits(yaw - a)
+        ok = int(fin.sum()) > 50 and h >= 0.90 and h_rot < 0.6 and h_mir < 0.6
         self.check('scan_vs_map', ok,
-                   f'{len(e)} tia: |sai| trung vị {med * 1000:.1f} mm, {within * 100:.1f} % < 5 cm '
-                   f'(giả thuyết xoay 180°: {np.median(np.abs(e_rot)) * 1000:.0f} mm, '
-                   f'lật gương: {np.median(np.abs(e_mir)) * 1000:.0f} mm)')
+                   f'{int(fin.sum())} tia: {h * 100:.1f} % điểm cuối trúng ô tường (±1 ô) '
+                   f'(xoay 180°: {h_rot * 100:.0f} %, lật gương: {h_mir * 100:.0f} %); '
+                   f'sai dọc tia trung vị {med * 1000:.1f} mm, {within * 100:.1f} % < 5 cm')
 
     def world_name(self):
         # `ign service -l` có thể trả danh sách thiếu khi discovery chưa xong -> thử lại
@@ -300,9 +325,11 @@ class S2Check(S0Check):
         msg.pose.covariance[35] = 0.06853891945200942
         t_pub = self.now_s()
         (self.guess_pub if csm else self.init_pub).publish(msg)
-        ok = self.wait_until(lambda: self.loc_status is not None and self.loc_status[0] > t_pub + 1.0
-                             and self.loc_status[1] == 'LOCALIZED', timeout)
-        t_loc = self.now_s() - t_pub
+        # Monitor đổi trạng thái sau vài chu kỳ (2 Hz): bản tin LOCALIZED cũ (trước khi nhận pose mới) không tính.
+        # Đạt = chuỗi LOCALIZED bắt đầu SAU lúc gửi pose và giữ liên tục >= 2 s.
+        ok = self.wait_until(lambda: self.loc_since is not None and self.loc_since > t_pub + 0.5
+                             and self.now_s() - self.loc_since >= 2.0, timeout)
+        t_loc = (self.loc_since - t_pub) if ok else self.now_s() - t_pub
         self.spin_for(2.0)
         pos, ang = self.amcl_error()
         csm_txt = (f"CSM {self.csm_status[1]} score {self.csm_status[2].get('score', 'n/a')}"
