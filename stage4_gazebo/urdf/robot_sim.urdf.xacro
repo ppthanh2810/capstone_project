@@ -191,9 +191,12 @@
         <geometry><mesh filename="${mesh}/drive_wheel.stl" scale="0.001 0.001 0.001"/></geometry>
         <xacro:color name="dark_black"/>
       </visual>
+      <!-- Collision là CẦU bán kính bánh, không phải trụ: trụ nằm trên sàn chỉ chạm ở mép trong
+           (track hiệu dụng 0.298 m thay vì 0.34 -> wheel_odom quay thiếu 12 %, đo ở S1). Cầu chạm đúng
+           dưới tâm bánh -> track = 0.34 như động học của zlac8015d_move/odom. -->
       <collision>
-        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
-        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry><sphere radius="${wheel_radius}"/></geometry>
       </collision>
     </link>
 
@@ -209,7 +212,7 @@
   <xacro:drive_wheel side="left" y="${wheel_y}" axis_y="1" mesh_yaw="${pi}"/>
   <xacro:drive_wheel side="right" y="${-wheel_y}" axis_y="-1" mesh_yaw="0"/>
 
-  <!-- ===== Frame cảm biến (y hệt robot.urdf; cảm biến mô phỏng thêm ở S1–S3) ===== -->
+  <!-- ===== Frame cảm biến (y hệt robot.urdf; cảm biến Gazebo ở sim_sensors.xacro) ===== -->
   <link name="imu_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 ${pi / 2}"/>
@@ -279,5 +282,6 @@
   </joint>
 
   <xacro:include filename="$(find stage4_gazebo)/urdf/sim_gazebo.xacro"/>
+  <xacro:include filename="$(find stage4_gazebo)/urdf/sim_sensors.xacro"/>
 
 </robot>

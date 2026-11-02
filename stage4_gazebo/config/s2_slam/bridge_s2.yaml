@@ -1,0 +1,46 @@
+# ros_gz_bridge S2 = S1 + LiDAR. Chỉ bridge những gì cần; KHÔNG bridge TF / odom của Gazebo.
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "ignition.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# zlac_sim -> JointController (rad/s)
+- ros_topic_name: "/sim/left_wheel/cmd_vel"
+  gz_topic_name: "/sim/left_wheel/cmd_vel"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "ignition.msgs.Double"
+  direction: ROS_TO_GZ
+- ros_topic_name: "/sim/right_wheel/cmd_vel"
+  gz_topic_name: "/sim/right_wheel/cmd_vel"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "ignition.msgs.Double"
+  direction: ROS_TO_GZ
+
+# JointStatePublisher -> zlac_sim (encoder)
+- ros_topic_name: "/sim/wheel_joint_states"
+  gz_topic_name: "/sim/wheel_joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "ignition.msgs.Model"
+  direction: GZ_TO_ROS
+
+# Ground truth (chỉ đánh giá)
+- ros_topic_name: "/sim/ground_truth/odom"
+  gz_topic_name: "/sim/ground_truth/odom"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "ignition.msgs.Odometry"
+  direction: GZ_TO_ROS
+
+# IMU Gazebo -> imu_sim_odom (S1)
+- ros_topic_name: "/sim/imu"
+  gz_topic_name: "/sim/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "ignition.msgs.IMU"
+  direction: GZ_TO_ROS
+
+# gpu_lidar Gazebo -> lidar_sim_adapter -> /scan_raw (S2)
+- ros_topic_name: "/sim/scan"
+  gz_topic_name: "/sim/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "ignition.msgs.LaserScan"
+  direction: GZ_TO_ROS

@@ -10,6 +10,8 @@
     <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"/>
     <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
     <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
+    <!-- Cảm biến: IMU (S1) -->
+    <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu"/>
 
     <gravity>0 0 -9.81</gravity>
     <scene>

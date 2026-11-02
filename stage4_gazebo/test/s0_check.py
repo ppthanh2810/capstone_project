@@ -40,8 +40,8 @@ def expected_rpm(v, w):
 
 class S0Check(Node):
 
-    def __init__(self):
-        super().__init__('s0_check', parameter_overrides=[Parameter('use_sim_time', value=True)])
+    def __init__(self, name='s0_check'):
+        super().__init__(name, parameter_overrides=[Parameter('use_sim_time', value=True)])
         self.nav_pub = self.create_publisher(Twist, '/cmd_vel_nav', 10)
         self.joy_pub = self.create_publisher(Twist, '/cmd_vel_joy', 10)
         self.create_subscription(Float64MultiArray, '/wheel_feedback', self.on_feedback, 50)

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!-- Cảm biến Gazebo Fortress cho robot_sim.urdf.xacro. Topic Gazebo nằm trong /sim/, adapter ROS
+     (imu_sim_odom, ...) đưa về đúng topic / frame của robot thật.
+     World phải nạp system tương ứng (vd. ignition-gazebo-imu-system cho IMU). -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Nhiễu IMU (TBD – cần đo BNO055 trên xe). Mặc định 0 = cấu hình lý tưởng của S1. -->
+  <xacro:arg name="imu_gyro_noise" default="0.0"/>    <!-- rad/s, độ lệch chuẩn -->
+  <xacro:arg name="imu_accel_noise" default="0.0"/>   <!-- m/s², độ lệch chuẩn -->
+
+  <xacro:macro name="noise_axis" params="stddev">
+    <noise type="gaussian"><mean>0.0</mean><stddev>${stddev}</stddev></noise>
+  </xacro:macro>
+
+  <!-- ===== IMU (thay ESP32 + BNO055) — imu_link, ~50 Hz như imu_odom trên xe ===== -->
+  <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+      <always_on>true</always_on>
+      <update_rate>50</update_rate>
+      <topic>/sim/imu</topic>
+      <ignition_frame_id>imu_link</ignition_frame_id>
+      <imu>
+        <angular_velocity>
+          <x><xacro:noise_axis stddev="$(arg imu_gyro_noise)"/></x>
+          <y><xacro:noise_axis stddev="$(arg imu_gyro_noise)"/></y>
+          <z><xacro:noise_axis stddev="$(arg imu_gyro_noise)"/></z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x><xacro:noise_axis stddev="$(arg imu_accel_noise)"/></x>
+          <y><xacro:noise_axis stddev="$(arg imu_accel_noise)"/></y>
+          <z><xacro:noise_axis stddev="$(arg imu_accel_noise)"/></z>
+        </linear_acceleration>
+      </imu>
+    </sensor>
+  </gazebo>
+
+  <!-- ===== RPLIDAR C1 (S2) — gpu_lidar tại lidar_link (= laser_frame), 360°, 720 tia, 10 Hz =====
+       Số tia / tần số / tầm theo log driver trên xe (Standard, 10 Hz, 720 tia angle_compensate,
+       max_distance 16 m; range_min 0.05 hard-code trong sllidar_node). Quét 0 -> 2pi (ngược chiều kim đồng hồ
+       từ +X của lidar_link) để lidar_sim_adapter chỉ cần trừ pi vào angle_min/max (giữ nguyên thứ tự tia),
+       ra đúng quy ước /scan_raw của sllidar_ros2 (góc 0 hướng ra SAU). Cần system Sensors (ogre2) trong world.
+       Không có laptop che phía sau: nửa sau vẫn bị laser_filters bỏ như trên xe.
+       Nhiễu: TBD – cần đo C1; mặc định 0.01 m (tạm). -->
+  <xacro:arg name="lidar_noise" default="0.01"/>       <!-- m, độ lệch chuẩn -->
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <always_on>true</always_on>
+      <update_rate>10</update_rate>
+      <visualize>false</visualize>
+      <topic>/sim/scan</topic>
+      <ignition_frame_id>lidar_link</ignition_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>${2 * pi}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>0.0</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>16.0</max>
+          <resolution>0.001</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>$(arg lidar_noise)</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+</robot>
