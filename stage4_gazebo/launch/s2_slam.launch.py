@@ -21,6 +21,9 @@ Lưu map (mapping): ros2 run nav2_map_server map_saver_cli -f <stage4_gazebo/map
 env:=warehouse: world kho AWS RoboMaker Small Warehouse (worlds/aws_small_warehouse.sdf, model ngoài repo:
 scripts/fetch_aws_warehouse.sh -> ~/capstone_ws/third_party/aws_small_warehouse, đổi bằng aws_dir:=).
 Map định vị mặc định stage4_gazebo/maps/warehouse.yaml (vẽ bằng mode:=mapping env:=warehouse rồi lưu tên đó).
+env:=house: nhà AWS RoboMaker Small House (worlds/aws_small_house.sdf; scripts/fetch_aws_house.sh ->
+~/capstone_ws/third_party/aws_small_house), map mặc định stage4_gazebo/maps/house.yaml.
+aws_dir rỗng = thư mục mặc định của env.
 """
 
 import importlib.util
@@ -39,7 +42,17 @@ REPO = Path.home() / 'capstone_ws' / 'capstone_project'
 DEFAULT_MAP = REPO / 'maps' / 'map.yaml'          # giống default của stage2 localization.launch.py
 SIM_MAPS_DIR = REPO / 'stage4_gazebo' / 'maps'    # map vẽ trong sim lưu ở đây (không ghi đè maps/map.yaml)
 WAREHOUSE_MAP = SIM_MAPS_DIR / 'warehouse.yaml'    # map chính của world kho AWS
-DEFAULT_AWS_DIR = Path.home() / 'capstone_ws' / 'third_party' / 'aws_small_warehouse'
+THIRD_PARTY = Path.home() / 'capstone_ws' / 'third_party'
+# env AWS: thư mục model mặc định, script tải, world (trong share/worlds), map định vị mặc định,
+# thư mục cần thêm vào IGN_GAZEBO_RESOURCE_PATH (tương đối aws_dir)
+AWS_ENVS = {
+    'warehouse': dict(dir=THIRD_PARTY / 'aws_small_warehouse', fetch='fetch_aws_warehouse.sh',
+                      world='aws_small_warehouse.sdf', map=WAREHOUSE_MAP,
+                      resource=('', 'models')),   # mesh kho dùng file://models/...
+    'house': dict(dir=THIRD_PARTY / 'aws_small_house', fetch='fetch_aws_house.sh',
+                  world='aws_small_house.sdf', map=SIM_MAPS_DIR / 'house.yaml',
+                  resource=('models',)),
+}
 SPAWN_STATE_DIR = Path.home() / '.ros' / 'stage4_gazebo'   # vị trí spawn đã lưu (scripts/save_pose.py)
 
 
@@ -89,23 +102,25 @@ def launch_setup(context):
         if not world:
             world = load_map_to_world().generate(world_map, height=float(arg('wall_height')))
         loc_map = os.path.expanduser(arg('map')) or world_map
-    elif env == 'warehouse':
-        aws = os.path.expanduser(arg('aws_dir'))
+    elif env in AWS_ENVS:
+        cfg = AWS_ENVS[env]
+        aws = os.path.expanduser(arg('aws_dir')) or str(cfg['dir'])
         if not os.path.isdir(os.path.join(aws, 'models')):
-            raise RuntimeError(f'Chưa có model kho AWS ở {aws}. Chạy: '
+            raise RuntimeError(f'Chưa có model AWS ({env}) ở {aws}. Chạy: '
                                f'{os.path.join(get_package_prefix("stage4_gazebo"), "lib", "stage4_gazebo")}'
-                               '/fetch_aws_warehouse.sh')
-        # Model AWS dùng URI mesh `file://models/...` -> cần cả <aws> lẫn <aws>/models. sim_world.launch.py
-        # (include bên dưới) ghép thêm giá trị đang có của biến này.
+                               f'/{cfg["fetch"]}')
+        # sim_world.launch.py (include bên dưới) ghép thêm giá trị đang có của biến này.
         os.environ['IGN_GAZEBO_RESOURCE_PATH'] = os.pathsep.join(
-            [aws, os.path.join(aws, 'models'), os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')])
-        world = world or os.path.join(pkg, 'worlds', 'aws_small_warehouse.sdf')
-        loc_map = os.path.expanduser(arg('map')) or str(WAREHOUSE_MAP)
+            [os.path.join(aws, r) if r else aws for r in cfg['resource']]
+            + [os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')])
+        world = world or os.path.join(pkg, 'worlds', cfg['world'])
+        loc_map = os.path.expanduser(arg('map')) or str(cfg['map'])
         if localization and not os.path.isfile(loc_map):
             raise RuntimeError(f'Chưa có map {loc_map}. Vẽ trước: ros2 launch stage4_gazebo s2_slam.launch.py '
-                               f'env:=warehouse mode:=mapping, rồi lưu bằng map_saver_cli -f {WAREHOUSE_MAP.with_suffix("")}')
+                               f'env:={env} mode:=mapping, rồi lưu bằng map_saver_cli -f '
+                               f'{Path(cfg["map"]).with_suffix("")}')
     else:
-        raise RuntimeError(f"env phải là 'map' hoặc 'warehouse' (nhận '{env}')")
+        raise RuntimeError(f"env phải là 'map', {', '.join(repr(k) for k in AWS_ENVS)} (nhận '{env}')")
 
     # Vị trí spawn: x/y/yaw truyền tay > vị trí đã lưu cho env (save_pose.py) > (0, 0, 0)
     given = [arg(k) for k in ('x', 'y', 'yaw')]
@@ -247,14 +262,16 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('mode', default_value='localization', description='localization | mapping'),
         DeclareLaunchArgument('env', default_value='map',
-                              description='map: world sinh từ world_map | warehouse: kho AWS Small Warehouse'),
-        DeclareLaunchArgument('aws_dir', default_value=str(DEFAULT_AWS_DIR),
-                              description='Thư mục repo AWS small warehouse (env:=warehouse)'),
+                              description='map: world sinh từ world_map | warehouse: kho AWS Small Warehouse | '
+                                          'house: nhà AWS Small House'),
+        DeclareLaunchArgument('aws_dir', default_value='',
+                              description='Thư mục repo AWS (env:=warehouse|house); rỗng = '
+                                          '~/capstone_ws/third_party/aws_small_<env>'),
         DeclareLaunchArgument('world_map', default_value=str(DEFAULT_MAP),
                               description='env:=map: bản đồ (.yaml) dùng để SINH world Gazebo'),
         DeclareLaunchArgument('map', default_value='',
                               description='Bản đồ cho map_server/AMCL (mode:=localization); rỗng = world_map '
-                                          '(env:=map) hoặc stage4_gazebo/maps/warehouse.yaml (env:=warehouse)'),
+                                          '(env:=map) hoặc stage4_gazebo/maps/<env>.yaml (env:=warehouse|house)'),
         DeclareLaunchArgument('world', default_value='',
                               description='File world .sdf; rỗng = sinh từ world_map'),
         DeclareLaunchArgument('wall_height', default_value='1.0',

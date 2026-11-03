@@ -36,12 +36,21 @@ from rclpy.time import Time
 from tf2_ros import Buffer, TransformListener
 
 AWS_DIR = os.environ.get('AWS_WAREHOUSE_DIR', os.path.expanduser('~/capstone_ws/third_party/aws_small_warehouse'))
+HOUSE_DIR = os.environ.get('AWS_HOUSE_DIR', os.path.expanduser('~/capstone_ws/third_party/aws_small_house'))
 PRESETS = {
     # Kho AWS: giữa kho -> đáy -> cột trái (lên) -> góc trên trái -> giữa -> 2 lối giữa các dãy kệ -> về gốc
     'warehouse': {
         'map': os.path.join(AWS_DIR, 'maps', '005', 'map.yaml'),
         'route': [(0.0, 0.0), (0.0, -6.5), (-5.0, -8.5), (-5.0, -3.0), (-5.0, 3.0), (-5.0, 8.5),
                   (1.5, 3.0), (3.6, -1.0), (3.6, -8.5), (5.6, -8.5), (5.6, -1.0), (5.0, 1.5), (0.0, 0.0)],
+    },
+    # Nhà AWS (map AWS khớp world 99 %, không cần dời): phòng trên giữa -> trên phải -> bếp -> phòng khách dưới
+    # -> phòng trái dưới/trên -> về gốc. Waypoint = điểm có khoảng hở lớn nhất trong từng ô 2 m.
+    'house': {
+        'map': os.path.join(HOUSE_DIR, 'maps', 'turtlebot3_waffle_pi', 'map.yaml'),
+        'route': [(0.0, 0.0), (1.4, 4.3), (5.4, 2.4), (8.2, 2.1), (8.1, -0.1), (6.1, -2.4), (6.1, -4.0),
+                  (2.0, -3.9), (-1.2, -4.0), (-4.6, -3.6), (-8.1, -2.9), (-8.2, 0.1), (-7.7, 2.0), (-4.5, 2.0),
+                  (-4.0, 0.0), (0.0, 0.0)],
     },
 }
 
