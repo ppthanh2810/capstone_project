@@ -806,7 +806,7 @@ Tham số chính của `fusion_layer` (`config/camera_fusion.yaml`, đều là g
 | `lidar_association_radius` | 0.10 m |
 | `expected_update_rate` | 1.0 s |
 
-- `max_obstacle_height` 0.70 m là **ước lượng** (robot 0.37 m + laptop + 0.1 m). Cần đo chiều cao thật.
+- `max_obstacle_height` 0.70 m = chiều cao robot kể cả laptop (**đo 0.60 m**, 2026-11-03) + 0.1 m lề.
 - Không có cloud mới trong 1 s → local costmap "không current" → controller_server ngừng điều khiển → robot dừng.
   Camera chết thì robot dừng chứ không chạy mù.
 - Tham số chỉ đọc lúc khởi động (đổi → chạy lại launch).
@@ -1559,7 +1559,7 @@ ros2 bag record -o ~/obstacle_run /cmd_vel_out /cmd_vel_nav /odometry/filtered /
 - **`/local_plan` có hai publisher** (hai plugin); chỉ plugin đang chạy publish.
 - **Chưa đo trên robot:** giới hạn vận tốc/gia tốc, quãng phanh, trọng số. `control_latency` 0.2 s mới đo từ một bag.
 - **Lớp camera (M2) đã chạy trên robot nhưng chưa đánh giá** (2026-10-20, không bag): độ nghiêng camera (CAD = nằm ngang), vật cản ma từ sàn, chiều cao
-  robot kể cả laptop (`max_obstacle_height` 0.70 là ước lượng) đều chưa kiểm. Vật quá gần camera (< 0.3 m, hoặc
+  robot kể cả laptop đã đo 0.60 m (2026-11-03, `max_obstacle_height` 0.70 = 0.60 + lề 0.1) nhưng dải độ cao chưa kiểm trên robot. Vật quá gần camera (< 0.3 m, hoặc
   mặt bàn khi robot ở < ~0.8 m) không xóa được, chỉ hết hạn sau 10 s.
 - **Mất IMU không bị phát hiện:** `imu_odom`, EKF và CustomDWB đều không báo; chỉ thấy qua `ros2 topic hz /imu_odom`.
 - **Driver tăng/giảm tốc 500 ms** (mặc định lại từ 2026-10-19) khác giả định `control_latency` 0.2 s → có thể quay lố.

@@ -20,8 +20,9 @@
   <xacro:property name="caster_radius" value="0.0375"/>
   <xacro:property name="mesh" value="package://robot_description/meshes"/>
 
-  <!-- ===== Khối lượng tạm (TBD – cần đo; xe chưa cân) ===== -->
-  <xacro:property name="base_mass" value="8.0"/>
+  <!-- ===== Khối lượng: xe + laptop cân được 12 kg (người dùng, 2026-11-03) = thân 11 + 2 bánh × 0.5.
+       Chia thân/bánh và trọng tâm vẫn là giả định. ===== -->
+  <xacro:property name="base_mass" value="11.0"/>
   <xacro:property name="wheel_mass" value="0.5"/>
   <!-- Mô-men tối đa mỗi bánh (giới hạn lực của joint khi bám vận tốc). TBD theo datasheet motor -->
   <xacro:property name="wheel_effort" value="20.0"/>
@@ -99,10 +100,13 @@
   <!-- ===== base_link: thân + motor + caster (một link, không thêm frame so với robot.urdf) ===== -->
   <link name="base_link">
     <inertial>
-      <!-- TBD: trọng tâm giả định ở tâm, cao 0.05 m trên base_link -->
+      <!-- TBD: trọng tâm giả định ở tâm, cao 0.05 m trên base_link. Quán tính: trụ đặc r 0.2, cao ~0.245
+           (cùng hình dạng như bản 8 kg cũ, nhân theo khối lượng). -->
       <origin xyz="0 0 0.05" rpy="0 0 0"/>
       <mass value="${base_mass}"/>
-      <inertia ixx="0.12" ixy="0" ixz="0" iyy="0.12" iyz="0" izz="0.16"/>
+      <inertia ixx="${base_mass * (3 * 0.2**2 + 0.245**2) / 12}" ixy="0" ixz="0"
+               iyy="${base_mass * (3 * 0.2**2 + 0.245**2) / 12}" iyz="0"
+               izz="${base_mass * 0.2**2 / 2}"/>
     </inertial>
 
     <!-- [Tầng dưới] Đế tròn Ø400 dày 5 mm: z 0 → 0.005 -->

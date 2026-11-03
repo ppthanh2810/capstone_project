@@ -19,8 +19,7 @@ local_costmap:
         # (robot dừng qua timeout 0.5 s của twist_mux). 0 = tắt kiểm tra (KHÔNG khuyến nghị).
         expected_update_rate: 1.0
         max_cloud_wait: 0.5             # s chờ TF cho một cloud trước khi bỏ
-        # Dải độ cao vật cản (so với sàn). Robot (không laptop) cao ~0.37 m; max = robot + laptop + 0.1 m.
-        # NOT_VERIFIED: đo chiều cao thật kể cả laptop rồi sửa.
+        # Dải độ cao vật cản (so với sàn). max = chiều cao robot kể cả laptop (đo 0.60 m, 2026-11-03) + 0.1 m lề.
         min_obstacle_height: 0.05       # sàn bóng/nhiễu sàn; kiểm tra trên robot
         max_obstacle_height: 0.70
         min_range: 0.30                 # m ngang từ camera (D435 ~0.28 m)

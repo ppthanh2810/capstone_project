@@ -42,7 +42,7 @@ struct FusionParams
   double resolution{0.05};               // m, = local costmap
   // Dải độ cao coi là vật cản (so với sàn). Trên max: robot đi lọt dưới; dưới min: sàn / nhiễu sàn bóng.
   double min_obstacle_height{0.05};      // m
-  double max_obstacle_height{0.70};      // m, NOT_VERIFIED: chiều cao robot kể cả laptop + 0.1 m
+  double max_obstacle_height{0.70};      // m: chiều cao robot kể cả laptop (đo 0.60 m, 2026-11-03) + 0.1 m
   // Khoảng cách NGANG từ camera. D435: độ sâu tin được từ ~0.28 m.
   double min_range{0.30};                // m
   double max_range{2.5};                 // m, đánh dấu + xóa
