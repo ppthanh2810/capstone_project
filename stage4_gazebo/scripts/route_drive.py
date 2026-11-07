@@ -13,6 +13,7 @@ Kẹt (đi < 5 cm sau 6 s CỘNG DỒN đang lệnh tiến, không tính lúc qu
 --log-slam: in sai số TF map->base_footprint (SLAM/AMCL) so với ground truth tại mỗi điểm (chỉ để đánh giá).
 
   route_drive.py --preset warehouse            # tuyến vẽ map kho AWS (bản đồ tham chiếu AWS maps/005)
+  route_drive.py --preset office               # văn phòng Husarion (map tham chiếu cắt từ world)
   route_drive.py --map <yaml> --route "x,y;x,y" [--no-spin] [--speed 0.25]
 """
 
@@ -37,6 +38,8 @@ from tf2_ros import Buffer, TransformListener
 
 AWS_DIR = os.environ.get('AWS_WAREHOUSE_DIR', os.path.expanduser('~/capstone_ws/third_party/aws_small_warehouse'))
 HOUSE_DIR = os.environ.get('AWS_HOUSE_DIR', os.path.expanduser('~/capstone_ws/third_party/aws_small_house'))
+HUSARION_DIR = os.environ.get('HUSARION_WORLDS_DIR',
+                              os.path.expanduser('~/capstone_ws/third_party/husarion_gz_worlds'))
 PRESETS = {
     # Kho AWS: giữa kho -> đáy -> cột trái (lên) -> góc trên trái -> giữa -> 2 lối giữa các dãy kệ -> về gốc
     'warehouse': {
@@ -51,6 +54,16 @@ PRESETS = {
         'route': [(0.0, 0.0), (1.4, 4.3), (5.4, 2.4), (8.2, 2.1), (8.1, -0.1), (6.1, -2.4), (6.1, -4.0),
                   (2.0, -3.9), (-1.2, -4.0), (-4.6, -3.6), (-8.1, -2.9), (-8.2, 0.1), (-7.7, 2.0), (-4.5, 2.0),
                   (-4.0, 0.0), (0.0, 0.0)],
+    },
+    # Văn phòng Husarion: map tham chiếu cắt từ world (world_to_ref_map.py, fetch_husarion_office.sh sinh ra).
+    # Phòng trên trái (spawn) -> hành lang trái xuống -> khu bàn dưới -> phòng dưới phải -> phòng phải giữa
+    # -> hành lang giữa lên -> về gốc. Cửa hẹp: cần nới 0.30 m (0.40 m tách rời các phòng).
+    'office': {
+        'map': os.path.join(HUSARION_DIR, 'maps', 'office_ref.yaml'),
+        'inflate': 0.30,
+        'route': [(0.0, 0.0), (1.0, -2.2), (1.1, -3.5), (2.6, -5.4), (3.5, -7.5), (4.7, -9.6), (6.0, -11.4),
+                  (8.0, -9.5), (8.1, -6.2), (10.3, -7.5), (11.0, -5.5), (12.5, -5.5), (9.8, -5.1), (8.4, -3.1),
+                  (8.5, -1.4), (8.2, -3.2), (5.7, -3.2), (6.0, -5.5), (2.6, -5.4), (1.1, -3.5), (0.0, 0.0)],
     },
 }
 
@@ -238,7 +251,7 @@ def main():
     ap.add_argument('--preset', choices=sorted(PRESETS))
     ap.add_argument('--map', help='bản đồ tham chiếu (yaml) ở toạ độ world Gazebo')
     ap.add_argument('--route', help='"x,y;x,y;..." (m, world)')
-    ap.add_argument('--inflate', type=float, default=0.40, help='nới vật cản (m)')
+    ap.add_argument('--inflate', type=float, help='nới vật cản (m); mặc định của preset hoặc 0.40')
     ap.add_argument('--speed', type=float, default=0.25, help='tốc độ tối đa (m/s)')
     ap.add_argument('--no-spin', action='store_true', help='không quay 360° tại mỗi điểm')
     ap.add_argument('--spin-speed', type=float, default=0.4, help='tốc độ quay 360° (rad/s)')
@@ -255,7 +268,9 @@ def main():
     if not map_path:
         ap.error('cần --map')
 
-    grid = Grid(map_path, args.inflate)
+    inflate = args.inflate if args.inflate is not None else (
+        PRESETS[args.preset].get('inflate', 0.40) if args.preset else 0.40)
+    grid = Grid(map_path, inflate)
     rclpy.init()
     node = RouteDriver(args.speed, args.log_slam)
     t_wall = time.monotonic()

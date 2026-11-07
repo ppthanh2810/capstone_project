@@ -23,6 +23,8 @@ scripts/fetch_aws_warehouse.sh -> ~/capstone_ws/third_party/aws_small_warehouse,
 Map định vị mặc định stage4_gazebo/maps/warehouse.yaml (vẽ bằng mode:=mapping env:=warehouse rồi lưu tên đó).
 env:=house: nhà AWS RoboMaker Small House (worlds/aws_small_house.sdf; scripts/fetch_aws_house.sh ->
 ~/capstone_ws/third_party/aws_small_house), map mặc định stage4_gazebo/maps/house.yaml.
+env:=office: văn phòng Husarion (worlds/husarion_office.sdf; scripts/fetch_husarion_office.sh ->
+~/capstone_ws/third_party/husarion_gz_worlds + mesh Fuel trong ~/.ignition/fuel), map stage4_gazebo/maps/office.yaml.
 aws_dir rỗng = thư mục mặc định của env.
 """
 
@@ -43,8 +45,8 @@ DEFAULT_MAP = REPO / 'maps' / 'map.yaml'          # giống default của stage2
 SIM_MAPS_DIR = REPO / 'stage4_gazebo' / 'maps'    # map vẽ trong sim lưu ở đây (không ghi đè maps/map.yaml)
 WAREHOUSE_MAP = SIM_MAPS_DIR / 'warehouse.yaml'    # map chính của world kho AWS
 THIRD_PARTY = Path.home() / 'capstone_ws' / 'third_party'
-# env AWS: thư mục model mặc định, script tải, world (trong share/worlds), map định vị mặc định,
-# thư mục cần thêm vào IGN_GAZEBO_RESOURCE_PATH (tương đối aws_dir)
+# env có model ngoài repo (AWS, Husarion): thư mục model mặc định, script tải, world (trong share/worlds),
+# map định vị mặc định, thư mục cần thêm vào IGN_GAZEBO_RESOURCE_PATH (tương đối aws_dir)
 AWS_ENVS = {
     'warehouse': dict(dir=THIRD_PARTY / 'aws_small_warehouse', fetch='fetch_aws_warehouse.sh',
                       world='aws_small_warehouse.sdf', map=WAREHOUSE_MAP,
@@ -52,6 +54,10 @@ AWS_ENVS = {
     'house': dict(dir=THIRD_PARTY / 'aws_small_house', fetch='fetch_aws_house.sh',
                   world='aws_small_house.sdf', map=SIM_MAPS_DIR / 'house.yaml',
                   resource=('models',)),
+    # Văn phòng Husarion: model://<Tên> trong <dir>/models, đồ đạc OpenRobotics là URI Fuel (cache ~/.ignition/fuel)
+    'office': dict(dir=THIRD_PARTY / 'husarion_gz_worlds', fetch='fetch_husarion_office.sh',
+                   world='husarion_office.sdf', map=SIM_MAPS_DIR / 'office.yaml',
+                   resource=('models',)),
 }
 SPAWN_STATE_DIR = Path.home() / '.ros' / 'stage4_gazebo'   # vị trí spawn đã lưu (scripts/save_pose.py)
 
@@ -106,7 +112,7 @@ def launch_setup(context):
         cfg = AWS_ENVS[env]
         aws = os.path.expanduser(arg('aws_dir')) or str(cfg['dir'])
         if not os.path.isdir(os.path.join(aws, 'models')):
-            raise RuntimeError(f'Chưa có model AWS ({env}) ở {aws}. Chạy: '
+            raise RuntimeError(f'Chưa có model của env:={env} ở {aws}. Chạy: '
                                f'{os.path.join(get_package_prefix("stage4_gazebo"), "lib", "stage4_gazebo")}'
                                f'/{cfg["fetch"]}')
         # sim_world.launch.py (include bên dưới) ghép thêm giá trị đang có của biến này.
@@ -263,15 +269,16 @@ def generate_launch_description():
         DeclareLaunchArgument('mode', default_value='localization', description='localization | mapping'),
         DeclareLaunchArgument('env', default_value='map',
                               description='map: world sinh từ world_map | warehouse: kho AWS Small Warehouse | '
-                                          'house: nhà AWS Small House'),
+                                          'house: nhà AWS Small House | office: văn phòng Husarion'),
         DeclareLaunchArgument('aws_dir', default_value='',
-                              description='Thư mục repo AWS (env:=warehouse|house); rỗng = '
-                                          '~/capstone_ws/third_party/aws_small_<env>'),
+                              description='Thư mục model ngoài repo (env:=warehouse|house|office); rỗng = '
+                                          '~/capstone_ws/third_party/aws_small_<env> | husarion_gz_worlds'),
         DeclareLaunchArgument('world_map', default_value=str(DEFAULT_MAP),
                               description='env:=map: bản đồ (.yaml) dùng để SINH world Gazebo'),
         DeclareLaunchArgument('map', default_value='',
                               description='Bản đồ cho map_server/AMCL (mode:=localization); rỗng = world_map '
-                                          '(env:=map) hoặc stage4_gazebo/maps/<env>.yaml (env:=warehouse|house)'),
+                                          '(env:=map) hoặc stage4_gazebo/maps/<env>.yaml '
+                                          '(env:=warehouse|house|office)'),
         DeclareLaunchArgument('world', default_value='',
                               description='File world .sdf; rỗng = sinh từ world_map'),
         DeclareLaunchArgument('wall_height', default_value='1.0',

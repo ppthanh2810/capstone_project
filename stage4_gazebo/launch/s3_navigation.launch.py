@@ -11,6 +11,7 @@ Khác với xe thật (mặc định của sim, đổi được bằng tham số
                                -> /cmd_vel_out -> zlac_sim. false = /cmd_vel_dwb (cách ly như xe thật).
   auto_follow:=true         -> 2D Goal Pose là robot chạy luôn. false = gọi /goal_path_bridge/follow như xe thật.
   env:=warehouse            -> kho AWS + maps/warehouse.yaml (S2b). env:=house -> nhà AWS + maps/house.yaml.
+                               env:=office -> văn phòng Husarion + maps/office.yaml.
 camera:=true: depth_camera D435 trong Gazebo + cloud_sim_adapter (-> /camera/camera/depth/color/points,
 camera_depth_optical_frame) thay realsense2_camera; camera_layer:=auto -> fusion (config/camera_fusion.yaml).
 
@@ -181,9 +182,12 @@ def generate_launch_description():
         DeclareLaunchArgument('mode', default_value='localization',
                               description='localization (map_server + AMCL + CSM + monitor) | mapping (slam_toolbox)'),
         DeclareLaunchArgument('env', default_value='warehouse',
-                              description='warehouse: kho AWS + maps/warehouse.yaml | house: nhà AWS + maps/house.yaml | '
+                              description='warehouse: kho AWS + maps/warehouse.yaml | '
+                                          'house: nhà AWS + maps/house.yaml | '
+                                          'office: văn phòng Husarion + maps/office.yaml | '
                                           'map: world sinh từ world_map'),
-        DeclareLaunchArgument('aws_dir', default_value='', description='rỗng = third_party/aws_small_<env>'),
+        DeclareLaunchArgument('aws_dir', default_value='',
+                              description='rỗng = third_party/aws_small_<env> | third_party/husarion_gz_worlds'),
         DeclareLaunchArgument('world_map', default_value=os.path.join(os.path.expanduser('~'), 'capstone_ws',
                                                                       'capstone_project', 'maps', 'map.yaml')),
         DeclareLaunchArgument('map', default_value='', description='Map cho AMCL; rỗng = mặc định của env'),
