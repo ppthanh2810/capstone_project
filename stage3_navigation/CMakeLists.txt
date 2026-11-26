@@ -42,9 +42,19 @@ target_include_directories(path_blockage PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+# replan_supervisor: logic replan event-triggered của goal_path_bridge, không phụ thuộc ROS (2026-11-26) -> dùng
+# chung với Fast 2D benchmark (stage5_benchmark).
+add_library(replan_supervisor STATIC src/replan_supervisor.cpp)
+target_compile_features(replan_supervisor PUBLIC cxx_std_17)
+set_target_properties(replan_supervisor PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(replan_supervisor PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(replan_supervisor path_blockage)
+
 add_executable(goal_path_bridge src/goal_path_bridge.cpp)
 target_compile_features(goal_path_bridge PUBLIC cxx_std_17)
-target_link_libraries(goal_path_bridge path_blockage)
+target_link_libraries(goal_path_bridge replan_supervisor path_blockage)
 ament_target_dependencies(goal_path_bridge
   rclcpp rclcpp_action geometry_msgs nav_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs
   std_msgs std_srvs diagnostic_msgs)
@@ -92,7 +102,17 @@ ament_target_dependencies(fusion_layer
   tf2_geometry_msgs)
 pluginlib_export_plugin_description_file(nav2_costmap_2d fusion_layer_plugin.xml)
 
-install(TARGETS dwa_core dwb_controller camera_fusion fusion_layer
+# Thư viện ROS-free xuất cho package khác (stage5_benchmark: Fast 2D simulator dùng CHÍNH lõi DWA + replan).
+install(TARGETS dwa_core path_blockage replan_supervisor
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_dependencies(nav2_costmap_2d)
+
+install(TARGETS dwb_controller camera_fusion fusion_layer
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

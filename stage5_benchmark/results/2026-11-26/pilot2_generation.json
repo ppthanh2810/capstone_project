@@ -1,0 +1,177 @@
+{
+ "generation": {
+  "N1": {
+   "attempted": 45,
+   "accepted": 45,
+   "reasons": {
+    "L_ref": 18,
+    "start/goal": 7
+   },
+   "levels": {
+    "easy": 42,
+    "medium": 3
+   }
+  },
+  "N2": {
+   "attempted": 45,
+   "accepted": 39,
+   "reasons": {
+    "start/goal": 200,
+    "path": 62,
+    "corridor:": 3
+   },
+   "levels": {
+    "easy": 25,
+    "medium": 14
+   }
+  },
+  "N3": {
+   "attempted": 45,
+   "accepted": 32,
+   "reasons": {
+    "start/goal": 281,
+    "path": 133,
+    "L_ref": 103,
+    "corridor:": 22,
+    "ambiguous_shortcut": 4
+   },
+   "levels": {
+    "easy": 23,
+    "medium": 9
+   }
+  },
+  "B1": {
+   "attempted": 45,
+   "accepted": 35,
+   "reasons": {
+    "path": 231,
+    "new": 66,
+    "delta": 52,
+    "ambiguous": 37,
+    "L_ref": 25,
+    "unsolvable": 12,
+    "ambiguous_shortcut": 2,
+    "feasible": 1
+   },
+   "levels": {
+    "easy": 27,
+    "medium": 8
+   }
+  },
+  "B2": {
+   "attempted": 45,
+   "accepted": 44,
+   "reasons": {
+    "path": 176,
+    "new": 63,
+    "L_ref": 8,
+    "B1/B2": 6,
+    "delta": 2,
+    "ambiguous": 1
+   },
+   "levels": {
+    "easy": 38,
+    "medium": 6
+   }
+  },
+  "B3": {
+   "attempted": 45,
+   "accepted": 25,
+   "reasons": {
+    "path": 568,
+    "new": 186,
+    "detour": 56,
+    "ambiguous_shortcut": 9,
+    "B3:": 9,
+    "feasible": 2
+   },
+   "levels": {
+    "medium": 6,
+    "easy": 19
+   }
+  },
+  "C1": {
+   "attempted": 45,
+   "accepted": 32,
+   "reasons": {
+    "ambiguous": 211,
+    "path": 132,
+    "new": 60,
+    "L_ref": 39,
+    "start/goal": 2,
+    "ambiguous_shortcut": 1,
+    "known": 1
+   },
+   "levels": {
+    "easy": 21,
+    "medium": 11
+   }
+  },
+  "C2": {
+   "attempted": 45,
+   "accepted": 34,
+   "reasons": {
+    "path": 201,
+    "new": 124,
+    "ambiguous": 51,
+    "known": 38,
+    "L_ref": 25,
+    "unsolvable": 21,
+    "ambiguous_shortcut": 9
+   },
+   "levels": {
+    "easy": 30,
+    "medium": 4
+   }
+  },
+  "C3": {
+   "attempted": 45,
+   "accepted": 18,
+   "reasons": {
+    "path": 334,
+    "C3:": 263,
+    "delta": 94,
+    "new": 70,
+    "L_ref": 53,
+    "ambiguous": 25,
+    "ambiguous_shortcut": 21,
+    "known": 4
+   },
+   "levels": {
+    "easy": 17,
+    "medium": 1
+   }
+  },
+  "C4": {
+   "attempted": 45,
+   "accepted": 45,
+   "reasons": {
+    "ambiguous": 16,
+    "path": 14,
+    "C4:": 7,
+    "no": 6,
+    "new": 4,
+    "ambiguous_shortcut": 4,
+    "unsolvable": 1
+   },
+   "levels": {
+    "easy": 42,
+    "medium": 3
+   }
+  },
+  "S1": {
+   "attempted": 45,
+   "accepted": 44,
+   "reasons": {
+    "path": 130,
+    "new": 87,
+    "start/goal": 34,
+    "L_ref": 3,
+    "S1": 1
+   },
+   "levels": {
+    "unsolvable": 44
+   }
+  }
+ }
+}

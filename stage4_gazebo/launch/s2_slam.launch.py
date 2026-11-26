@@ -141,7 +141,7 @@ def launch_setup(context):
     init_pose = arg('init_pose').strip().lower()
     send_init = localization and init_pose in ('true', '1', 'yes')
 
-    common = ['gui', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'camera']
+    common = ['gui', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'command_delay', 'camera']
     s1_args = {k: arg(k) for k in common}
     s1_args.update({
         'x': str(spawn[0]), 'y': str(spawn[1]), 'yaw': str(spawn[2]),
@@ -300,6 +300,7 @@ def generate_launch_description():
         DeclareLaunchArgument('follow', default_value='false'),
         DeclareLaunchArgument('joy', default_value='true'),
         DeclareLaunchArgument('accel_time_ms', default_value='500'),
+        DeclareLaunchArgument('command_delay', default_value='0.15'),
         DeclareLaunchArgument('decel_time_ms', default_value='500'),
         DeclareLaunchArgument('camera', default_value='false', description='true: depth camera D435 (S3)'),
         DeclareLaunchArgument('bridge_config', default_value='',

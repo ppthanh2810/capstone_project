@@ -14,7 +14,12 @@ Kịch bản (hộp tĩnh, cao 0.6 m > mặt quét LiDAR 0.347 m; ground truth c
   R5 narrow        khe 0.65 m giữa 2 hộp trên đường               -> SUCCEEDED
   R6 multi         3 hộp zigzag                                   -> SUCCEEDED
   R7 no_path       đích bị rào kín (S1)                           -> FAILED (Safe Stop), đứng yên, không chạm
-  R8 gap050        khe 0.50 m (A* qua được, DWB không) — THÔNG TIN (kiểm tra nhất quán footprint)
+  R8 gap050        khe 0.50 m — THÔNG TIN. Từ 2026-11-26 inscribed global = local 0.25 -> A* không qua nữa
+  R9 occluded      tường mới 2.4 m chắn đường + hộp KHUẤT ngay sau đầu tường (góc khuất)  -> SUCCEEDED, không chạm
+  R10 gap060       khe mép-mép 0.60 m (cận dưới quy tắc C1)       -> SUCCEEDED
+  R11 multi5       5 hộp 0.3 m trong hành lang ±1 m, khe >= 0.60   -> SUCCEEDED
+  R12 stale_scan   LiDAR ngừng (SIGSTOP lidar_sim_adapter) khi đang chạy -> robot dừng <= 1.5 s, không chạm;
+                   LiDAR chạy lại -> điều hướng tiếp tục hoặc kết thúc có lý do (không treo)
 Kiểm tra chung: không va chạm (hở thân > 0), hai lần REPLANNING cách nhau >= min_interval, số replan <= giới hạn.
 """
 
@@ -27,6 +32,7 @@ import sys
 
 import rclpy
 from diagnostic_msgs.msg import DiagnosticStatus
+from geometry_msgs.msg import PoseStamped
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from nav2_msgs.srv import ClearEntireCostmap
 from nav_msgs.msg import Path
@@ -40,6 +46,7 @@ from s3_check import S3Check  # noqa: E402
 
 # FAILED = Safe Stop của goal_path_bridge (replan hết đường) cũng là trạng thái cuối.
 s3_check.TERMINAL = s3_check.TERMINAL + ('FAILED',)
+TERMINAL_ALL = s3_check.TERMINAL
 ROBOT_NAME = 'ace492'       # sim_world.launch.py
 
 START = (0.0, 0.0, -90)
@@ -75,7 +82,16 @@ SCENARIOS = {
                            ('c', 0.3, -5.4, 0.4, 0.4, 0.6)]),
     'R7': ('no_path', ring(0.0, -5.5, 0.6)),
     'R8': ('gap050', [('l', -0.5, -3.6, 0.5, 0.5, 0.6), ('r', 0.5, -3.6, 0.5, 0.5, 0.6)]),
+    # Góc khuất: tường x -2.0..0.4 ở y -3.2 (ngoài tầm lúc gửi goal) + hộp 0.4 khuất ngay sau tường trên đường cũ.
+    # Từ START tia tới hộp đi qua tường -> chỉ thấy hộp khi robot vòng qua đầu tường (x > 0.4).
+    'R9': ('occluded', [('w', -0.8, -3.2, 2.4, 0.3, 0.6), ('h', 0.0, -4.2, 0.4, 0.4, 0.6)]),
+    'R10': ('gap060', [('l', -0.55, -3.6, 0.5, 0.5, 0.6), ('r', 0.55, -3.6, 0.5, 0.5, 0.6)]),
+    'R11': ('multi5', [('a', 0.35, -3.0, 0.3, 0.3, 0.6), ('b', -0.35, -3.8, 0.3, 0.3, 0.6),
+                       ('c', 0.40, -4.6, 0.3, 0.3, 0.6), ('d', -0.75, -4.6, 0.3, 0.3, 0.6),
+                       ('e', -0.05, -5.6, 0.3, 0.3, 0.6)]),
+    'R12': ('stale_scan', []),
 }
+GOALS['R11'] = (0.0, -6.8, -90)
 
 
 class Regression(S3Check):
@@ -83,6 +99,7 @@ class Regression(S3Check):
     def __init__(self):
         super().__init__()
         self.states = []               # (t, text) mọi trạng thái bridge
+        self.loc_events = []           # (t, state, reasons, consistency, blocked_ratio) khi != LOCALIZED
         self.dwb = {}
         self.max_shift = 0.0
         self.n_blocked = 0
@@ -103,6 +120,13 @@ class Regression(S3Check):
     def on_follow(self, msg):
         super().on_follow(msg)
         self.states.append((self.now_s(), msg.data))
+
+    def on_loc(self, msg):
+        super().on_loc(msg)
+        vals = {v.key: v.value for v in msg.values}
+        if msg.message != 'LOCALIZED':
+            self.loc_events.append((round(self.now_s(), 1), msg.message, vals.get('reasons', ''),
+                                    vals.get('scan_consistency', ''), vals.get('blocked_ratio', '')))
 
     def on_dwb(self, msg):
         kv = {k.key: k.value for k in msg.values}
@@ -164,8 +188,14 @@ class Regression(S3Check):
         for b in boxes:
             self.add_box(f'reg_{sid}_{b[0]}', *b[1:])
         self.states, self.max_shift, self.n_blocked, self.path_lens = [], 0.0, 0, []
+        self.loc_events = []
         t0 = self.now_s()
-        r = self.navigate(*GOALS.get(sid, GOAL), timeout=200.0)
+        stale = None
+        if sid == 'R12':
+            stale = self.stale_scan_episode()
+            r = stale.pop('nav')
+        else:
+            r = self.navigate(*GOALS.get(sid, GOAL), timeout=200.0)
         hold = self.hold_displacement() if r['state'].startswith('FAILED') else (math.nan, math.nan)
         rp = [t for t, s in self.states if s.startswith('REPLANNING')]
         gaps = [b - a for a, b in zip(rp, rp[1:])]
@@ -174,7 +204,10 @@ class Regression(S3Check):
                    if not math.isnan(r['path']) else None, replans=len(rp),
                    min_replan_gap=round(min(gaps), 2) if gaps else None, carrot_shift_max=round(self.max_shift, 3),
                    carrot_blocked_msgs=self.n_blocked, paths=list(self.path_lens), hold_disp=hold[0], hold_yaw=hold[1],
-                   states=[(round(t - t0, 1), s) for t, s in self.states])
+                   states=[(round(t - t0, 1), s) for t, s in self.states],
+                   loc_events=[(round(e[0] - t0, 1),) + e[1:] for e in self.loc_events[:40]])
+        if stale:
+            res.update(stale)
         for b in boxes:
             self.del_box(f'reg_{sid}_{b[0]}')
         self.clear_costmaps()
@@ -187,6 +220,49 @@ class Regression(S3Check):
         self.check(f'{sid}_{name}', res['verdict'] in ('PASS', 'INFO'), json.dumps(
             {k: v for k, v in res.items() if k != 'states'}, ensure_ascii=False))
         return res
+
+    def stale_scan_episode(self, freeze_after=4.0, freeze_for=6.0):
+        """R12: đang chạy thì đóng băng lidar_sim_adapter (SIGSTOP) -> /scan_raw ngừng -> local costmap không
+        current -> controller_server ngừng phát -> twist_mux timeout 0.5 s + driver ramp -> robot dừng.
+        Đo thời gian/quãng tới khi |v| < 0.02 (GT). Sau freeze_for giây SIGCONT."""
+        yaw = math.radians(GOAL[2])
+        g = PoseStamped()
+        g.header.frame_id = 'map'
+        g.header.stamp = self.get_clock().now().to_msg()
+        g.pose.position.x, g.pose.position.y = GOAL[0], GOAL[1]
+        g.pose.orientation.z, g.pose.orientation.w = math.sin(yaw / 2), math.cos(yaw / 2)
+        self.goal_pub.publish(g)
+        self.spin_for(freeze_after)
+        pid = subprocess.run(['pgrep', '-f', 'lidar_sim_adapter'], capture_output=True, text=True).stdout.split()
+        x0, y0, _ = self.gt_pose()
+        subprocess.run(['kill', '-STOP'] + pid)
+        t_freeze = self.now_s()
+        stop_t, stop_d, last, prev_t = None, None, (x0, y0), self.now_s()
+        while self.now_s() - t_freeze < freeze_for:
+            rclpy.spin_once(self, timeout_sec=0.02)
+            x, y, _ = self.gt_pose()
+            now = self.now_s()
+            if now - prev_t >= 0.1:
+                v = math.hypot(x - last[0], y - last[1]) / (now - prev_t)
+                last, prev_t = (x, y), now
+                if stop_t is None and v < 0.02 and now - t_freeze > 0.15:
+                    stop_t, stop_d = now - t_freeze, math.hypot(x - x0, y - y0)
+        subprocess.run(['kill', '-CONT'] + pid)
+        # Không gửi goal mới: chờ phiên hiện tại tự kết thúc (tiếp tục bám / abort -> replan / FAILED).
+        r = {'state': 'none', 'clear': math.inf, 'dist': 0.0, 'path': math.nan}
+        t_cont = self.now_s()
+        while rclpy.ok() and self.now_s() - t_cont < 150.0:
+            rclpy.spin_once(self, timeout_sec=0.02)
+            fs = self.follow_state
+            if fs and fs[0] > t_freeze - 0.5 and fs[1].startswith(TERMINAL_ALL):
+                r['state'] = fs[1]
+                break
+        self.spin_for(1.5)
+        r['t'] = self.now_s() - t_freeze + freeze_after
+        gx, gy, _ = self.gt_pose()
+        r['gt_err'] = math.hypot(gx - GOAL[0], gy - GOAL[1])
+        return {'nav': r, 'stale_pid': pid, 'stop_time': None if stop_t is None else round(stop_t, 2),
+                'stop_dist': None if stop_d is None else round(stop_d, 3)}
 
     @staticmethod
     def verdict(r):
@@ -201,6 +277,9 @@ class Regression(S3Check):
             'R4': succ and r['replans'] >= 1,
             'R5': succ, 'R6': succ, 'R6b': succ,
             'R7': r['state'].startswith('FAILED') and r['hold_disp'] < 0.02,
+            'R9': succ, 'R10': succ, 'R11': succ,
+            # stale: dừng <= 1.5 s sau khi LiDAR ngừng; kết thúc có trạng thái (không treo); không chạm
+            'R12': r.get('stop_time') is not None and r['stop_time'] <= 1.5 and r['state'] != 'none',
         }.get(r['id'])
         if cond is None:
             return 'INFO' if no_collision else 'FAIL'
@@ -211,6 +290,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--only', default='', help='vd R2,R4 (mặc định tất cả)')
     ap.add_argument('--out', default='')
+    ap.add_argument('--repeat', type=int, default=1, help='số lượt lặp mỗi kịch bản (gate: 3)')
     ap.add_argument('--no-csm', action='store_true')
     ap.add_argument('--no-require-localized', action='store_true',
                     help='goal_path_bridge require_localized=false (tách Navigation khỏi localization_monitor)')
@@ -226,7 +306,15 @@ def main():
         node.get_logger().info(f"require_localized=false: {node.set_bridge_param('require_localized', False)}")
     node.reset_robot()               # bắt đầu từ START đã định vị, costmap sạch
     ids = [s for s in (args.only.split(',') if args.only else SCENARIOS)]
-    results = [node.run(s) for s in ids]
+    results = []
+    for k in range(args.repeat):
+        for s in ids:
+            res = node.run(s)
+            res['round'] = k + 1
+            results.append(res)
+            if args.out:                 # ghi dần (lượt dài, tránh mất dữ liệu)
+                with open(args.out, 'w') as f:
+                    json.dump(results, f, ensure_ascii=False, indent=1)
     if args.out:
         with open(args.out, 'w') as f:
             json.dump(results, f, ensure_ascii=False, indent=1)

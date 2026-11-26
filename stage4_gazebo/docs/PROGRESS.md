@@ -533,3 +533,20 @@ Sai số cuối theo ground truth = sai số goal checker (0.15 m, so với AMCL
   - `~/capstone_ws/third_party/aws_small_house` (clone AWS, MIT-0, có `COLCON_IGNORE`, vá quán tính 2 model).
   - `~/capstone_ws/third_party/husarion_gz_worlds` (clone Husarion, Apache-2.0, có `COLCON_IGNORE`, map tham chiếu `maps/office_ref.*`).
   - `~/.ignition/fuel/fuel.gazebosim.org/openrobotics/models/*` (15 model Fuel cho world văn phòng).
+
+## Master Plan v3 — Giai đoạn A/B (2026-11-26)
+
+- `command_delay` thành launch arg của s0–s3 (mặc định **0.15 s**, profile benchmark); YAML node giữ 0.
+- `zlac_driver_model` được export (target CMake) cho `stage5_benchmark` (Fast 2D dùng cùng mô hình driver).
+- `test/s3_regression.py`: thêm R9 góc khuất, R10 khe 0.60 m, R11 5 vật cản, R12 LiDAR ngừng (SIGSTOP
+  `lidar_sim_adapter`), `--repeat`, ghi lý do UNCERTAIN của monitor. `test/run_regression.sh`: chạy headless cách ly.
+- `test/config_consistency.py`: đọc `command_delay` từ launch.
+- Kết quả regression ×3 (cấu hình v2 và cấu hình chốt v3): `stage5_benchmark/docs/ACCEPTANCE_2026-11-26.md`.
+- Gazebo chạy scenario của dataset: `stage5_benchmark/scripts/gazebo_episode.py` (env:=map, world sinh từ M,
+  Δ spawn bằng `ros_gz_sim create`, cùng evaluator với Fast 2D).
+
+Phát hiện:
+- R12: LiDAR ngừng → robot dừng sau 2.0–2.1 s / 0.52–0.54 m (0.5 s costmap còn current + watchdog 0.5 s + trễ 0.15 s
+  + ramp 0.5 s). Quỹ đạo cuối đã được kiểm tra va chạm trên toàn sim_time nên không chạm.
+- AMCL lệch 0.2–0.4 m tại đích trong layout sinh ra (phòng/hành lang ít đặc trưng) → goal checker đạt theo AMCL
+  nhưng GT lệch. Evaluator ghi `LOC_LIMITED`.

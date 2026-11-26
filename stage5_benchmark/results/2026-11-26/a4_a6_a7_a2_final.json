@@ -1,0 +1,2728 @@
+{
+ "scenarios": "bench_runs/pilot2_gen/scenarios",
+ "n_scenarios": 316,
+ "seeds": [
+  0,
+  1
+ ],
+ "base_sim": {},
+ "base_dwb": {},
+ "experiments": {
+  "rotate": {
+   "rth_0.8": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 512,
+     "COLLISION": 0,
+     "STUCK": 15,
+     "SAFE_STOP": 84,
+     "TIMEOUT": 21,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 94.11764705882354,
+    "CR": 0.0,
+    "SSR": 95.45454545454545,
+    "STR": 2.7573529411764706,
+    "system_errors": 0,
+    "clearance_min": 0.023684663912623305,
+    "clearance_p5": 0.07383602441205177,
+    "clearance_median": 0.1244676402723591,
+    "time_success_mean": 33.84542968750164,
+    "replans_mean": 0.7297794117647058,
+    "valid_fraction": 0.9708348234695665,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.02836080506773874,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0008043714626947092
+    },
+    "cycles_no_valid_fraction": 0.001190796917937389,
+    "compute_ms_p99_max": 11.851119,
+    "compute_ms_mean": 3.743507338312785,
+    "failures": [
+     [
+      "B2:TIMEOUT:",
+      8
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      6
+     ],
+     [
+      "B1:TIMEOUT:",
+      6
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      5
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "C2:TIMEOUT:",
+      3
+     ],
+     [
+      "S1:TIMEOUT:",
+      3
+     ],
+     [
+      "S1:TIMEOUT:no safe stop (none)",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 82.85714285714286,
+     "B2": 85.22727272727273,
+     "B3": 100.0,
+     "C1": 100.0,
+     "C2": 89.70588235294117,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 145.13096284866333,
+    "dwb_override": {
+     "rotate_to_heading_angle": 0.8
+    },
+    "sim_override": {}
+   },
+   "rth_1.6": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 517,
+     "COLLISION": 0,
+     "STUCK": 15,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 14,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 95.03676470588235,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 2.7573529411764706,
+    "system_errors": 0,
+    "clearance_min": 0.02831009875798088,
+    "clearance_p5": 0.06670708981051723,
+    "clearance_median": 0.12338684161571908,
+    "time_success_mean": 31.488075435204006,
+    "replans_mean": 0.5386029411764706,
+    "valid_fraction": 0.9717415470285221,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.027044430276743723,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0012140226947341868
+    },
+    "cycles_no_valid_fraction": 0.002115917496608735,
+    "compute_ms_p99_max": 11.081944,
+    "compute_ms_mean": 3.894753526468812,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      8
+     ],
+     [
+      "B2:TIMEOUT:",
+      6
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      5
+     ],
+     [
+      "B1:TIMEOUT:",
+      4
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B3:TIMEOUT:",
+      1
+     ],
+     [
+      "C4:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 87.14285714285714,
+     "B2": 84.0909090909091,
+     "B3": 94.0,
+     "C1": 100.0,
+     "C2": 100.0,
+     "C3": 100.0,
+     "C4": 98.88888888888889,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 141.70440411567688,
+    "dwb_override": {
+     "rotate_to_heading_angle": 1.6
+    },
+    "sim_override": {}
+   },
+   "rth_2.5": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 532,
+     "COLLISION": 0,
+     "STUCK": 10,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 4,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.79411764705883,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 1.838235294117647,
+    "system_errors": 0,
+    "clearance_min": 0.02635128351024174,
+    "clearance_p5": 0.07115033725384934,
+    "clearance_median": 0.12324662951706686,
+    "time_success_mean": 30.4963533834592,
+    "replans_mean": 0.2922794117647059,
+    "valid_fraction": 0.9751791666969742,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.023862504910008745,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0009583283930170397
+    },
+    "cycles_no_valid_fraction": 0.001926130771599534,
+    "compute_ms_p99_max": 11.947767,
+    "compute_ms_mean": 3.924085664187431,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 94.28571428571429,
+     "B2": 94.31818181818181,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 138.16244053840637,
+    "dwb_override": {
+     "rotate_to_heading_angle": 2.5
+    },
+    "sim_override": {}
+   }
+  },
+  "inflation": {
+   "infl0.30_wO0": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 396,
+     "COLLISION": 0,
+     "STUCK": 140,
+     "SAFE_STOP": 88,
+     "TIMEOUT": 8,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 72.79411764705883,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "STR": 25.735294117647058,
+    "system_errors": 0,
+    "clearance_min": 0.03553413355403026,
+    "clearance_p5": 0.05411482012590591,
+    "clearance_median": 0.10516119444408328,
+    "time_success_mean": 29.627474747475574,
+    "replans_mean": 1.150735294117647,
+    "valid_fraction": 0.8856439219256619,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.10621929906868814,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.00813677900564993
+    },
+    "cycles_no_valid_fraction": 0.01761124800695753,
+    "compute_ms_p99_max": 14.083473,
+    "compute_ms_mean": 3.8185187944642744,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      55
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      41
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      17
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      15
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      12
+     ],
+     [
+      "B1:TIMEOUT:",
+      3
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "C1:TIMEOUT:",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 37.142857142857146,
+     "B2": 35.22727272727273,
+     "B3": 66.0,
+     "C1": 96.875,
+     "C2": 76.47058823529412,
+     "C3": 100.0,
+     "C4": 86.66666666666667,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 124.55605053901672,
+    "dwb_override": {
+     "obstacle_scale": 0.0
+    },
+    "sim_override": {
+     "local_inflation": 0.3
+    }
+   },
+   "infl0.30_wO1": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 506,
+     "COLLISION": 0,
+     "STUCK": 33,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 6,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 93.01470588235294,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 6.0661764705882355,
+    "system_errors": 0,
+    "clearance_min": 0.03473047937297591,
+    "clearance_p5": 0.062118177052551994,
+    "clearance_median": 0.12209527145999202,
+    "time_success_mean": 29.992549407115106,
+    "replans_mean": 0.4264705882352941,
+    "valid_fraction": 0.9556861412731767,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.04131305314571507,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.003000805581108216
+    },
+    "cycles_no_valid_fraction": 0.004809713395484557,
+    "compute_ms_p99_max": 11.168769,
+    "compute_ms_mean": 4.077447250167331,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      18
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      7
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      7
+     ],
+     [
+      "C2:TIMEOUT:",
+      3
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "C1:STUCK:ABORTED",
+      1
+     ],
+     [
+      "S1:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 90.0,
+     "B2": 77.27272727272727,
+     "B3": 86.0,
+     "C1": 98.4375,
+     "C2": 95.58823529411765,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 138.70436120033264,
+    "dwb_override": {
+     "obstacle_scale": 1.0
+    },
+    "sim_override": {
+     "local_inflation": 0.3
+    }
+   },
+   "infl0.30_wO4": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 532,
+     "COLLISION": 0,
+     "STUCK": 10,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 4,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.79411764705883,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 1.838235294117647,
+    "system_errors": 0,
+    "clearance_min": 0.02635128351024174,
+    "clearance_p5": 0.07115033725384934,
+    "clearance_median": 0.12324662951706686,
+    "time_success_mean": 30.4963533834592,
+    "replans_mean": 0.2922794117647059,
+    "valid_fraction": 0.9751791666969742,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.023862504910008745,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0009583283930170397
+    },
+    "cycles_no_valid_fraction": 0.001926130771599534,
+    "compute_ms_p99_max": 8.3436,
+    "compute_ms_mean": 3.529430739872505,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 94.28571428571429,
+     "B2": 94.31818181818181,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 121.21566772460938,
+    "dwb_override": {
+     "obstacle_scale": 4.0
+    },
+    "sim_override": {
+     "local_inflation": 0.3
+    }
+   },
+   "infl0.30_wO8": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 532,
+     "COLLISION": 0,
+     "STUCK": 4,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 9,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.79411764705883,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 0.7352941176470589,
+    "system_errors": 0,
+    "clearance_min": 0.05885305953633524,
+    "clearance_p5": 0.08043722152238114,
+    "clearance_median": 0.12369800585089769,
+    "time_success_mean": 30.55086466165467,
+    "replans_mean": 0.2867647058823529,
+    "valid_fraction": 0.9772638310051003,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.021640228548413732,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.001095940446485999
+    },
+    "cycles_no_valid_fraction": 0.0009086072604893329,
+    "compute_ms_p99_max": 5.316827,
+    "compute_ms_mean": 3.0069433010544695,
+    "failures": [
+     [
+      "B1:TIMEOUT:",
+      5
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      2
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      1
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      1
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "S1:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 91.42857142857143,
+     "B2": 97.72727272727273,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 97.05882352941177,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 104.97879195213318,
+    "dwb_override": {
+     "obstacle_scale": 8.0
+    },
+    "sim_override": {
+     "local_inflation": 0.3
+    }
+   },
+   "infl0.40_wO0": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 396,
+     "COLLISION": 0,
+     "STUCK": 140,
+     "SAFE_STOP": 88,
+     "TIMEOUT": 8,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 72.79411764705883,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "STR": 25.735294117647058,
+    "system_errors": 0,
+    "clearance_min": 0.03553413355403026,
+    "clearance_p5": 0.05411482012590591,
+    "clearance_median": 0.10516119444408328,
+    "time_success_mean": 29.627474747475574,
+    "replans_mean": 1.150735294117647,
+    "valid_fraction": 0.8856439219256619,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.10621929906868814,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.00813677900564993
+    },
+    "cycles_no_valid_fraction": 0.01761124800695753,
+    "compute_ms_p99_max": 4.938682,
+    "compute_ms_mean": 2.906671771166824,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      55
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      41
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      17
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      15
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      12
+     ],
+     [
+      "B1:TIMEOUT:",
+      3
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "C1:TIMEOUT:",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 37.142857142857146,
+     "B2": 35.22727272727273,
+     "B3": 66.0,
+     "C1": 96.875,
+     "C2": 76.47058823529412,
+     "C3": 100.0,
+     "C4": 86.66666666666667,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 94.81284022331238,
+    "dwb_override": {
+     "obstacle_scale": 0.0
+    },
+    "sim_override": {
+     "local_inflation": 0.4
+    }
+   },
+   "infl0.40_wO1": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 476,
+     "COLLISION": 0,
+     "STUCK": 67,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 2,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 87.5,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 12.316176470588236,
+    "system_errors": 0,
+    "clearance_min": 0.028621438546204053,
+    "clearance_p5": 0.05662185461033692,
+    "clearance_median": 0.177067994069443,
+    "time_success_mean": 30.429789915966957,
+    "replans_mean": 0.6433823529411765,
+    "valid_fraction": 0.9387547672186918,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.05665107332442547,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.004594159456882791
+    },
+    "cycles_no_valid_fraction": 0.009596429235633253,
+    "compute_ms_p99_max": 5.047893,
+    "compute_ms_mean": 2.9637769732822012,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      33
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      13
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      7
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      6
+     ],
+     [
+      "C2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "C4:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "B1:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      1
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C1:STUCK:ABORTED",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 80.0,
+     "B2": 61.36363636363637,
+     "B3": 86.0,
+     "C1": 98.4375,
+     "C2": 94.11764705882354,
+     "C3": 100.0,
+     "C4": 91.11111111111111,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 101.66386413574219,
+    "dwb_override": {
+     "obstacle_scale": 1.0
+    },
+    "sim_override": {
+     "local_inflation": 0.4
+    }
+   },
+   "infl0.40_wO4": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 529,
+     "COLLISION": 0,
+     "STUCK": 12,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 4,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.24264705882354,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 2.2058823529411766,
+    "system_errors": 0,
+    "clearance_min": 0.03931150970636521,
+    "clearance_p5": 0.07475065806885497,
+    "clearance_median": 0.20565353948824983,
+    "time_success_mean": 30.799990548204672,
+    "replans_mean": 0.28125,
+    "valid_fraction": 0.9816389016245125,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.01757379404218785,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0007873043332996835
+    },
+    "cycles_no_valid_fraction": 0.0012909904335824092,
+    "compute_ms_p99_max": 5.073774,
+    "compute_ms_mean": 2.980433121411871,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      3
+     ],
+     [
+      "B1:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "C2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "C4:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ],
+     [
+      "S1:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 91.42857142857143,
+     "B2": 95.45454545454545,
+     "B3": 100.0,
+     "C1": 100.0,
+     "C2": 95.58823529411765,
+     "C3": 100.0,
+     "C4": 97.77777777777777,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 105.64706230163574,
+    "dwb_override": {
+     "obstacle_scale": 4.0
+    },
+    "sim_override": {
+     "local_inflation": 0.4
+    }
+   },
+   "infl0.40_wO8": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 522,
+     "COLLISION": 0,
+     "STUCK": 11,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 13,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 95.95588235294117,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 2.0220588235294117,
+    "system_errors": 0,
+    "clearance_min": 0.057747716047679976,
+    "clearance_p5": 0.09990895598149335,
+    "clearance_median": 0.21114011647577813,
+    "time_success_mean": 30.656149425287907,
+    "replans_mean": 0.30514705882352944,
+    "valid_fraction": 0.9836481750629322,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.01514462590828647,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0012071990287813466
+    },
+    "cycles_no_valid_fraction": 0.0009728486778102061,
+    "compute_ms_p99_max": 5.002259,
+    "compute_ms_mean": 3.028675534366478,
+    "failures": [
+     [
+      "B1:TIMEOUT:",
+      4
+     ],
+     [
+      "B2:TIMEOUT:",
+      4
+     ],
+     [
+      "C4:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      4
+     ],
+     [
+      "B1:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "C2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      1
+     ],
+     [
+      "B3:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 91.42857142857143,
+     "B2": 95.45454545454545,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 92.6470588235294,
+     "C3": 100.0,
+     "C4": 94.44444444444444,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 111.6347963809967,
+    "dwb_override": {
+     "obstacle_scale": 8.0
+    },
+    "sim_override": {
+     "local_inflation": 0.4
+    }
+   },
+   "infl0.50_wO0": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 396,
+     "COLLISION": 0,
+     "STUCK": 140,
+     "SAFE_STOP": 88,
+     "TIMEOUT": 8,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 72.79411764705883,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "STR": 25.735294117647058,
+    "system_errors": 0,
+    "clearance_min": 0.03553413355403026,
+    "clearance_p5": 0.05411482012590591,
+    "clearance_median": 0.10516119444408328,
+    "time_success_mean": 29.627474747475574,
+    "replans_mean": 1.150735294117647,
+    "valid_fraction": 0.8856439219256619,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.10621929906868814,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.00813677900564993
+    },
+    "cycles_no_valid_fraction": 0.01761124800695753,
+    "compute_ms_p99_max": 11.050258,
+    "compute_ms_mean": 3.2689931825939964,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      55
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      41
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      17
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      15
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      12
+     ],
+     [
+      "B1:TIMEOUT:",
+      3
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "C1:TIMEOUT:",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 37.142857142857146,
+     "B2": 35.22727272727273,
+     "B3": 66.0,
+     "C1": 96.875,
+     "C2": 76.47058823529412,
+     "C3": 100.0,
+     "C4": 86.66666666666667,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 105.13245558738708,
+    "dwb_override": {
+     "obstacle_scale": 0.0
+    },
+    "sim_override": {
+     "local_inflation": 0.5
+    }
+   },
+   "infl0.50_wO1": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 430,
+     "COLLISION": 0,
+     "STUCK": 109,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 6,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 79.04411764705883,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 20.03676470588235,
+    "system_errors": 0,
+    "clearance_min": 0.04483671650263507,
+    "clearance_p5": 0.05352921896841758,
+    "clearance_median": 0.1378926728562779,
+    "time_success_mean": 30.45058139534947,
+    "replans_mean": 0.9044117647058824,
+    "valid_fraction": 0.9105832547140357,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.08339444798460413,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.006022297301360166
+    },
+    "cycles_no_valid_fraction": 0.013718967882580669,
+    "compute_ms_p99_max": 5.046276,
+    "compute_ms_mean": 2.9564467029871215,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      44
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      26
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      10
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      10
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      8
+     ],
+     [
+      "C4:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      6
+     ],
+     [
+      "B1:TIMEOUT:",
+      4
+     ],
+     [
+      "N2:STUCK:NO_PROGRESS",
+      1
+     ],
+     [
+      "B1:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      1
+     ],
+     [
+      "B2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 55.714285714285715,
+     "B2": 47.72727272727273,
+     "B3": 78.0,
+     "C1": 100.0,
+     "C2": 83.82352941176471,
+     "C3": 100.0,
+     "C4": 84.44444444444444,
+     "N2": 98.71794871794872,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 101.27286911010742,
+    "dwb_override": {
+     "obstacle_scale": 1.0
+    },
+    "sim_override": {
+     "local_inflation": 0.5
+    }
+   },
+   "infl0.50_wO4": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 513,
+     "COLLISION": 0,
+     "STUCK": 28,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 4,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 94.30147058823529,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 5.147058823529412,
+    "system_errors": 0,
+    "clearance_min": 0.03749123103437532,
+    "clearance_p5": 0.07044446058039516,
+    "clearance_median": 0.26651609326432846,
+    "time_success_mean": 31.250906432749098,
+    "replans_mean": 0.31985294117647056,
+    "valid_fraction": 0.9799443412229354,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.019233173692829206,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0008224850842353749
+    },
+    "cycles_no_valid_fraction": 0.0017998792263450726,
+    "compute_ms_p99_max": 5.204769,
+    "compute_ms_mean": 3.0519633630305303,
+    "failures": [
+     [
+      "C4:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      11
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      3
+     ],
+     [
+      "B1:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "C2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "N2:STUCK:NO_PROGRESS",
+      1
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 90.0,
+     "B2": 92.04545454545455,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 97.05882352941177,
+     "C3": 100.0,
+     "C4": 86.66666666666667,
+     "N2": 98.71794871794872,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 110.78693199157715,
+    "dwb_override": {
+     "obstacle_scale": 4.0
+    },
+    "sim_override": {
+     "local_inflation": 0.5
+    }
+   },
+   "infl0.50_wO8": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 507,
+     "COLLISION": 0,
+     "STUCK": 20,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 19,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 93.19852941176471,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 3.676470588235294,
+    "system_errors": 0,
+    "clearance_min": 0.05165448553900093,
+    "clearance_p5": 0.09034223699642957,
+    "clearance_median": 0.30002152118903186,
+    "time_success_mean": 31.65736686390577,
+    "replans_mean": 0.4007352941176471,
+    "valid_fraction": 0.984391477295436,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.014751231798239617,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0008572909063244347
+    },
+    "cycles_no_valid_fraction": 0.0010616615286790545,
+    "compute_ms_p99_max": 8.112012,
+    "compute_ms_mean": 3.046194386725106,
+    "failures": [
+     [
+      "C4:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      10
+     ],
+     [
+      "B1:TIMEOUT:",
+      8
+     ],
+     [
+      "B2:TIMEOUT:",
+      5
+     ],
+     [
+      "C2:TIMEOUT:",
+      3
+     ],
+     [
+      "B1:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      2
+     ],
+     [
+      "B2:STUCK:SUCCEEDED_BUT_OFF_GOAL",
+      2
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "N2:STUCK:NO_PROGRESS",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 82.85714285714286,
+     "B2": 92.04545454545455,
+     "B3": 100.0,
+     "C1": 98.4375,
+     "C2": 94.11764705882354,
+     "C3": 100.0,
+     "C4": 86.66666666666667,
+     "N2": 98.71794871794872,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 113.29508256912231,
+    "dwb_override": {
+     "obstacle_scale": 8.0
+    },
+    "sim_override": {
+     "local_inflation": 0.5
+    }
+   }
+  },
+  "costmap": {
+   "2x2_T1.5": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 507,
+     "COLLISION": 0,
+     "STUCK": 32,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 6,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 93.19852941176471,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 5.882352941176471,
+    "system_errors": 0,
+    "clearance_min": 0.037271933588589184,
+    "clearance_p5": 0.06170176896029817,
+    "clearance_median": 0.11375253951569156,
+    "time_success_mean": 30.278076923077528,
+    "replans_mean": 0.46875,
+    "valid_fraction": 0.9484384631186574,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.04653106394338997,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.005030472937952633
+    },
+    "cycles_no_valid_fraction": 0.004727181905127408,
+    "compute_ms_p99_max": 7.435978,
+    "compute_ms_mean": 2.4048210395308613,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      15
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      8
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      5
+     ],
+     [
+      "B2:TIMEOUT:",
+      3
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      3
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ],
+     [
+      "C4:TIMEOUT:",
+      1
+     ],
+     [
+      "S1:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 87.14285714285714,
+     "B2": 79.54545454545455,
+     "B3": 90.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 95.55555555555556,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 88.6431040763855,
+    "dwb_override": {
+     "sim_time": 1.5
+    },
+    "sim_override": {
+     "local_size": 2.0
+    }
+   },
+   "2x2_T2": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 532,
+     "COLLISION": 0,
+     "STUCK": 10,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 4,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.79411764705883,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 1.838235294117647,
+    "system_errors": 0,
+    "clearance_min": 0.02635128351024174,
+    "clearance_p5": 0.07115033725384934,
+    "clearance_median": 0.12324662951706686,
+    "time_success_mean": 30.4963533834592,
+    "replans_mean": 0.2922794117647059,
+    "valid_fraction": 0.9751791666969742,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.023862504910008745,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0009583283930170397
+    },
+    "cycles_no_valid_fraction": 0.001926130771599534,
+    "compute_ms_p99_max": 7.237301,
+    "compute_ms_mean": 3.0349500990727893,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 94.28571428571429,
+     "B2": 94.31818181818181,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 105.19539880752563,
+    "dwb_override": {
+     "sim_time": 2.0
+    },
+    "sim_override": {
+     "local_size": 2.0
+    }
+   },
+   "2x2_T2.5": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 530,
+     "COLLISION": 0,
+     "STUCK": 11,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 5,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.42647058823529,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 2.0220588235294117,
+    "system_errors": 0,
+    "clearance_min": 0.03361217054952839,
+    "clearance_p5": 0.07124202470165439,
+    "clearance_median": 0.1274327251347642,
+    "time_success_mean": 31.5440566037741,
+    "replans_mean": 0.31985294117647056,
+    "valid_fraction": 0.9660860762729555,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.03369627290060348,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0002176508264410216
+    },
+    "cycles_no_valid_fraction": 0.001469293514701681,
+    "compute_ms_p99_max": 6.17446,
+    "compute_ms_mean": 3.581826259808171,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      6
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B1:TIMEOUT:",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "B3:STUCK:FALSE_NO_PATH",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 91.42857142857143,
+     "B2": 92.04545454545455,
+     "B3": 98.0,
+     "C1": 100.0,
+     "C2": 100.0,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 121.74912548065186,
+    "dwb_override": {
+     "sim_time": 2.5
+    },
+    "sim_override": {
+     "local_size": 2.0
+    }
+   },
+   "2x2_T3": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 526,
+     "COLLISION": 0,
+     "STUCK": 7,
+     "SAFE_STOP": 84,
+     "TIMEOUT": 15,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 96.69117647058823,
+    "CR": 0.0,
+    "SSR": 95.45454545454545,
+    "STR": 1.286764705882353,
+    "system_errors": 0,
+    "clearance_min": 0.05475625029575354,
+    "clearance_p5": 0.07255356498221152,
+    "clearance_median": 0.12758468017942873,
+    "time_success_mean": 34.95328897338441,
+    "replans_mean": 0.35294117647058826,
+    "valid_fraction": 0.957695978735174,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.041871252548587465,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.00043276871623851564
+    },
+    "cycles_no_valid_fraction": 0.0007825293837192429,
+    "compute_ms_p99_max": 9.177726,
+    "compute_ms_mean": 4.127270916304173,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:TIMEOUT:",
+      4
+     ],
+     [
+      "S1:TIMEOUT:",
+      3
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "B3:TIMEOUT:",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      2
+     ],
+     [
+      "B1:STUCK:FALSE_NO_PATH",
+      1
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "C1:TIMEOUT:",
+      1
+     ],
+     [
+      "C4:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 91.42857142857143,
+     "B2": 93.18181818181819,
+     "B3": 96.0,
+     "C1": 98.4375,
+     "C2": 97.05882352941177,
+     "C3": 100.0,
+     "C4": 98.88888888888889,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 151.39612889289856,
+    "dwb_override": {
+     "sim_time": 3.0
+    },
+    "sim_override": {
+     "local_size": 2.0
+    }
+   },
+   "4x4_T1.5": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 513,
+     "COLLISION": 0,
+     "STUCK": 28,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 5,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 94.30147058823529,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 5.147058823529412,
+    "system_errors": 0,
+    "clearance_min": 0.04594327192702194,
+    "clearance_p5": 0.06301341564631804,
+    "clearance_median": 0.11379003582296246,
+    "time_success_mean": 29.92166666666722,
+    "replans_mean": 0.3805147058823529,
+    "valid_fraction": 0.9620095406900655,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.034475335119445664,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0035151241904887967
+    },
+    "cycles_no_valid_fraction": 0.004338247125369772,
+    "compute_ms_p99_max": 4.065895,
+    "compute_ms_mean": 2.4623004772833488,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      15
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      8
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 87.14285714285714,
+     "B2": 80.68181818181819,
+     "B3": 92.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 92.15950727462769,
+    "dwb_override": {
+     "sim_time": 1.5
+    },
+    "sim_override": {
+     "local_size": 4.0
+    }
+   },
+   "4x4_T2": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 529,
+     "COLLISION": 0,
+     "STUCK": 9,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 8,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.24264705882354,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 1.6544117647058822,
+    "system_errors": 0,
+    "clearance_min": 0.0347266818843244,
+    "clearance_p5": 0.07198110158818108,
+    "clearance_median": 0.12228971404470546,
+    "time_success_mean": 30.315113421550613,
+    "replans_mean": 0.29044117647058826,
+    "valid_fraction": 0.9684771743377745,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.03017964727894972,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.001343178383275767
+    },
+    "cycles_no_valid_fraction": 0.001600744195037089,
+    "compute_ms_p99_max": 7.886838,
+    "compute_ms_mean": 3.083667982958855,
+    "failures": [
+     [
+      "B1:TIMEOUT:",
+      4
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      3
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 91.42857142857143,
+     "B2": 93.18181818181819,
+     "B3": 94.0,
+     "C1": 100.0,
+     "C2": 100.0,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 109.71167397499084,
+    "dwb_override": {
+     "sim_time": 2.0
+    },
+    "sim_override": {
+     "local_size": 4.0
+    }
+   },
+   "4x4_T2.5": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 533,
+     "COLLISION": 0,
+     "STUCK": 7,
+     "SAFE_STOP": 87,
+     "TIMEOUT": 5,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.9779411764706,
+    "CR": 0.0,
+    "SSR": 98.86363636363636,
+    "STR": 1.286764705882353,
+    "system_errors": 0,
+    "clearance_min": 0.02537989376150962,
+    "clearance_p5": 0.07155882160699915,
+    "clearance_median": 0.12693859039999986,
+    "time_success_mean": 31.00696998123871,
+    "replans_mean": 0.2536764705882353,
+    "valid_fraction": 0.967366960101282,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.032300822826095185,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0003322170726228136
+    },
+    "cycles_no_valid_fraction": 0.0011524277811923787,
+    "compute_ms_p99_max": 6.316715,
+    "compute_ms_mean": 3.70662054027984,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      3
+     ],
+     [
+      "C2:TIMEOUT:",
+      3
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "S1:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 94.28571428571429,
+     "B2": 97.72727272727273,
+     "B3": 100.0,
+     "C1": 100.0,
+     "C2": 92.6470588235294,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 126.94886493682861,
+    "dwb_override": {
+     "sim_time": 2.5
+    },
+    "sim_override": {
+     "local_size": 4.0
+    }
+   },
+   "4x4_T3": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 534,
+     "COLLISION": 0,
+     "STUCK": 6,
+     "SAFE_STOP": 84,
+     "TIMEOUT": 8,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 98.16176470588235,
+    "CR": 0.0,
+    "SSR": 95.45454545454545,
+    "STR": 1.1029411764705883,
+    "system_errors": 0,
+    "clearance_min": 0.057662716829558425,
+    "clearance_p5": 0.0709903640486842,
+    "clearance_median": 0.12592748318748395,
+    "time_success_mean": 34.26080524344597,
+    "replans_mean": 0.23897058823529413,
+    "valid_fraction": 0.9596707617641501,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.04010314750212438,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.00022609073372554004
+    },
+    "cycles_no_valid_fraction": 0.000680304648925597,
+    "compute_ms_p99_max": 7.251652,
+    "compute_ms_mean": 4.141565745821597,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "S1:TIMEOUT:",
+      3
+     ],
+     [
+      "B3:TIMEOUT:",
+      2
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      1
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ],
+     [
+      "S1:TIMEOUT:no safe stop (none)",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 97.14285714285714,
+     "B2": 94.31818181818181,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 150.99556708335876,
+    "dwb_override": {
+     "sim_time": 3.0
+    },
+    "sim_override": {
+     "local_size": 4.0
+    }
+   },
+   "4x4_T4": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 491,
+     "COLLISION": 0,
+     "STUCK": 15,
+     "SAFE_STOP": 85,
+     "TIMEOUT": 41,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 90.25735294117646,
+    "CR": 0.0,
+    "SSR": 96.5909090909091,
+    "STR": 2.7573529411764706,
+    "system_errors": 0,
+    "clearance_min": 0.05078918436006713,
+    "clearance_p5": 0.06682487177443247,
+    "clearance_median": 0.12428472756918188,
+    "time_success_mean": 41.53096741344411,
+    "replans_mean": 0.33455882352941174,
+    "valid_fraction": 0.9327946918889914,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.0669214953950312,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.000283812715977376
+    },
+    "cycles_no_valid_fraction": 0.0010866075618008052,
+    "compute_ms_p99_max": 9.304109,
+    "compute_ms_mean": 5.090644669520318,
+    "failures": [
+     [
+      "B3:TIMEOUT:",
+      29
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      9
+     ],
+     [
+      "B1:TIMEOUT:",
+      6
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      3
+     ],
+     [
+      "B2:TIMEOUT:",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "C1:STUCK:ABORTED",
+      1
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ],
+     [
+      "C4:STUCK:ABORTED",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 87.14285714285714,
+     "B2": 87.5,
+     "B3": 42.0,
+     "C1": 98.4375,
+     "C2": 97.05882352941177,
+     "C3": 100.0,
+     "C4": 98.88888888888889,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 224.69322681427002,
+    "dwb_override": {
+     "sim_time": 4.0
+    },
+    "sim_override": {
+     "local_size": 4.0
+    }
+   },
+   "4x4_T5": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 475,
+     "COLLISION": 0,
+     "STUCK": 11,
+     "SAFE_STOP": 84,
+     "TIMEOUT": 62,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 87.31617647058823,
+    "CR": 0.0,
+    "SSR": 95.45454545454545,
+    "STR": 2.0220588235294117,
+    "system_errors": 0,
+    "clearance_min": 0.044597041087412664,
+    "clearance_p5": 0.07129024266159643,
+    "clearance_median": 0.1232349490995149,
+    "time_success_mean": 51.77605263158435,
+    "replans_mean": 0.46691176470588236,
+    "valid_fraction": 0.9146423637076093,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.08512174183601619,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0002358944563745393
+    },
+    "cycles_no_valid_fraction": 0.0006273215022699133,
+    "compute_ms_p99_max": 11.127064,
+    "compute_ms_mean": 6.513605122385443,
+    "failures": [
+     [
+      "B3:TIMEOUT:",
+      44
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      8
+     ],
+     [
+      "B2:TIMEOUT:",
+      6
+     ],
+     [
+      "B1:TIMEOUT:",
+      4
+     ],
+     [
+      "S1:TIMEOUT:",
+      3
+     ],
+     [
+      "C1:TIMEOUT:",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      2
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      1
+     ],
+     [
+      "C1:STUCK:ABORTED",
+      1
+     ],
+     [
+      "C2:STUCK:NO_PROGRESS",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 94.28571428571429,
+     "B2": 84.0909090909091,
+     "B3": 10.0,
+     "C1": 95.3125,
+     "C2": 95.58823529411765,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 339.3216152191162,
+    "dwb_override": {
+     "sim_time": 5.0
+    },
+    "sim_override": {
+     "local_size": 4.0
+    }
+   }
+  },
+  "delay": {
+   "delay0.00": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 536,
+     "COLLISION": 0,
+     "STUCK": 7,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 3,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 98.52941176470588,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 1.286764705882353,
+    "system_errors": 0,
+    "clearance_min": 0.027675162646270818,
+    "clearance_p5": 0.06596660219481973,
+    "clearance_median": 0.12211402631350046,
+    "time_success_mean": 29.931679104478143,
+    "replans_mean": 0.25,
+    "valid_fraction": 0.9779904051817799,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.02162940161942982,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.00038019319879022394
+    },
+    "cycles_no_valid_fraction": 0.001604998247415707,
+    "compute_ms_p99_max": 5.305284,
+    "compute_ms_mean": 3.1208116224483082,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      2
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      2
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 97.14285714285714,
+     "B2": 96.5909090909091,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 105.54275369644165,
+    "dwb_override": {},
+    "sim_override": {
+     "command_delay": 0.0
+    }
+   },
+   "delay0.15": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 532,
+     "COLLISION": 0,
+     "STUCK": 10,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 4,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.79411764705883,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 1.838235294117647,
+    "system_errors": 0,
+    "clearance_min": 0.02635128351024174,
+    "clearance_p5": 0.07115033725384934,
+    "clearance_median": 0.12324662951706686,
+    "time_success_mean": 30.4963533834592,
+    "replans_mean": 0.2922794117647059,
+    "valid_fraction": 0.9751791666969742,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.023862504910008745,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0009583283930170397
+    },
+    "cycles_no_valid_fraction": 0.001926130771599534,
+    "compute_ms_p99_max": 5.066295,
+    "compute_ms_mean": 3.0519640834002586,
+    "failures": [
+     [
+      "B1:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B2:STUCK:ABORTED",
+      4
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "B2:TIMEOUT:",
+      1
+     ],
+     [
+      "C2:TIMEOUT:",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 94.28571428571429,
+     "B2": 94.31818181818181,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 98.52941176470588,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 105.18929767608643,
+    "dwb_override": {},
+    "sim_override": {
+     "command_delay": 0.15
+    }
+   },
+   "delay0.30": {
+    "n": 632,
+    "Nf": 544,
+    "Nu": 88,
+    "counts": {
+     "SUCCESS": 514,
+     "COLLISION": 0,
+     "STUCK": 26,
+     "SAFE_STOP": 86,
+     "TIMEOUT": 6,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 94.48529411764706,
+    "CR": 0.0,
+    "SSR": 97.72727272727273,
+    "STR": 4.779411764705882,
+    "system_errors": 0,
+    "clearance_min": 0.045175606318905936,
+    "clearance_p5": 0.06762707206990676,
+    "clearance_median": 0.12165756947174211,
+    "time_success_mean": 30.520369649806018,
+    "replans_mean": 0.3860294117647059,
+    "valid_fraction": 0.971053792264308,
+    "reject_fraction": {
+     "none": 0.0,
+     "collision": 0.027891341049412387,
+     "unknown": 0.0,
+     "off_map": 0.0,
+     "braking": 0.0010548666862796284
+    },
+    "cycles_no_valid_fraction": 0.0037130883340086235,
+    "compute_ms_p99_max": 9.955177,
+    "compute_ms_mean": 3.0867950629059386,
+    "failures": [
+     [
+      "B2:STUCK:ABORTED",
+      17
+     ],
+     [
+      "B1:STUCK:ABORTED",
+      6
+     ],
+     [
+      "B1:TIMEOUT:",
+      2
+     ],
+     [
+      "B3:STUCK:ABORTED",
+      2
+     ],
+     [
+      "C2:TIMEOUT:",
+      2
+     ],
+     [
+      "S1:TIMEOUT:",
+      2
+     ],
+     [
+      "C2:STUCK:ABORTED",
+      1
+     ]
+    ],
+    "SR_by_type": {
+     "B1": 88.57142857142857,
+     "B2": 80.68181818181819,
+     "B3": 96.0,
+     "C1": 100.0,
+     "C2": 95.58823529411765,
+     "C3": 100.0,
+     "C4": 100.0,
+     "N2": 100.0,
+     "S1": null
+    },
+    "CR_by_type": {
+     "B1": 0.0,
+     "B2": 0.0,
+     "B3": 0.0,
+     "C1": 0.0,
+     "C2": 0.0,
+     "C3": 0.0,
+     "C4": 0.0,
+     "N2": 0.0,
+     "S1": 0.0
+    },
+    "wall_s": 106.32556676864624,
+    "dwb_override": {},
+    "sim_override": {
+     "command_delay": 0.3
+    }
+   }
+  }
+ }
+}

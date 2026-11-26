@@ -1594,3 +1594,24 @@ Quy tắc lập lại (`goal_path_bridge.replan.*`):
 | 15 s không có đường | `FAILED: …` (Safe Stop, đứng yên) |
 
 Trạng thái mới trên `/goal_path_bridge/follow_state`: `REPLANNING: …`, `FOLLOWING (replanned Nx)`, `WAITING: …`, `FAILED: …`.
+
+## 17. Cập nhật 2026-11-26: đóng băng cho mô phỏng (Master Plan v3, Giai đoạn A)
+
+Bằng chứng: `../stage5_benchmark/docs/ACCEPTANCE_2026-11-26.md`. Trạng thái **SIM_READY**, chưa chạy robot.
+
+| Thay đổi | Lý do (tóm tắt) |
+|---|---|
+| global `footprint_padding: 0.05` | inscribed global = local (trước 0.21 vs 0.25, A\* qua khe DWB không qua) |
+| local `resolution` 0.05 → **0.025** | sai số rời rạc ô ăn hết padding 0.05; 0.025 giữ hở ≥ 0.01 m |
+| local `width/height` 2 → **4** | cả miền T_sim 1.5–3.0 s nằm trong costmap; SR tốt nhất ở T 2.5–3.0 |
+| local `footprint_clearing_enabled: false` | bật thì vật cản sát thân bị xóa → va chạm khi wO thấp (wO 0: CR 7.95 %) |
+| bridge `localization_occluded_*` | WARN chỉ do vật cản lạ che LiDAR: chịu tới 8 s thay vì 2 s |
+| `src/replan_supervisor.cpp` | logic replan tách khỏi ROS, dùng chung Fast 2D; hành vi không đổi |
+
+Hệ quả cần biết:
+- Loại va chạm cứng giờ **độc lập trọng số** (Fast 2D: CR 0 với mọi wO 0–8, inflation 0.30–0.50).
+- Robot có thể dừng hẳn khi ô tâm thành INSCRIBED (không lùi): STUCK ~1–2 % ở trọng số hiện tại.
+- Local costmap 160×160 ô (trước 40×40): tải CPU trên laptop robot chưa đo.
+- Nav2 DWB (`FollowPath`, chỉ để so sánh) chưa thử lại với 4×4 m.
+
+`goal_path_bridge` tham số mới: `localization_occluded_ratio` (0.5), `localization_occluded_grace` (8.0 s).

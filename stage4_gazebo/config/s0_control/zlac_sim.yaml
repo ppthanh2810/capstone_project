@@ -14,7 +14,7 @@ zlac_sim:
     ramp_reference_rpm: 3000.0
     # Trễ lệnh -> firmware. Bag ~/rot_debug (2026-10-14, accel 200 ms): RPM bắt đầu đổi 0.11–0.16 s
     # sau /cmd_vel_out, nhưng con số đó gồm cả thời gian đọc feedback qua Modbus. Cấu hình lý tưởng = 0.
-    command_delay: 0.0
+    command_delay: 0.0         # giá trị node khi chạy không qua launch; s0..s3 launch ghi đè (arg command_delay, mặc định 0.15)
     speed_loop_tau: 0.0
 
     # ---- giao tiếp Gazebo ----

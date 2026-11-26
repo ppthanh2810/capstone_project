@@ -1,0 +1,2334 @@
+[
+ {
+  "id": "R1",
+  "name": "normal",
+  "state": "SUCCEEDED",
+  "t": 19.1,
+  "clear": Infinity,
+  "gt_err": 0.075,
+  "dist": 5.43,
+  "path": 5.51,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.51
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    19.1,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R2",
+  "name": "detour",
+  "state": "SUCCEEDED",
+  "t": 20.3,
+  "clear": 0.095,
+  "gt_err": 0.104,
+  "dist": 5.8,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.5,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    20.3,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R3",
+  "name": "carrot",
+  "state": "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)",
+  "t": 19.5,
+  "clear": 0.057,
+  "gt_err": 2.464,
+  "dist": 3.03,
+  "path": 3.18,
+  "replans": 4,
+  "min_replan_gap": 0.42,
+  "carrot_shift_max": 0.487,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41,
+   3.41,
+   3.29,
+   4.18,
+   3.18
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    15.4,
+    "REPLANNING: obstacle on the path 0.12 m ahead at (0.01, -3.12), cost 99, no progress for 4.2 s"
+   ],
+   [
+    15.4,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    15.5,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    18.2,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    18.3,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    18.3,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    18.7,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    18.7,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    18.7,
+    "FOLLOWING (replanned 3x)"
+   ],
+   [
+    19.1,
+    "REPLANNING: FollowPath aborted (3/3)"
+   ],
+   [
+    19.1,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    19.1,
+    "FOLLOWING (replanned 4x)"
+   ],
+   [
+    19.5,
+    "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R4",
+  "name": "replan",
+  "state": "SUCCEEDED",
+  "t": 36.8,
+  "clear": 0.083,
+  "gt_err": 0.054,
+  "dist": 8.33,
+  "path": 4.62,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.525,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.51,
+   4.62
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    15.0,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (-0.04, -3.07), cost 99, no progress for 4.1 s"
+   ],
+   [
+    15.0,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    36.8,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    17.8,
+    "UNCERTAIN",
+    "scan blocked by unmapped objects 0.861 > 0.85",
+    "0.9292",
+    "0.8611"
+   ],
+   [
+    19.3,
+    "UNCERTAIN",
+    "scan blocked by unmapped objects 0.881 > 0.85",
+    "0.9268",
+    "0.8806"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R5",
+  "name": "narrow",
+  "state": "SUCCEEDED",
+  "t": 18.7,
+  "clear": 0.114,
+  "gt_err": 0.086,
+  "dist": 5.34,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R6",
+  "name": "multi",
+  "state": "SUCCEEDED",
+  "t": 21.7,
+  "clear": 0.11,
+  "gt_err": 0.042,
+  "dist": 5.92,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.7,
+  "carrot_blocked_msgs": 9,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    21.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R6b",
+  "name": "multi_spec",
+  "state": "SUCCEEDED",
+  "t": 24.1,
+  "clear": 0.091,
+  "gt_err": 0.04,
+  "dist": 6.73,
+  "path": 6.26,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.675,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   6.26
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    24.1,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R7",
+  "name": "no_path",
+  "state": "FAILED: no free path to the goal for 15.0 s",
+  "t": 63.2,
+  "clear": 0.093,
+  "gt_err": 1.382,
+  "dist": 11.67,
+  "path": 0,
+  "replans": 10,
+  "min_replan_gap": 2.08,
+  "carrot_shift_max": 0.512,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46,
+   2.73,
+   4.61,
+   3.0
+  ],
+  "hold_disp": 0.0,
+  "hold_yaw": 0.0,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    19.0,
+    "REPLANNING: obstacle on the path 0.13 m ahead at (-0.04, -4.47), cost 99, no progress for 4.2 s"
+   ],
+   [
+    19.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    19.0,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    24.2,
+    "REPLANNING: obstacle on the path 1.44 m ahead at (-0.98, -5.19), cost 99, no progress for 4.2 s"
+   ],
+   [
+    24.2,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    39.2,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    39.2,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    39.2,
+    "FOLLOWING (replanned 3x)"
+   ],
+   [
+    48.2,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    48.2,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    50.3,
+    "REPLANNING: retry, waiting 2.1 s"
+   ],
+   [
+    50.3,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 96). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    52.5,
+    "REPLANNING: retry, waiting 4.3 s"
+   ],
+   [
+    52.5,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 96). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    54.6,
+    "REPLANNING: retry, waiting 6.4 s"
+   ],
+   [
+    54.6,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 96). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    56.8,
+    "REPLANNING: retry, waiting 8.6 s"
+   ],
+   [
+    56.8,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 96). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    58.9,
+    "REPLANNING: retry, waiting 10.7 s"
+   ],
+   [
+    59.0,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 96). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    61.0,
+    "REPLANNING: retry, waiting 12.8 s"
+   ],
+   [
+    61.0,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 96). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    63.2,
+    "FAILED: no free path to the goal for 15.0 s"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R8",
+  "name": "gap050",
+  "state": "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)",
+  "t": 14.0,
+  "clear": 0.078,
+  "gt_err": 2.3,
+  "dist": 3.13,
+  "path": 3.83,
+  "replans": 3,
+  "min_replan_gap": 0.42,
+  "carrot_shift_max": 0.675,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.48,
+   4.1,
+   3.83,
+   3.83
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    12.7,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    12.8,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    12.8,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    13.1,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    13.2,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    13.2,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    13.6,
+    "REPLANNING: FollowPath aborted (3/3)"
+   ],
+   [
+    13.6,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    13.6,
+    "FOLLOWING (replanned 3x)"
+   ],
+   [
+    14.0,
+    "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "INFO",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R9",
+  "name": "occluded",
+  "state": "SUCCEEDED",
+  "t": 26.9,
+  "clear": 0.121,
+  "gt_err": 0.067,
+  "dist": 6.48,
+  "path": 3.32,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.512,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41,
+   3.32
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    13.9,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.01, -2.80), cost 99, no progress for 4.0 s"
+   ],
+   [
+    13.9,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    26.9,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R10",
+  "name": "gap060",
+  "state": "SUCCEEDED",
+  "t": 18.9,
+  "clear": 0.091,
+  "gt_err": 0.068,
+  "dist": 5.37,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.9,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R11",
+  "name": "multi5",
+  "state": "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)",
+  "t": 13.3,
+  "clear": 0.064,
+  "gt_err": 3.363,
+  "dist": 3.39,
+  "path": 4.14,
+  "replans": 3,
+  "min_replan_gap": 0.36,
+  "carrot_shift_max": 0.587,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   6.71,
+   4.22,
+   4.14,
+   4.14
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    12.1,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    12.1,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    12.5,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    12.5,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    12.5,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    12.9,
+    "REPLANNING: FollowPath aborted (3/3)"
+   ],
+   [
+    12.9,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    12.9,
+    "FOLLOWING (replanned 3x)"
+   ],
+   [
+    13.3,
+    "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R12",
+  "name": "stale_scan",
+  "state": "SUCCEEDED",
+  "t": 25.6,
+  "clear": Infinity,
+  "gt_err": 0.076,
+  "dist": 0.0,
+  "path": null,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    24.1,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    4.5,
+    "UNCERTAIN",
+    "scan age 0.502 > 0.5",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    5.0,
+    "UNCERTAIN",
+    "scan age 0.961 > 0.5",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    5.4,
+    "UNCERTAIN",
+    "scan age 1.38 > 0.5",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    5.8,
+    "UNCERTAIN",
+    "scan age 1.8 > 0.5; TF map->base age 0.8 > 0.5",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    6.2,
+    "LOST",
+    "scan age 2.24 > 2; TF map->base age 1.24 > 0.5",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    6.7,
+    "LOST",
+    "scan age 2.68 > 2; TF map->base age 1.68 > 0.5",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    7.2,
+    "LOST",
+    "scan age 3.15 > 2; TF map->base age 2.15 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    7.6,
+    "LOST",
+    "scan age 3.57 > 2; TF map->base age 2.57 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    8.0,
+    "LOST",
+    "scan age 4.04 > 2; TF map->base age 3.04 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    8.5,
+    "LOST",
+    "scan age 4.5 > 2; TF map->base age 3.5 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    8.9,
+    "LOST",
+    "scan age 4.86 > 2; TF map->base age 3.86 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    9.3,
+    "LOST",
+    "scan age 5.26 > 2; TF map->base age 4.26 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    9.7,
+    "LOST",
+    "scan age 5.7 > 2; TF map->base age 4.7 > 2",
+    "0.802",
+    "0.01111"
+   ],
+   [
+    10.1,
+    "LOST",
+    "TF map->base age 5.14 > 2",
+    "0.8036",
+    "0.04722"
+   ],
+   [
+    10.6,
+    "UNCERTAIN",
+    "AMCL std_xy 0.269 > 0.25; AMCL std_yaw 0.358 > 0.17",
+    "0.8122",
+    "0.04722"
+   ],
+   [
+    11.1,
+    "UNCERTAIN",
+    "AMCL std_xy 0.269 > 0.25; AMCL std_yaw 0.358 > 0.17",
+    "0.82",
+    "0.025"
+   ],
+   [
+    11.5,
+    "UNCERTAIN",
+    "AMCL std_xy 0.256 > 0.25; AMCL std_yaw 0.239 > 0.17",
+    "0.8437",
+    "0.01944"
+   ],
+   [
+    12.0,
+    "UNCERTAIN",
+    "AMCL std_yaw 0.206 > 0.17",
+    "0.8552",
+    "0.01111"
+   ]
+  ],
+  "stale_pid": [
+   "172115",
+   "185174"
+  ],
+  "stop_time": 2.02,
+  "stop_dist": 0.503,
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 1
+ },
+ {
+  "id": "R1",
+  "name": "normal",
+  "state": "SUCCEEDED",
+  "t": 18.7,
+  "clear": Infinity,
+  "gt_err": 0.103,
+  "dist": 5.34,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R2",
+  "name": "detour",
+  "state": "SUCCEEDED",
+  "t": 20.5,
+  "clear": 0.1,
+  "gt_err": 0.101,
+  "dist": 5.86,
+  "path": 5.41,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.5,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    20.5,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R3",
+  "name": "carrot",
+  "state": "SUCCEEDED",
+  "t": 23.5,
+  "clear": 0.108,
+  "gt_err": 0.069,
+  "dist": 6.27,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.75,
+  "carrot_blocked_msgs": 14,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    23.5,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R4",
+  "name": "replan",
+  "state": "SUCCEEDED",
+  "t": 38.2,
+  "clear": 0.115,
+  "gt_err": 0.035,
+  "dist": 8.57,
+  "path": 4.68,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.487,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46,
+   4.68
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    15.3,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.01, -3.17), cost 99, no progress for 4.1 s"
+   ],
+   [
+    15.4,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    15.4,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    38.2,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    17.9,
+    "UNCERTAIN",
+    "scan blocked by unmapped objects 0.869 > 0.85",
+    "0.5117",
+    "0.8694"
+   ],
+   [
+    19.2,
+    "UNCERTAIN",
+    "scan blocked by unmapped objects 0.883 > 0.85",
+    "0.7919",
+    "0.8833"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R5",
+  "name": "narrow",
+  "state": "SUCCEEDED",
+  "t": 18.7,
+  "clear": 0.092,
+  "gt_err": 0.098,
+  "dist": 5.32,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R6",
+  "name": "multi",
+  "state": "SUCCEEDED",
+  "t": 21.5,
+  "clear": 0.105,
+  "gt_err": 0.042,
+  "dist": 5.89,
+  "path": 5.41,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.7,
+  "carrot_blocked_msgs": 6,
+  "paths": [
+   5.41
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    21.5,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R6b",
+  "name": "multi_spec",
+  "state": "SUCCEEDED",
+  "t": 25.8,
+  "clear": 0.107,
+  "gt_err": 0.06,
+  "dist": 7.11,
+  "path": 6.21,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.65,
+  "carrot_blocked_msgs": 1,
+  "paths": [
+   6.21
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.1,
+    "FOLLOWING"
+   ],
+   [
+    25.8,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R7",
+  "name": "no_path",
+  "state": "FAILED: no free path to the goal for 15.0 s",
+  "t": 47.3,
+  "clear": 0.113,
+  "gt_err": 1.357,
+  "dist": 9.29,
+  "path": 0,
+  "replans": 9,
+  "min_replan_gap": 2.03,
+  "carrot_shift_max": 0.55,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.48,
+   4.37
+  ],
+  "hold_disp": 0.0,
+  "hold_yaw": 0.0,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.6,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    18.6,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    18.7,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    32.3,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    32.3,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 82). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    34.3,
+    "REPLANNING: retry, waiting 2.0 s"
+   ],
+   [
+    34.3,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    36.4,
+    "REPLANNING: retry, waiting 4.1 s"
+   ],
+   [
+    36.4,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    38.5,
+    "REPLANNING: retry, waiting 6.2 s"
+   ],
+   [
+    38.5,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    40.5,
+    "REPLANNING: retry, waiting 8.2 s"
+   ],
+   [
+    40.6,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    42.6,
+    "REPLANNING: retry, waiting 10.3 s"
+   ],
+   [
+    42.6,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    44.7,
+    "REPLANNING: retry, waiting 12.4 s"
+   ],
+   [
+    44.7,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    46.8,
+    "REPLANNING: retry, waiting 14.5 s"
+   ],
+   [
+    46.8,
+    "WAITING: no path (aborted). Goal is free (cost 0); start is free (cost 91). Both cells are free: goal is probably enclosed / not connected to the robot (or connected only through unknown space with allow_unknown:=false) (retry every 2.0 s, give up after 15.0 s)"
+   ],
+   [
+    47.3,
+    "FAILED: no free path to the goal for 15.0 s"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R8",
+  "name": "gap050",
+  "state": "SUCCEEDED",
+  "t": 34.5,
+  "clear": 0.058,
+  "gt_err": 0.046,
+  "dist": 6.97,
+  "path": 4.25,
+  "replans": 2,
+  "min_replan_gap": 5.24,
+  "carrot_shift_max": 0.675,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.43,
+   4.09,
+   4.25
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    15.6,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.06, -3.30), cost 99, no progress for 4.1 s"
+   ],
+   [
+    15.7,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    15.7,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    20.9,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    20.9,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    34.5,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "INFO",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R9",
+  "name": "occluded",
+  "state": "SUCCEEDED",
+  "t": 32.4,
+  "clear": 0.114,
+  "gt_err": 0.076,
+  "dist": 7.52,
+  "path": 4.52,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.475,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46,
+   4.52
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    14.4,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.01, -2.77), cost 99, no progress for 4.1 s"
+   ],
+   [
+    14.4,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    14.4,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    32.4,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    16.4,
+    "UNCERTAIN",
+    "scan-to-map consistency 0.425 < 0.45",
+    "0.4252",
+    "0.6306"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R10",
+  "name": "gap060",
+  "state": "SUCCEEDED",
+  "t": 18.7,
+  "clear": 0.086,
+  "gt_err": 0.078,
+  "dist": 5.32,
+  "path": 5.41,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R11",
+  "name": "multi5",
+  "state": "SUCCEEDED",
+  "t": 36.2,
+  "clear": 0.073,
+  "gt_err": 0.049,
+  "dist": 7.79,
+  "path": 2.88,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.675,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   6.71,
+   2.88
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    21.3,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.01, -4.60), cost 99, no progress for 4.0 s"
+   ],
+   [
+    21.3,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    21.3,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    36.2,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R12",
+  "name": "stale_scan",
+  "state": "SUCCEEDED",
+  "t": 25.4,
+  "clear": Infinity,
+  "gt_err": 0.124,
+  "dist": 0.0,
+  "path": null,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.48
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    23.9,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    4.9,
+    "UNCERTAIN",
+    "scan age 0.859 > 0.5",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    5.4,
+    "UNCERTAIN",
+    "scan age 1.36 > 0.5",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    5.9,
+    "UNCERTAIN",
+    "scan age 1.86 > 0.5; TF map->base age 0.859 > 0.5",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    6.4,
+    "LOST",
+    "scan age 2.36 > 2; TF map->base age 1.36 > 0.5",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    6.9,
+    "LOST",
+    "scan age 2.86 > 2; TF map->base age 1.86 > 0.5",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    7.4,
+    "LOST",
+    "scan age 3.36 > 2; TF map->base age 2.36 > 2",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    7.9,
+    "LOST",
+    "scan age 3.86 > 2; TF map->base age 2.86 > 2",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    8.4,
+    "LOST",
+    "scan age 4.36 > 2; TF map->base age 3.36 > 2",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    8.9,
+    "LOST",
+    "scan age 4.86 > 2; TF map->base age 3.86 > 2",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    9.4,
+    "LOST",
+    "scan age 5.36 > 2; TF map->base age 4.36 > 2",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    9.9,
+    "LOST",
+    "scan age 5.86 > 2; TF map->base age 4.86 > 2",
+    "0.8134",
+    "0.02778"
+   ],
+   [
+    10.4,
+    "UNCERTAIN",
+    "AMCL std_xy 0.273 > 0.25; AMCL std_yaw 0.336 > 0.17",
+    "0.6123",
+    "0.075"
+   ],
+   [
+    10.9,
+    "UNCERTAIN",
+    "AMCL std_xy 0.273 > 0.25; AMCL std_yaw 0.336 > 0.17",
+    "0.6424",
+    "0.08611"
+   ],
+   [
+    11.4,
+    "UNCERTAIN",
+    "AMCL std_xy 0.269 > 0.25; AMCL std_yaw 0.286 > 0.17",
+    "0.6667",
+    "0.08889"
+   ]
+  ],
+  "stale_pid": [
+   "172115"
+  ],
+  "stop_time": 2.02,
+  "stop_dist": 0.51,
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 2
+ },
+ {
+  "id": "R1",
+  "name": "normal",
+  "state": "SUCCEEDED",
+  "t": 18.6,
+  "clear": Infinity,
+  "gt_err": 0.106,
+  "dist": 5.34,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.6,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R2",
+  "name": "detour",
+  "state": "SUCCEEDED",
+  "t": 20.3,
+  "clear": 0.082,
+  "gt_err": 0.089,
+  "dist": 5.8,
+  "path": 5.41,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.45,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    20.3,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R3",
+  "name": "carrot",
+  "state": "SUCCEEDED",
+  "t": 25.1,
+  "clear": 0.108,
+  "gt_err": 0.037,
+  "dist": 6.64,
+  "path": 2.72,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.737,
+  "carrot_blocked_msgs": 15,
+  "paths": [
+   5.46,
+   2.72
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    14.2,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    14.2,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    14.2,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    25.1,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R4",
+  "name": "replan",
+  "state": "SUCCEEDED",
+  "t": 39.4,
+  "clear": 0.119,
+  "gt_err": 0.064,
+  "dist": 8.42,
+  "path": 4.68,
+  "replans": 2,
+  "min_replan_gap": 8.09,
+  "carrot_shift_max": 0.5,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.43,
+   4.64,
+   4.68
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    15.0,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.06, -3.20), cost 99, no progress for 4.0 s"
+   ],
+   [
+    15.0,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    23.1,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    23.1,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    23.1,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    39.4,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    21.1,
+    "UNCERTAIN",
+    "scan-to-map consistency unavailable; scan blocked by unmapped objects 0.914 > 0.85",
+    "n/a",
+    "0.9139"
+   ],
+   [
+    21.6,
+    "UNCERTAIN",
+    "scan-to-map consistency 0.365 < 0.45",
+    "0.3649",
+    "0.8306"
+   ],
+   [
+    22.1,
+    "UNCERTAIN",
+    "scan-to-map consistency 0.372 < 0.45",
+    "0.3718",
+    "0.6889"
+   ],
+   [
+    22.6,
+    "UNCERTAIN",
+    "scan-to-map consistency 0.43 < 0.45",
+    "0.4303",
+    "0.5583"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R5",
+  "name": "narrow",
+  "state": "SUCCEEDED",
+  "t": 18.7,
+  "clear": 0.094,
+  "gt_err": 0.094,
+  "dist": 5.34,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R6",
+  "name": "multi",
+  "state": "SUCCEEDED",
+  "t": 35.7,
+  "clear": 0.107,
+  "gt_err": 0.058,
+  "dist": 7.35,
+  "path": 3.23,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.75,
+  "carrot_blocked_msgs": 24,
+  "paths": [
+   5.46,
+   3.23
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    17.6,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.01, -3.55), cost 99, no progress for 4.2 s"
+   ],
+   [
+    17.7,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    17.7,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    35.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R6b",
+  "name": "multi_spec",
+  "state": "SUCCEEDED",
+  "t": 24.6,
+  "clear": 0.096,
+  "gt_err": 0.063,
+  "dist": 6.9,
+  "path": 6.26,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.625,
+  "carrot_blocked_msgs": 2,
+  "paths": [
+   6.26
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    24.6,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R7",
+  "name": "no_path",
+  "state": "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)",
+  "t": 23.3,
+  "clear": 0.061,
+  "gt_err": 1.073,
+  "dist": 4.41,
+  "path": 3.54,
+  "replans": 4,
+  "min_replan_gap": 0.42,
+  "carrot_shift_max": 0.487,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41,
+   3.38,
+   3.2,
+   3.3,
+   3.54
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    19.4,
+    "REPLANNING: obstacle on the path 0.12 m ahead at (0.01, -4.55), cost 99, no progress for 4.2 s"
+   ],
+   [
+    19.4,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    19.4,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    22.1,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    22.1,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    22.1,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    22.5,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    22.6,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    22.6,
+    "FOLLOWING (replanned 3x)"
+   ],
+   [
+    23.0,
+    "REPLANNING: FollowPath aborted (3/3)"
+   ],
+   [
+    23.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    23.0,
+    "FOLLOWING (replanned 4x)"
+   ],
+   [
+    23.3,
+    "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)"
+   ]
+  ],
+  "loc_events": [
+   [
+    19.8,
+    "UNCERTAIN",
+    "scan blocked by unmapped objects 0.872 > 0.85",
+    "0.8014",
+    "0.8722"
+   ],
+   [
+    20.3,
+    "UNCERTAIN",
+    "scan blocked by unmapped objects 0.875 > 0.85",
+    "0.8373",
+    "0.875"
+   ]
+  ],
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R8",
+  "name": "gap050",
+  "state": "SUCCEEDED",
+  "t": 38.4,
+  "clear": 0.062,
+  "gt_err": 0.095,
+  "dist": 7.0,
+  "path": 4.13,
+  "replans": 2,
+  "min_replan_gap": 2.43,
+  "carrot_shift_max": 0.612,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46,
+   4.2,
+   4.13
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.8,
+    "REPLANNING: obstacle on the path 0.11 m ahead at (0.01, -3.40), cost 99, no progress for 4.2 s"
+   ],
+   [
+    18.8,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    21.2,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    21.2,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    21.2,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    38.4,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "INFO",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R9",
+  "name": "occluded",
+  "state": "SUCCEEDED",
+  "t": 32.1,
+  "clear": 0.115,
+  "gt_err": 0.087,
+  "dist": 7.42,
+  "path": 4.41,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.5,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.41,
+   4.41
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    13.8,
+    "REPLANNING: obstacle on the path 0.10 m ahead at (0.01, -2.82), cost 99, no progress for 4.2 s"
+   ],
+   [
+    13.9,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    13.9,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    32.1,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R10",
+  "name": "gap060",
+  "state": "SUCCEEDED",
+  "t": 18.7,
+  "clear": 0.076,
+  "gt_err": 0.099,
+  "dist": 5.32,
+  "path": 5.46,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    18.7,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "PASS",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R11",
+  "name": "multi5",
+  "state": "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)",
+  "t": 13.7,
+  "clear": 0.06,
+  "gt_err": 3.397,
+  "dist": 3.5,
+  "path": 4.15,
+  "replans": 3,
+  "min_replan_gap": 0.32,
+  "carrot_shift_max": 0.65,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   6.71,
+   4.29,
+   4.15,
+   4.15
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    12.6,
+    "REPLANNING: FollowPath aborted (1/3)"
+   ],
+   [
+    12.6,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    12.7,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    12.9,
+    "REPLANNING: FollowPath aborted (2/3)"
+   ],
+   [
+    13.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    13.0,
+    "FOLLOWING (replanned 2x)"
+   ],
+   [
+    13.3,
+    "REPLANNING: FollowPath aborted (3/3)"
+   ],
+   [
+    13.3,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    13.3,
+    "FOLLOWING (replanned 3x)"
+   ],
+   [
+    13.7,
+    "ABORTED: FollowPath aborted 4 times (replan.max_abort_replans 3)"
+   ]
+  ],
+  "loc_events": [],
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 3
+ },
+ {
+  "id": "R12",
+  "name": "stale_scan",
+  "state": "SUCCEEDED",
+  "t": 25.5,
+  "clear": Infinity,
+  "gt_err": 0.088,
+  "dist": 0.0,
+  "path": null,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.0,
+  "carrot_blocked_msgs": 0,
+  "paths": [
+   5.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    24.0,
+    "SUCCEEDED"
+   ]
+  ],
+  "loc_events": [
+   [
+    4.7,
+    "UNCERTAIN",
+    "scan age 0.812 > 0.5",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    5.2,
+    "UNCERTAIN",
+    "scan age 1.31 > 0.5",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    5.7,
+    "UNCERTAIN",
+    "scan age 1.81 > 0.5; TF map->base age 0.812 > 0.5",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    6.2,
+    "LOST",
+    "scan age 2.31 > 2; TF map->base age 1.31 > 0.5",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    6.7,
+    "LOST",
+    "scan age 2.81 > 2; TF map->base age 1.81 > 0.5",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    7.2,
+    "LOST",
+    "scan age 3.31 > 2; TF map->base age 2.31 > 2",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    7.7,
+    "LOST",
+    "scan age 3.81 > 2; TF map->base age 2.81 > 2",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    8.2,
+    "LOST",
+    "scan age 4.31 > 2; TF map->base age 3.31 > 2",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    8.7,
+    "LOST",
+    "scan age 4.81 > 2; TF map->base age 3.81 > 2",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    9.2,
+    "LOST",
+    "scan age 5.31 > 2; TF map->base age 4.31 > 2",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    9.7,
+    "LOST",
+    "scan age 5.81 > 2; TF map->base age 4.81 > 2",
+    "0.7872",
+    "0.03333"
+   ],
+   [
+    10.2,
+    "UNCERTAIN",
+    "AMCL std_yaw 0.312 > 0.17",
+    "0.8652",
+    "0.03889"
+   ],
+   [
+    10.7,
+    "UNCERTAIN",
+    "AMCL std_yaw 0.312 > 0.17",
+    "0.8764",
+    "0.01667"
+   ],
+   [
+    11.2,
+    "UNCERTAIN",
+    "AMCL std_yaw 0.251 > 0.17",
+    "0.9007",
+    "0.01389"
+   ],
+   [
+    11.7,
+    "UNCERTAIN",
+    "AMCL std_yaw 0.183 > 0.17",
+    "0.9077",
+    "0.002778"
+   ]
+  ],
+  "stale_pid": [
+   "172115"
+  ],
+  "stop_time": 1.92,
+  "stop_dist": 0.467,
+  "verdict": "FAIL",
+  "return": "SUCCEEDED",
+  "round": 3
+ }
+]

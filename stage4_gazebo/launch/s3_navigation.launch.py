@@ -34,7 +34,7 @@ CAMERA_LAYERS = {'fusion': 'camera_fusion.yaml', 'voxel': 'camera_voxel.yaml', '
 
 # Tham số chuyển nguyên xuống s2_slam.launch.py
 S2_ARGS = ('mode', 'env', 'aws_dir', 'world_map', 'map', 'world', 'wall_height', 'csm', 'monitor', 'gui',
-           'x', 'y', 'yaw', 'init_pose', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'camera')
+           'x', 'y', 'yaw', 'init_pose', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'command_delay', 'camera')
 
 
 def is_true(value):
@@ -206,6 +206,8 @@ def generate_launch_description():
         DeclareLaunchArgument('follow', default_value='false'),
         DeclareLaunchArgument('joy', default_value='true'),
         DeclareLaunchArgument('accel_time_ms', default_value='500'),
+        DeclareLaunchArgument('command_delay', default_value='0.15',
+                              description='zlac_sim trễ lệnh (s); 0.15 = profile benchmark (Master Plan v3)'),
         DeclareLaunchArgument('decel_time_ms', default_value='500'),
         DeclareLaunchArgument('camera', default_value='false',
                               description='true: depth camera D435 sim + cloud_sim_adapter (tốn GPU)'),

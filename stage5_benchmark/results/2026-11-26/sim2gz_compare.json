@@ -1,0 +1,638 @@
+{
+ "rows": [
+  {
+   "scenario": "gen_B1_0000",
+   "type": "B1",
+   "param_set": "base",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 26.042,
+   "fast2d_time_mean": 27.554999999998603,
+   "gazebo_path": 7.486128156953937,
+   "fast2d_path_mean": 7.762895321224772,
+   "gazebo_clearance": 0.10774100194823027,
+   "fast2d_clearance_mean": 0.1127472378773581,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.2,
+   "gazebo_astar0": 7.159323197254146,
+   "fast2d_astar0": 7.10237864674357
+  },
+  {
+   "scenario": "gen_B2_0000",
+   "type": "B2",
+   "param_set": "base",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 30.403000000000002,
+   "fast2d_time_mean": 30.79499999999796,
+   "gazebo_path": 8.783480471950977,
+   "fast2d_path_mean": 8.903492661699513,
+   "gazebo_clearance": 0.08419334723317196,
+   "fast2d_clearance_mean": 0.09777535024406186,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.472975133857247,
+   "fast2d_astar0": 8.477142535135368
+  },
+  {
+   "scenario": "gen_B3_0000",
+   "type": "B3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": true,
+   "gazebo_time": 87.414,
+   "fast2d_time_mean": 90.39499999998937,
+   "gazebo_path": 23.94614278150332,
+   "fast2d_path_mean": 23.95422756202322,
+   "gazebo_clearance": 0.09122776601683796,
+   "fast2d_clearance_mean": 0.1168757683162653,
+   "gazebo_replans": 2,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.161922147252087,
+   "fast2d_astar0": 7.1424926041863275
+  },
+  {
+   "scenario": "gen_C1_0000",
+   "type": "C1",
+   "param_set": "base",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 29.378,
+   "fast2d_time_mean": 30.134999999998094,
+   "gazebo_path": 8.514231041780592,
+   "fast2d_path_mean": 8.74656707803193,
+   "gazebo_clearance": 0.11041019662496848,
+   "fast2d_clearance_mean": 0.13743589181604338,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.894866990549437,
+   "fast2d_astar0": 9.070006429232928
+  },
+  {
+   "scenario": "gen_C2_0000",
+   "type": "C2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "LOC_LIMITED 0.27 m",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.27097645769670137,
+   "label_in_fast2d": true,
+   "gazebo_time": 20.424,
+   "fast2d_time_mean": 20.614999999999984,
+   "gazebo_path": 5.655834231911706,
+   "fast2d_path_mean": 5.864282764607052,
+   "gazebo_clearance": 0.12855339059327375,
+   "fast2d_clearance_mean": 0.16138879044539559,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.1671078680346785,
+   "fast2d_astar0": 6.142142611876421
+  },
+  {
+   "scenario": "gen_C4_0000",
+   "type": "C4",
+   "param_set": "base",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 24.235,
+   "fast2d_time_mean": 25.15499999999908,
+   "gazebo_path": 6.996329181615505,
+   "fast2d_path_mean": 7.255382243673536,
+   "gazebo_clearance": 0.325,
+   "fast2d_clearance_mean": 0.32458412449749524,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.361161405392614,
+   "fast2d_astar0": 7.373959703703926
+  },
+  {
+   "scenario": "gen_N2_0000",
+   "type": "N2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": true,
+   "gazebo_time": 21.366,
+   "fast2d_time_mean": 22.234999999999662,
+   "gazebo_path": 5.749929851444703,
+   "fast2d_path_mean": 5.97779180051767,
+   "gazebo_clearance": 0.11041019662496848,
+   "fast2d_clearance_mean": 0.18647402673353267,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.332865419239439,
+   "fast2d_astar0": 6.403579616173744
+  },
+  {
+   "scenario": "gen_B1_0000",
+   "type": "B1",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "TIMEOUT": 4,
+    "SUCCESS": 1
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "none": 4,
+    "SUCCEEDED": 1
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 34.321,
+   "fast2d_time_mean": 34.454999999999686,
+   "gazebo_path": 7.126058583615324,
+   "fast2d_path_mean": 4.259290072330122,
+   "gazebo_clearance": 0.07818554205352851,
+   "fast2d_clearance_mean": 0.08715845035244477,
+   "gazebo_replans": 2,
+   "fast2d_replans_mean": 3.4,
+   "gazebo_astar0": 7.09749182225716,
+   "fast2d_astar0": 7.10237864674357
+  },
+  {
+   "scenario": "gen_B2_0000",
+   "type": "B2",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 41.092000000000006,
+   "fast2d_time_mean": 39.635000000002336,
+   "gazebo_path": 8.810532041979137,
+   "fast2d_path_mean": 9.215104124606905,
+   "gazebo_clearance": 0.12926317995740683,
+   "fast2d_clearance_mean": 0.1170625190758153,
+   "gazebo_replans": 2,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 8.522832387864085,
+   "fast2d_astar0": 8.477142535135368
+  },
+  {
+   "scenario": "gen_B3_0000",
+   "type": "B3",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "FALSE_NO_PATH",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "FAILED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 28.98599999999999,
+   "fast2d_time_mean": 89.2549999999904,
+   "gazebo_path": 3.9055709275764348,
+   "fast2d_path_mean": 23.353066945835028,
+   "gazebo_clearance": 0.27499999999999997,
+   "fast2d_clearance_mean": 0.08414200299038499,
+   "gazebo_replans": 7,
+   "fast2d_replans_mean": 2.0,
+   "gazebo_astar0": 7.076904743724271,
+   "fast2d_astar0": 7.1424926041863275
+  },
+  {
+   "scenario": "gen_C1_0000",
+   "type": "C1",
+   "param_set": "timid_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "scan silent > 2 s",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 7.560000000000002,
+   "fast2d_time_mean": 29.954999999998126,
+   "gazebo_path": 1.9577535152629757,
+   "fast2d_path_mean": 8.753389895903343,
+   "gazebo_clearance": 2.9250000000000003,
+   "fast2d_clearance_mean": 0.13773888518112068,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.894866990549437,
+   "fast2d_astar0": 9.070006429232928
+  },
+  {
+   "scenario": "gen_C2_0000",
+   "type": "C2",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "LOC_LIMITED 0.23 m",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.22830858852623548,
+   "label_in_fast2d": true,
+   "gazebo_time": 19.510999999999996,
+   "fast2d_time_mean": 20.475000000000012,
+   "gazebo_path": 5.567697832862904,
+   "fast2d_path_mean": 5.871452326001654,
+   "gazebo_clearance": 0.09515621187164242,
+   "fast2d_clearance_mean": 0.15343313054711166,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.1137685821159975,
+   "fast2d_astar0": 6.142142611876421
+  },
+  {
+   "scenario": "gen_C4_0000",
+   "type": "C4",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 24.232,
+   "fast2d_time_mean": 24.994999999999113,
+   "gazebo_path": 7.011673465839415,
+   "fast2d_path_mean": 7.266128779083992,
+   "gazebo_clearance": 0.325,
+   "fast2d_clearance_mean": 0.32458412449749524,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.322995068844191,
+   "fast2d_astar0": 7.373959703703926
+  },
+  {
+   "scenario": "gen_N2_0000",
+   "type": "N2",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": true,
+   "gazebo_time": 20.983999999999995,
+   "fast2d_time_mean": 22.014999999999706,
+   "gazebo_path": 5.718130138066553,
+   "fast2d_path_mean": 5.980274644067403,
+   "gazebo_clearance": 0.11041019662496848,
+   "fast2d_clearance_mean": 0.17947581558490158,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.332865419239439,
+   "fast2d_astar0": 6.403579616173744
+  },
+  {
+   "scenario": "gen_B1_0000",
+   "type": "B1",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 26.393000000000015,
+   "fast2d_time_mean": 27.774999999998563,
+   "gazebo_path": 6.989294895895421,
+   "fast2d_path_mean": 7.2618127494933065,
+   "gazebo_clearance": 0.0980344188021881,
+   "fast2d_clearance_mean": 0.11147957307174657,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.159323197254146,
+   "fast2d_astar0": 7.10237864674357
+  },
+  {
+   "scenario": "gen_B2_0000",
+   "type": "B2",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 32.622000000000014,
+   "fast2d_time_mean": 33.71499999999931,
+   "gazebo_path": 8.68390873193244,
+   "fast2d_path_mean": 8.92539050105999,
+   "gazebo_clearance": 0.12179649304029055,
+   "fast2d_clearance_mean": 0.11742114635756482,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.472975133857247,
+   "fast2d_astar0": 8.477142535135368
+  },
+  {
+   "scenario": "gen_B3_0000",
+   "type": "B3",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "TIMEOUT": 3,
+    "SUCCESS": 2
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "none": 3,
+    "SUCCEEDED": 2
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 93.88000000000002,
+   "fast2d_time_mean": 98.90499999998163,
+   "gazebo_path": 23.305349002438117,
+   "fast2d_path_mean": 23.89087645137143,
+   "gazebo_clearance": 0.09122776601683796,
+   "fast2d_clearance_mean": 0.1198667332061945,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.4,
+   "gazebo_astar0": 7.126524951751518,
+   "fast2d_astar0": 7.1424926041863275
+  },
+  {
+   "scenario": "gen_C1_0000",
+   "type": "C1",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 33.08500000000001,
+   "fast2d_time_mean": 34.15499999999953,
+   "gazebo_path": 8.415163795440462,
+   "fast2d_path_mean": 8.711490435339405,
+   "gazebo_clearance": 0.125,
+   "fast2d_clearance_mean": 0.13806633682125655,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.113217857955366,
+   "fast2d_astar0": 9.070006429232928
+  },
+  {
+   "scenario": "gen_C2_0000",
+   "type": "C2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "LOC_LIMITED 0.26 m",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.2556819763018607,
+   "label_in_fast2d": true,
+   "gazebo_time": 23.408999999999992,
+   "fast2d_time_mean": 23.85499999999934,
+   "gazebo_path": 5.640295123959981,
+   "fast2d_path_mean": 5.84123878554531,
+   "gazebo_clearance": 0.09515621187164242,
+   "fast2d_clearance_mean": 0.1564910542994451,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.1671078680346785,
+   "fast2d_astar0": 6.142142611876421
+  },
+  {
+   "scenario": "gen_C4_0000",
+   "type": "C4",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 26.769999999999996,
+   "fast2d_time_mean": 27.794999999998556,
+   "gazebo_path": 6.9378665705243225,
+   "fast2d_path_mean": 7.235452760278396,
+   "gazebo_clearance": 0.325,
+   "fast2d_clearance_mean": 0.32458412449749524,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.361161405392614,
+   "fast2d_astar0": 7.373959703703926
+  },
+  {
+   "scenario": "gen_N2_0000",
+   "type": "N2",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "SUCCEEDED_BUT_OFF_GOAL",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 24.293000000000006,
+   "fast2d_time_mean": 26.214999999998874,
+   "gazebo_path": 5.700048698515649,
+   "fast2d_path_mean": 5.933387211020354,
+   "gazebo_clearance": 0.11041019662496848,
+   "fast2d_clearance_mean": 0.1769080815209051,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.332865419239439,
+   "fast2d_astar0": 6.403579616173744
+  }
+ ],
+ "summary": {
+  "n": 21,
+  "label_match_rate": 0.2857142857142857,
+  "outcome_match_rate": 0.8095238095238095,
+  "label_in_fast2d_rate": 0.2857142857142857,
+  "time_rel_err_median": 0.03545702326481237,
+  "path_rel_err_median": 0.03697066874466261,
+  "astar0_rel_err_median": 0.0047416213894982216,
+  "mean_time_by_param_set": {
+   "gazebo": {
+    "base": 34.180285714285716,
+    "timid_short": 28.028,
+    "bold_long": 37.20742857142858
+   },
+   "fast2d": {
+    "base": 35.26928571428325,
+    "timid_short": 28.31500000000017,
+    "bold_long": 38.916428571425115
+   }
+  }
+ }
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>stage5_benchmark</name>
+  <version>0.1.0</version>
+  <description>Benchmark SAC-DWA: Fast 2D simulator (dùng chính DwaCore/ReplanSupervisor/NavFn/ZlacDriverModel),
+    Scenario Generator, Feasibility/Difficulty, Episode Evaluator, Gazebo runner, pilot. Chỉ mô phỏng.</description>
+  <maintainer email="pphuongthanh0805@gmail.com">thanhpham</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <build_depend>pybind11-dev</build_depend>
+  <depend>stage3_navigation</depend>
+  <depend>stage4_gazebo</depend>
+  <depend>nav2_costmap_2d</depend>
+  <depend>nav2_navfn_planner</depend>
+  <depend>geometry_msgs</depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>python3-scipy</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

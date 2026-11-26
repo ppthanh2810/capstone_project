@@ -1,0 +1,330 @@
+{
+ "all": {
+  "n": 588,
+  "Nf": 530,
+  "Nu": 58,
+  "counts": {
+   "SUCCESS": 525,
+   "COLLISION": 0,
+   "STUCK": 1,
+   "SAFE_STOP": 58,
+   "TIMEOUT": 4,
+   "SYSTEM_ERROR": 0
+  },
+  "SR": 99.05660377358491,
+  "CR": 0.0,
+  "SSR": 100.0,
+  "STR": 0.18867924528301888,
+  "system_errors": 0
+ },
+ "by_type": {
+  "B1": {
+   "n": 60,
+   "Nf": 60,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 59,
+    "COLLISION": 0,
+    "STUCK": 1,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 98.33333333333333,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 1.6666666666666667,
+   "system_errors": 0
+  },
+  "B2": {
+   "n": 60,
+   "Nf": 60,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 58,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 2,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 96.66666666666667,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "B3": {
+   "n": 30,
+   "Nf": 30,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 29,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 1,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 96.66666666666667,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "C1": {
+   "n": 60,
+   "Nf": 60,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 60,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "C2": {
+   "n": 60,
+   "Nf": 60,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 59,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 1,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 98.33333333333333,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "C3": {
+   "n": 36,
+   "Nf": 36,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 36,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "C4": {
+   "n": 60,
+   "Nf": 60,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 60,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "N1": {
+   "n": 60,
+   "Nf": 60,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 60,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "N2": {
+   "n": 56,
+   "Nf": 56,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 56,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "N3": {
+   "n": 48,
+   "Nf": 48,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 48,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "S1": {
+   "n": 58,
+   "Nf": 0,
+   "Nu": 58,
+   "counts": {
+    "SUCCESS": 0,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 58,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": null,
+   "CR": 0.0,
+   "SSR": 100.0,
+   "STR": null,
+   "system_errors": 0
+  }
+ },
+ "by_level": {
+  "easy": {
+   "n": 484,
+   "Nf": 484,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 479,
+    "COLLISION": 0,
+    "STUCK": 1,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 4,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 98.96694214876032,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.2066115702479339,
+   "system_errors": 0
+  },
+  "medium": {
+   "n": 46,
+   "Nf": 46,
+   "Nu": 0,
+   "counts": {
+    "SUCCESS": 46,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 0,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 100.0,
+   "CR": 0.0,
+   "SSR": null,
+   "STR": 0.0,
+   "system_errors": 0
+  },
+  "unsolvable": {
+   "n": 58,
+   "Nf": 0,
+   "Nu": 58,
+   "counts": {
+    "SUCCESS": 0,
+    "COLLISION": 0,
+    "STUCK": 0,
+    "SAFE_STOP": 58,
+    "TIMEOUT": 0,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": null,
+   "CR": 0.0,
+   "SSR": 100.0,
+   "STR": null,
+   "system_errors": 0
+  }
+ },
+ "by_map": {
+  "generated": {
+   "n": 588,
+   "Nf": 530,
+   "Nu": 58,
+   "counts": {
+    "SUCCESS": 525,
+    "COLLISION": 0,
+    "STUCK": 1,
+    "SAFE_STOP": 58,
+    "TIMEOUT": 4,
+    "SYSTEM_ERROR": 0
+   },
+   "SR": 99.05660377358491,
+   "CR": 0.0,
+   "SSR": 100.0,
+   "STR": 0.18867924528301888,
+   "system_errors": 0
+  }
+ },
+ "failures": [
+  [
+   "B2",
+   "TIMEOUT",
+   "",
+   2
+  ],
+  [
+   "B1",
+   "STUCK",
+   "SUCCEEDED_BUT_OFF_GOAL",
+   1
+  ],
+  [
+   "B3",
+   "TIMEOUT",
+   "",
+   1
+  ],
+  [
+   "C2",
+   "TIMEOUT",
+   "",
+   1
+  ]
+ ],
+ "timing": {
+  "generation_s": 59.14063763618469,
+  "run_wall_s": 91.39454674720764,
+  "episodes": 588,
+  "sim_s_total": 18627.90500000042,
+  "compute_ms_p99_max": 13.88751
+ },
+ "profile": "fpclear_on"
+}

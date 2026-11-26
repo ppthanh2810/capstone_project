@@ -29,8 +29,10 @@ global_costmap:
       use_sim_time: false
       global_frame: map
       robot_base_frame: base_footprint
-      # Robot tròn Ø400 mm.
+      # Robot tròn Ø400 mm + biên 0.05 m = bán kính nội tiếp 0.25 m, GIỐNG local_costmap (2026-11-26, Master Plan v3
+      # Q1: trước đó padding mặc định Nav2 0.01 -> 0.21 m, A* lập đường qua khe 0.50 m mà DWB không qua, R8).
       robot_radius: 0.20
+      footprint_padding: 0.05
       # 2 Hz: obstacle_layer (LiDAR) phải cập nhật đủ nhanh để goal_path_bridge thấy đường bị chặn (1 Hz khi chỉ có
       # static + inflation, 2026-10-19 .. 2026-11-25). Mỗi lần publish gửi cả bản đồ (always_send_full_costmap).
       update_frequency: 2.0
@@ -85,8 +87,8 @@ global_costmap:
           observation_persistence: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        # Khoảng an toàn: bán kính 0.20 m (nội tiếp, NavFn coi như vật cản) + vùng chi phí giảm dần tới 0.40 m
-        # -> đường ưu tiên đi cách tường, nhưng vẫn qua được khe >= 0.40 m.
+        # Khoảng an toàn: bán kính nội tiếp 0.25 m (robot 0.20 + padding 0.05, NavFn coi như vật cản) + vùng chi phí
+        # giảm dần tới 0.40 m -> đường ưu tiên đi cách tường; khe nhỏ nhất A* qua được ~0.55 m (= khe DWB).
         inflation_radius: 0.40
         cost_scaling_factor: 3.0
         inflate_unknown: false
@@ -147,6 +149,12 @@ goal_path_bridge:
     # Đang bám đường: UNCERTAIN/INITIALIZING liên tục <= mức này được bỏ qua (LOST, status cũ -> hủy ngay).
     # Robot 2026-10-14: UNCERTAIN chập chờn 0.5-1 s khi quay/đi làm 6/8 lượt bị hủy. Bắt đầu vẫn đòi LOCALIZED.
     localization_uncertain_grace: 2.0  # s
+    # Vật cản lớn chưa có trong map che phần lớn LiDAR (Gazebo R4 2026-11-26: blocked_ratio 0.88, consistency 0.28 ->
+    # hủy khi đang né/replan). WARN CHỈ do "scan blocked" / "scan-to-map consistency" với blocked_ratio >= ratio =
+    # thiếu bằng chứng, không phải mâu thuẫn -> chịu tới occluded_grace (từ đầu chuỗi WARN) nếu WARN không-che-khuất
+    # không kéo dài quá localization_uncertain_grace. LOST / status cũ / AMCL std / pose jump: hủy như cũ.
+    localization_occluded_ratio: 0.5
+    localization_occluded_grace: 8.0   # s
     # ---- Replanning event-triggered (Stage 3.3; khôi phục 1e87e65 + trigger "stall", 2026-11-25) ----
     # Chỉ trong phiên đã kích hoạt (~/follow / auto_follow). Bị chặn = ô global_costmap (static + obstacle +
     # inflation) dọc đường phía trước có chi phí >= blocked_cost, liên tục confirm_time. Lập lại A* (từ vị trí hiện
@@ -388,9 +396,21 @@ local_costmap:
       # SAU tường -> GoalDist kéo về phía tường, PathDist kéo theo đường vòng -> robot đứng yên ->
       # "Failed to make progress" (tái hiện offline). 2 x 2 m: đích cục bộ <= ~1 m, bám theo đường vòng.
       # Ở 0.15 m/s, sim_time 1.7 s chỉ nhìn trước ~0.26 m nên ±1 m là đủ cho tránh vật cản.
-      width: 2
-      height: 2
-      resolution: 0.05
+      # 4 x 4 m (2026-11-26, Master Plan v3 A7; trước 2 x 2). Fast 2D (pilot2, 2 seed, CR 0 mọi cấu hình):
+      #   2x2: sim_time 1.5/2.0/2.5/3.0 -> SR 93.2/97.8/97.4/96.7 %; T_sim bị chặn <= 3.17 s bởi mép costmap;
+      #   4x4: 1.5/2.0/2.5/3.0/4.0/5.0 -> 94.3/97.2/98.0/98.2/90.3/87.3 % (T >= 4: B3 sụp); không có OFF_MAP.
+      # Chọn 4x4 cho cả M0/M1: cả miền T_sim [1.5, 3.0] của SAC nằm gọn trong costmap, đường sau vật cản còn trong
+      # costmap (cà rốt hợp lệ). Lưu ý: Nav2 DWB (FollowPath, chỉ để so sánh) lấy đích cục bộ ở mép costmap — 3x3 đã
+      # làm nó đứng yên offline (lịch sử ở trên); chưa thử lại FollowPath với 4x4.
+      width: 4
+      height: 4
+      # 0.025 (2026-11-26, Master Plan v3 A1; trước 0.05). Fast 2D 2358 episode/cấu hình (pilot2 x 3 seed):
+      #   0.05 + footprint clearing: 1 va chạm (hở -0.008 m) — vật cản sát thân nằm trong footprint đã padding bị xóa;
+      #   0.05 không clearing: 0 va chạm nhưng STUCK 1.3 % ("robot pose is in collision" ở hở thật ~0.09 m);
+      #   0.025 + clearing: SR 99.8 %, 0 va chạm, hở nhỏ nhất 0.011 m, CustomDWB p99 10.5 ms.
+      # Sai số rời rạc ô (+ nhiễu LiDAR) ăn gần hết padding 0.05 ở ô 0.05 m; ô 0.025 m giữ được biên mà không tăng
+      # padding (padding 0.10: SR giảm 2.8–5.3 điểm). NOT_VERIFIED tải CPU trên laptop robot.
+      resolution: 0.025
       update_frequency: 5.0
       publish_frequency: 2.0
       transform_tolerance: 0.3
@@ -400,7 +420,12 @@ local_costmap:
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: true
-        footprint_clearing_enabled: true
+        # false (2026-11-26, Master Plan v3 A1/A6): Nav2 xóa mọi ô trong footprint ĐÃ PADDING (~0.25–0.27 m) mỗi lần
+        # cập nhật -> vật cản sát thân (robot được phép tới ~0.245 m) bị xóa -> DWA thấy trống -> va chạm. Fast 2D:
+        # clearing bật: wO 0 -> CR 7.95 %, wO 1 -> 3.12 %, wO 4 -> 0 % (an toàn phụ thuộc trọng số mềm);
+        # tắt: CR 0 % với mọi wO (loại va chạm cứng độc lập trọng số), đổi lại STUCK ~1 % ở wO 4 (robot dừng hẳn khi
+        # ô tâm thành INSCRIBED, không lùi). Global costmap giữ true (A* lập đường từ vị trí robot).
+        footprint_clearing_enabled: false
         combination_method: 1      # max
         observation_sources: scan
         scan:

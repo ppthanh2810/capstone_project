@@ -52,6 +52,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "stage3_navigation/path_blockage.hpp"
+#include "stage3_navigation/replan_supervisor.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "std_srvs/srv/trigger.hpp"
 #include "tf2/exceptions.h"
@@ -103,6 +104,13 @@ public:
     // Đang bám đường: WARN (UNCERTAIN / INITIALIZING) chỉ hủy khi kéo dài liên tục quá mức này;
     // ERROR (LOST) và status cũ vẫn hủy ngay. Bắt đầu bám đường vẫn đòi OK.
     declare_parameter<double>("localization_uncertain_grace", 2.0);
+    // Vật cản lớn chưa có trong bản đồ che phần lớn tia (Master Plan v3 A8, Gazebo R4 2026-11-26: blocked_ratio 0.88
+    // rồi consistency 0.28 -> UNCERTAIN > 2 s -> hủy giữa lúc đang né / replan). WARN chỉ do "scan blocked" /
+    // "scan-to-map consistency" khi blocked_ratio >= localization_occluded_ratio = thiếu bằng chứng, không phải mâu
+    // thuẫn -> chịu tới localization_occluded_grace (tính từ đầu chuỗi WARN) miễn WARN không-che-khuất không kéo dài
+    // quá localization_uncertain_grace. LOST, status cũ, AMCL std / pose jump / tuổi dữ liệu: như cũ.
+    declare_parameter<double>("localization_occluded_ratio", 0.5);
+    declare_parameter<double>("localization_occluded_grace", 8.0);
     const auto status_topic =
       declare_parameter<std::string>("localization_status_topic", "/localization/status");
 
@@ -164,8 +172,15 @@ public:
         loc_status_time_ = now();
         if (msg->level != DiagnosticStatus::WARN) {
           loc_warn_since_.reset();
-        } else if (!loc_warn_since_) {
-          loc_warn_since_ = loc_status_time_;
+          loc_occluded_last_.reset();
+        } else {
+          if (!loc_warn_since_) {
+            loc_warn_since_ = loc_status_time_;
+            loc_occluded_last_.reset();
+          }
+          if (occludedWarn(*msg)) {
+            loc_occluded_last_ = loc_status_time_;
+          }
         }
       });
 
@@ -219,21 +234,44 @@ private:
     std::uint64_t id{0};
     geometry_msgs::msg::PoseStamped goal;
     rclcpp::Time start;
-    int obstacle_replans{0};
-    int abort_replans{0};
-    bool replan_in_flight{false};
-    bool costmap_cleared{false};                 // đã xóa obstacle layer một lần trong đợt chờ hiện tại
-    std::optional<rclcpp::Time> waiting_since;   // không có FollowPath, đang chờ đường mới
-    std::optional<rclcpp::Time> blocked_since;   // đầu chuỗi "đường bị chặn" liên tục hiện tại
-    std::optional<rclcpp::Time> clear_since;     // đầu chuỗi "thông" khi đang bị chặn (hysteresis)
-    double ref_progress{0.0};                    // m dọc đường, mốc tiến trình gần nhất
-    rclcpp::Time ref_time;                       // lúc đạt ref_progress (+ stall_progress)
-    std::vector<double> path_s;                  // độ dài cung tích lũy của path
-    std::optional<rclcpp::Time> last_attempt;    // lần gửi ComputePathToPose lập lại gần nhất
-    std::vector<PathPoint> path;                 // đường đang bám (frame của path)
     std::string path_frame;
-    std::size_t progress_segment{0};
+    // Trạng thái replan (chặn / tiến trình / chờ / số lần): thư viện ROS-free dùng chung với Fast 2D benchmark.
+    ReplanSupervisor sup;
   };
+
+  // Tham số replan.* đọc lại mỗi lần dùng (ros2 param set có hiệu lực ngay).
+  ReplanParams replanParams() const
+  {
+    ReplanParams p;
+    p.enabled = get_parameter("replan.enabled").as_bool();
+    p.trigger = get_parameter("replan.trigger").as_string();
+    p.lookahead_distance = get_parameter("replan.lookahead_distance").as_double();
+    p.start_offset = get_parameter("replan.start_offset").as_double();
+    p.blocked_cost = static_cast<int>(get_parameter("replan.blocked_cost").as_int());
+    p.confirm_time = get_parameter("replan.confirm_time").as_double();
+    p.clear_time = get_parameter("replan.clear_time").as_double();
+    p.stall_time = get_parameter("replan.stall_time").as_double();
+    p.stall_progress = get_parameter("replan.stall_progress").as_double();
+    p.min_interval = get_parameter("replan.min_interval").as_double();
+    p.max_obstacle_replans =
+      static_cast<int>(get_parameter("replan.max_obstacle_replans").as_int());
+    p.max_abort_replans = static_cast<int>(get_parameter("replan.max_abort_replans").as_int());
+    p.wait_timeout = get_parameter("replan.wait_timeout").as_double();
+    return p;
+  }
+
+  // Thực hiện quyết định của ReplanSupervisor.
+  void apply(const ReplanDecision & d)
+  {
+    if (d.type == ReplanDecision::Type::REPLAN) {
+      requestReplan(d.text);
+    } else if (d.type == ReplanDecision::Type::END) {
+      if (d.text.rfind("FAILED", 0) == 0) {
+        RCLCPP_ERROR(get_logger(), "replan: giving up -> %s", d.text.c_str());
+      }
+      endSession(d.text);
+    }
+  }
 
   // ======================= A* (ComputePathToPose) =======================
 
@@ -361,6 +399,7 @@ private:
     session_->id = ++session_counter_;
     session_->goal = *last_goal_;
     session_->start = now();
+    session_->sup.begin(now().seconds());
     RCLCPP_INFO(
       get_logger(), "FollowPath requested (%s): %zu poses, path age %.1f s, robot %.2f m from path",
       trigger.c_str(), last_path_->poses.size(), age, nearest);
@@ -420,24 +459,15 @@ private:
     const std::uint64_t id = ++follow_id_;
     following_ = true;
     // follow_handle_ giữ handle cũ (nếu có) tới khi goal mới được chấp nhận: hủy trong lúc đó hủy cả hai.
-    session_->path.clear();
-    for (const auto & p : path.poses) {
-      session_->path.push_back(PathPoint{p.pose.position.x, p.pose.position.y});
+    {
+      std::vector<PathPoint> pts;
+      pts.reserve(path.poses.size());
+      for (const auto & p : path.poses) {
+        pts.push_back(PathPoint{p.pose.position.x, p.pose.position.y});
+      }
+      session_->path_frame = path.header.frame_id.empty() ? global_frame_ : path.header.frame_id;
+      session_->sup.setPath(pts, now().seconds());
     }
-    session_->path_frame = path.header.frame_id.empty() ? global_frame_ : path.header.frame_id;
-    session_->progress_segment = 0;
-    session_->path_s.assign(session_->path.size(), 0.0);
-    for (std::size_t i = 1; i < session_->path.size(); ++i) {
-      session_->path_s[i] = session_->path_s[i - 1] + std::hypot(
-        session_->path[i].x - session_->path[i - 1].x,
-        session_->path[i].y - session_->path[i - 1].y);
-    }
-    session_->ref_progress = 0.0;
-    session_->ref_time = now();
-    session_->clear_since.reset();
-    session_->blocked_since.reset();
-    session_->waiting_since.reset();
-    session_->costmap_cleared = false;
 
     rclcpp_action::Client<FollowPath>::SendGoalOptions options;
     options.goal_response_callback =
@@ -458,9 +488,9 @@ private:
         }
         follow_handle_ = handle;
         publishState(
-          session_ && (session_->obstacle_replans + session_->abort_replans) > 0 ?
+          session_ && session_->sup.totalReplans() > 0 ?
           "FOLLOWING (replanned " + std::to_string(
-            session_->obstacle_replans + session_->abort_replans) + "x)" : "FOLLOWING");
+            session_->sup.totalReplans()) + "x)" : "FOLLOWING");
         RCLCPP_INFO(get_logger(), "FollowPath accepted: DWB is following the A* path");
       };
     options.feedback_callback =
@@ -504,26 +534,11 @@ private:
   // FollowPath bị abort trong phiên: lập lại A* (có giới hạn) thay vì kết thúc ngay.
   void onFollowAborted()
   {
-    if (!session_ || !get_parameter("replan.enabled").as_bool()) {
+    if (!session_) {
       endSession("ABORTED");
       return;
     }
-    const int max_abort = static_cast<int>(get_parameter("replan.max_abort_replans").as_int());
-    if (session_->abort_replans >= max_abort) {
-      endSession(
-        "ABORTED: FollowPath aborted " + std::to_string(session_->abort_replans + 1) +
-        " times (replan.max_abort_replans " + std::to_string(max_abort) + ")");
-      return;
-    }
-    ++session_->abort_replans;
-    if (!session_->waiting_since) {
-      session_->waiting_since = now();
-    }
-    if (!session_->replan_in_flight) {
-      requestReplan(
-        "FollowPath aborted (" + std::to_string(session_->abort_replans) + "/" +
-        std::to_string(max_abort) + ")");
-    }
+    apply(session_->sup.onFollowAborted(now().seconds(), replanParams()));
   }
 
   // Hủy goal FollowPath đang chạy (nếu có), KHÔNG kết thúc phiên. controller_server phát vận tốc 0.
@@ -592,7 +607,7 @@ private:
         }
       }
     }
-    if (session_->replan_in_flight) {
+    if (session_->sup.inFlight()) {
       return;
     }
     if (!get_parameter("replan.enabled").as_bool()) {
@@ -603,8 +618,8 @@ private:
     }
     if (following_) {
       checkBlockage();
-    } else if (session_->waiting_since) {
-      retryWhileWaiting();
+    } else if (session_->sup.waiting()) {
+      apply(session_->sup.retryWhileWaiting(now().seconds(), replanParams()));
     }
   }
 
@@ -614,7 +629,7 @@ private:
   void checkBlockage()
   {
     auto & s = *session_;
-    if (!costmap_ || s.path.empty()) {
+    if (!costmap_) {
       return;
     }
     const double costmap_age = (now() - costmap_time_).seconds();
@@ -622,7 +637,7 @@ private:
       RCLCPP_WARN_THROTTLE(
         get_logger(), *get_clock(), 5000,
         "replan: global costmap is %.1f s old, path blockage not checked", costmap_age);
-      s.blocked_since.reset();
+      s.sup.costmapStale();
       return;
     }
     if (costmap_->header.frame_id != s.path_frame) {
@@ -638,18 +653,6 @@ private:
     } catch (const tf2::TransformException &) {
       return;   // localization / TF đã được giám sát ở nơi khác
     }
-    double along = 0.0;
-    s.progress_segment = projectOnPath(
-      s.path, robot.transform.translation.x, robot.transform.translation.y, s.progress_segment, 2.0,
-      along);
-    // Tiến trình dọc đường (chỉ tăng khi robot thật sự tiến theo đường, kể cả khi đang vòng né sát đường).
-    const double progress =
-      (s.progress_segment < s.path_s.size() ? s.path_s[s.progress_segment] : 0.0) + along;
-    if (progress >= s.ref_progress + get_parameter("replan.stall_progress").as_double()) {
-      s.ref_progress = progress;
-      s.ref_time = now();
-    }
-
     const auto & info = costmap_->info;
     GridView grid;
     grid.origin_x = info.origin.position.x;
@@ -659,94 +662,24 @@ private:
     grid.height = info.height;
     grid.data = costmap_->data.size() == static_cast<std::size_t>(info.width) * info.height ?
       costmap_->data.data() : nullptr;
-    const auto b = findBlockage(
-      s.path, grid, s.progress_segment, along,
-      get_parameter("replan.start_offset").as_double(),
-      get_parameter("replan.lookahead_distance").as_double(),
-      static_cast<int>(get_parameter("replan.blocked_cost").as_int()));
-    if (!b.blocked) {
-      if (s.blocked_since) {
-        // Hysteresis: một vài chu kỳ "thông" (vật cản ở mép tầm LiDAR, nhiễu) không xóa trạng thái chặn.
-        if (!s.clear_since) {
-          s.clear_since = now();
-        }
-        if ((now() - *s.clear_since).seconds() >= get_parameter("replan.clear_time").as_double()) {
-          RCLCPP_INFO(get_logger(), "replan: path is clear again");
-          s.blocked_since.reset();
-          s.clear_since.reset();
-        }
-      }
-      return;
-    }
-    s.clear_since.reset();
-    const std::string where = "obstacle on the path " + fmt2(b.distance_ahead) + " m ahead at (" +
-      fmt(b.x, b.y) + "), cost " + std::to_string(b.cost);
-    if (!s.blocked_since) {
-      s.blocked_since = now();
+    BlockageEvent event = BlockageEvent::NONE;
+    std::string where;
+    const auto d = s.sup.checkBlockage(
+      now().seconds(), robot.transform.translation.x, robot.transform.translation.y, grid,
+      replanParams(), &event, &where);
+    if (event == BlockageEvent::CONFIRMING) {
       RCLCPP_WARN(get_logger(), "replan: %s, confirming", where.c_str());
+    } else if (event == BlockageEvent::CLEARED) {
+      RCLCPP_INFO(get_logger(), "replan: path is clear again");
     }
-    if ((now() - *s.blocked_since).seconds() < get_parameter("replan.confirm_time").as_double()) {
-      return;
-    }
-    if (get_parameter("replan.trigger").as_string() != "immediate") {
-      // Event-triggered: CustomDWB đang tự vòng qua (tiến trình dọc đường còn tăng) -> không lập lại.
-      const rclcpp::Time since = std::max(s.ref_time, *s.blocked_since);
-      const double stalled = (now() - since).seconds();
-      if (stalled < get_parameter("replan.stall_time").as_double()) {
-        return;
-      }
-      requestObstacleReplan(where + ", no progress for " + fmt1(stalled) + " s");
-      return;
-    }
-    requestObstacleReplan(where);
-  }
-
-  // Lập lại do vật cản: cooldown (min_interval) + giới hạn số lần (max_obstacle_replans) -> FAILED (Safe Stop).
-  void requestObstacleReplan(const std::string & where)
-  {
-    auto & s = *session_;
-    if (s.last_attempt &&
-      (now() - *s.last_attempt).seconds() < get_parameter("replan.min_interval").as_double())
-    {
-      return;
-    }
-    const int max_replans = static_cast<int>(get_parameter("replan.max_obstacle_replans").as_int());
-    if (max_replans > 0 && s.obstacle_replans >= max_replans) {
-      RCLCPP_ERROR(
-        get_logger(), "replan: %s, but replan.max_obstacle_replans (%d) reached: stopping",
-        where.c_str(), max_replans);
-      endSession("FAILED: path blocked, replan.max_obstacle_replans reached");
-      return;
-    }
-    ++s.obstacle_replans;
-    requestReplan(where);
-  }
-
-  void retryWhileWaiting()
-  {
-    auto & s = *session_;
-    const double waited = (now() - *s.waiting_since).seconds();
-    const double wait_timeout = get_parameter("replan.wait_timeout").as_double();
-    if (waited > wait_timeout) {
-      RCLCPP_ERROR(
-        get_logger(), "replan: no followable path for %.1f s (> replan.wait_timeout %.1f s): giving up",
-        waited, wait_timeout);
-      endSession("FAILED: no free path to the goal for " + fmt1(waited) + " s");
-      return;
-    }
-    if (s.last_attempt &&
-      (now() - *s.last_attempt).seconds() < get_parameter("replan.min_interval").as_double())
-    {
-      return;
-    }
-    requestReplan("retry, waiting " + fmt1(waited) + " s");
+    apply(d);
   }
 
   // ComputePathToPose tới đích của phiên, start = pose robot hiện tại. Thành công -> FollowPath đường mới.
   void requestReplan(const std::string & reason)
   {
     auto & s = *session_;
-    s.last_attempt = now();
+    s.sup.markAttempt(now().seconds());
     RCLCPP_WARN(get_logger(), "replan: %s -> computing a new A* path", reason.c_str());
     publishState("REPLANNING: " + reason);
     if (!client_->action_server_is_ready()) {
@@ -757,7 +690,7 @@ private:
     request.goal = s.goal;
     request.planner_id = planner_id_;
     request.use_start = false;
-    s.replan_in_flight = true;
+    s.sup.setInFlight(true);
 
     const std::uint64_t id = ++request_id_;
     const std::uint64_t sid = s.id;
@@ -768,7 +701,7 @@ private:
     options.goal_response_callback =
       [this, current](const GoalHandle::SharedPtr & handle) {
         if (!handle && current()) {
-          session_->replan_in_flight = false;
+          session_->sup.setInFlight(false);
           onReplanFailed("planner_server rejected the ComputePathToPose goal");
         }
       };
@@ -777,7 +710,7 @@ private:
         if (!current()) {
           return;   // goal mới / phiên đã kết thúc
         }
-        session_->replan_in_flight = false;
+        session_->sup.setInFlight(false);
         if (!succeeded(result)) {
           geometry_msgs::msg::Vector3 start;
           try {
@@ -815,9 +748,7 @@ private:
     if (stopFollowGoal()) {
       RCLCPP_WARN(get_logger(), "replan: stopping the robot (FollowPath canceled) while waiting");
     }
-    if (!s.waiting_since) {
-      s.waiting_since = now();
-    }
+    s.sup.onReplanFailed(now().seconds());
     RCLCPP_ERROR(get_logger(), "replan failed: %s", why.c_str());
     publishState(
       "WAITING: " + why + " (retry every " + fmt1(
@@ -829,8 +760,7 @@ private:
     empty.header.stamp = now();
     path_pub_->publish(empty);
 
-    if (get_parameter("replan.clear_costmap_on_failure").as_bool() && !s.costmap_cleared) {
-      s.costmap_cleared = true;
+    if (get_parameter("replan.clear_costmap_on_failure").as_bool() && s.sup.takeCostmapClear()) {
       if (clear_client_->service_is_ready()) {
         auto req = std::make_shared<ClearExcept::Request>();
         req->reset_distance =
@@ -882,9 +812,55 @@ private:
 
   bool withinGrace() const
   {
-    return warnFresh() &&
-           (now() - *loc_warn_since_).seconds() <=
-           get_parameter("localization_uncertain_grace").as_double();
+    if (!warnFresh()) {
+      return false;
+    }
+    const double grace = get_parameter("localization_uncertain_grace").as_double();
+    const double chain = (now() - *loc_warn_since_).seconds();
+    if (chain <= grace) {
+      return true;
+    }
+    // Chuỗi WARN do che khuất bởi vật cản chưa có trong map: gia hạn (xem localization_occluded_*).
+    return loc_occluded_last_ &&
+           chain <= get_parameter("localization_occluded_grace").as_double() &&
+           (now() - *loc_occluded_last_).seconds() <= grace;
+  }
+
+  // WARN chỉ gồm lý do "scan blocked by unmapped objects" / "scan-to-map consistency" và blocked_ratio cao.
+  bool occludedWarn(const DiagnosticStatus & msg) const
+  {
+    double blocked = -1.0;
+    std::string reasons;
+    for (const auto & kv : msg.values) {
+      if (kv.key == "blocked_ratio") {
+        try {
+          blocked = std::stod(kv.value);
+        } catch (const std::exception &) {
+          blocked = -1.0;
+        }
+      } else if (kv.key == "reasons") {
+        reasons = kv.value;
+      }
+    }
+    if (blocked < get_parameter("localization_occluded_ratio").as_double() || reasons.empty()) {
+      return false;
+    }
+    std::size_t pos = 0;
+    while (pos < reasons.size()) {
+      std::size_t end = reasons.find(';', pos);
+      if (end == std::string::npos) {
+        end = reasons.size();
+      }
+      std::string item = reasons.substr(pos, end - pos);
+      item.erase(0, item.find_first_not_of(' '));
+      if (item.rfind("scan blocked by unmapped objects", 0) != 0 &&
+        item.rfind("scan-to-map consistency", 0) != 0)
+      {
+        return false;
+      }
+      pos = end + 1;
+    }
+    return true;
   }
 
   void publishState(const std::string & state)
@@ -1032,7 +1008,8 @@ private:
   std::uint64_t session_counter_{0};
   DiagnosticStatus::ConstSharedPtr loc_status_;
   rclcpp::Time loc_status_time_;
-  std::optional<rclcpp::Time> loc_warn_since_;   // đầu chuỗi WARN liên tục hiện tại
+  std::optional<rclcpp::Time> loc_warn_since_;
+  std::optional<rclcpp::Time> loc_occluded_last_;   // WARN che khuất gần nhất trong chuỗi WARN hiện tại   // đầu chuỗi WARN liên tục hiện tại
 
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;

@@ -1,0 +1,984 @@
+{
+ "dwb_override": {},
+ "splits": {
+  "general_val": {
+   "all": {
+    "n": 300,
+    "Nf": 300,
+    "Nu": 0,
+    "counts": {
+     "SUCCESS": 291,
+     "COLLISION": 0,
+     "STUCK": 8,
+     "SAFE_STOP": 0,
+     "TIMEOUT": 1,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 97.0,
+    "CR": 0.0,
+    "SSR": null,
+    "STR": 2.6666666666666665,
+    "system_errors": 0
+   },
+   "by_type": {
+    "B1": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 32,
+      "COLLISION": 0,
+      "STUCK": 3,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 91.42857142857143,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 8.571428571428571,
+     "system_errors": 0
+    },
+    "B2": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 32,
+      "COLLISION": 0,
+      "STUCK": 2,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 1,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 91.42857142857143,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 5.714285714285714,
+     "system_errors": 0
+    },
+    "B3": {
+     "n": 21,
+     "Nf": 21,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 21,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C1": {
+     "n": 10,
+     "Nf": 10,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 10,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C2": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 33,
+      "COLLISION": 0,
+      "STUCK": 2,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 94.28571428571429,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 5.714285714285714,
+     "system_errors": 0
+    },
+    "C3": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 35,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C4": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 34,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 97.14285714285714,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 2.857142857142857,
+     "system_errors": 0
+    },
+    "N1": {
+     "n": 37,
+     "Nf": 37,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 37,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N2": {
+     "n": 21,
+     "Nf": 21,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 21,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N3": {
+     "n": 36,
+     "Nf": 36,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 36,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    }
+   },
+   "by_level": {
+    "easy": {
+     "n": 100,
+     "Nf": 100,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 99,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 99.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 1.0,
+     "system_errors": 0
+    },
+    "hard": {
+     "n": 100,
+     "Nf": 100,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 96,
+      "COLLISION": 0,
+      "STUCK": 3,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 1,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 96.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 3.0,
+     "system_errors": 0
+    },
+    "medium": {
+     "n": 100,
+     "Nf": 100,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 96,
+      "COLLISION": 0,
+      "STUCK": 4,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 96.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 4.0,
+     "system_errors": 0
+    }
+   },
+   "failures": [
+    [
+     "B1:STUCK:ABORTED",
+     3
+    ],
+    [
+     "B2:STUCK:ABORTED",
+     2
+    ],
+    [
+     "C2:STUCK:ABORTED",
+     2
+    ],
+    [
+     "B2:TIMEOUT:",
+     1
+    ],
+    [
+     "C4:STUCK:ABORTED",
+     1
+    ]
+   ],
+   "compute_ms_p99_max": 16.532199
+  },
+  "general_s1_val": {
+   "all": {
+    "n": 30,
+    "Nf": 0,
+    "Nu": 30,
+    "counts": {
+     "SUCCESS": 0,
+     "COLLISION": 0,
+     "STUCK": 0,
+     "SAFE_STOP": 30,
+     "TIMEOUT": 0,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": null,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "STR": null,
+    "system_errors": 0
+   },
+   "by_type": {
+    "S1": {
+     "n": 30,
+     "Nf": 0,
+     "Nu": 30,
+     "counts": {
+      "SUCCESS": 0,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 30,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "STR": null,
+     "system_errors": 0
+    }
+   },
+   "by_level": {
+    "unsolvable": {
+     "n": 30,
+     "Nf": 0,
+     "Nu": 30,
+     "counts": {
+      "SUCCESS": 0,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 30,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "STR": null,
+     "system_errors": 0
+    }
+   },
+   "failures": [],
+   "compute_ms_p99_max": 6.95927
+  },
+  "classroom_val": {
+   "all": {
+    "n": 100,
+    "Nf": 100,
+    "Nu": 0,
+    "counts": {
+     "SUCCESS": 99,
+     "COLLISION": 0,
+     "STUCK": 1,
+     "SAFE_STOP": 0,
+     "TIMEOUT": 0,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 99.0,
+    "CR": 0.0,
+    "SSR": null,
+    "STR": 1.0,
+    "system_errors": 0
+   },
+   "by_type": {
+    "B1": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "B2": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "B3": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 10,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 90.9090909090909,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 9.090909090909092,
+     "system_errors": 0
+    },
+    "C1": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C2": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C3": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N1": {
+     "n": 12,
+     "Nf": 12,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 12,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N2": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N3": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    }
+   },
+   "by_level": {
+    "easy": {
+     "n": 43,
+     "Nf": 43,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 43,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "hard": {
+     "n": 15,
+     "Nf": 15,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 15,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "medium": {
+     "n": 42,
+     "Nf": 42,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 41,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 97.61904761904762,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 2.380952380952381,
+     "system_errors": 0
+    }
+   },
+   "failures": [
+    [
+     "B3:STUCK:ABORTED",
+     1
+    ]
+   ],
+   "compute_ms_p99_max": 10.35734
+  },
+  "classroom_s1_val": {
+   "all": {
+    "n": 10,
+    "Nf": 0,
+    "Nu": 9,
+    "counts": {
+     "SUCCESS": 0,
+     "COLLISION": 0,
+     "STUCK": 0,
+     "SAFE_STOP": 9,
+     "TIMEOUT": 0,
+     "SYSTEM_ERROR": 1
+    },
+    "SR": null,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "STR": null,
+    "system_errors": 1
+   },
+   "by_type": {
+    "S1": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 9,
+     "counts": {
+      "SUCCESS": 0,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 9,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 1
+     },
+     "SR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "STR": null,
+     "system_errors": 1
+    }
+   },
+   "by_level": {
+    "unsolvable": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 9,
+     "counts": {
+      "SUCCESS": 0,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 9,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 1
+     },
+     "SR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "STR": null,
+     "system_errors": 1
+    }
+   },
+   "failures": [
+    [
+     "S1:SYSTEM_ERROR:SUCCEEDED on an unsolvable scenario (label error)",
+     1
+    ]
+   ],
+   "compute_ms_p99_max": 8.159986
+  },
+  "house_val": {
+   "all": {
+    "n": 100,
+    "Nf": 100,
+    "Nu": 0,
+    "counts": {
+     "SUCCESS": 96,
+     "COLLISION": 0,
+     "STUCK": 3,
+     "SAFE_STOP": 0,
+     "TIMEOUT": 1,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": 96.0,
+    "CR": 0.0,
+    "SSR": null,
+    "STR": 3.0,
+    "system_errors": 0
+   },
+   "by_type": {
+    "B1": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "B2": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 8,
+      "COLLISION": 0,
+      "STUCK": 2,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 1,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 72.72727272727273,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 18.181818181818183,
+     "system_errors": 0
+    },
+    "B3": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C1": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "C2": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 10,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 90.9090909090909,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 9.090909090909092,
+     "system_errors": 0
+    },
+    "C3": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N1": {
+     "n": 12,
+     "Nf": 12,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 12,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N2": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    },
+    "N3": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 11,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 100.0,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 0.0,
+     "system_errors": 0
+    }
+   },
+   "by_level": {
+    "easy": {
+     "n": 24,
+     "Nf": 24,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 23,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 95.83333333333333,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 4.166666666666667,
+     "system_errors": 0
+    },
+    "hard": {
+     "n": 28,
+     "Nf": 28,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 27,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 0,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 96.42857142857143,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 3.5714285714285716,
+     "system_errors": 0
+    },
+    "medium": {
+     "n": 48,
+     "Nf": 48,
+     "Nu": 0,
+     "counts": {
+      "SUCCESS": 46,
+      "COLLISION": 0,
+      "STUCK": 1,
+      "SAFE_STOP": 0,
+      "TIMEOUT": 1,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": 95.83333333333333,
+     "CR": 0.0,
+     "SSR": null,
+     "STR": 2.0833333333333335,
+     "system_errors": 0
+    }
+   },
+   "failures": [
+    [
+     "B2:STUCK:ABORTED",
+     2
+    ],
+    [
+     "B2:TIMEOUT:",
+     1
+    ],
+    [
+     "C2:STUCK:ABORTED",
+     1
+    ]
+   ],
+   "compute_ms_p99_max": 15.041954
+  },
+  "house_s1_val": {
+   "all": {
+    "n": 10,
+    "Nf": 0,
+    "Nu": 10,
+    "counts": {
+     "SUCCESS": 0,
+     "COLLISION": 0,
+     "STUCK": 0,
+     "SAFE_STOP": 8,
+     "TIMEOUT": 2,
+     "SYSTEM_ERROR": 0
+    },
+    "SR": null,
+    "CR": 0.0,
+    "SSR": 80.0,
+    "STR": null,
+    "system_errors": 0
+   },
+   "by_type": {
+    "S1": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 10,
+     "counts": {
+      "SUCCESS": 0,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 8,
+      "TIMEOUT": 2,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": null,
+     "CR": 0.0,
+     "SSR": 80.0,
+     "STR": null,
+     "system_errors": 0
+    }
+   },
+   "by_level": {
+    "unsolvable": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 10,
+     "counts": {
+      "SUCCESS": 0,
+      "COLLISION": 0,
+      "STUCK": 0,
+      "SAFE_STOP": 8,
+      "TIMEOUT": 2,
+      "SYSTEM_ERROR": 0
+     },
+     "SR": null,
+     "CR": 0.0,
+     "SSR": 80.0,
+     "STR": null,
+     "system_errors": 0
+    }
+   },
+   "failures": [
+    [
+     "S1:TIMEOUT:",
+     2
+    ]
+   ],
+   "compute_ms_p99_max": 7.579204
+  }
+ }
+}

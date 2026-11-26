@@ -15,6 +15,7 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -48,6 +49,7 @@ def generate_launch_description():
         parameters=[
             os.path.join(pkg, 'config', 's0_control', 'zlac_sim.yaml'),
             {'accel_time_ms': LaunchConfiguration('accel_time_ms'),
+             'command_delay': ParameterValue(LaunchConfiguration('command_delay'), value_type=float),
              'decel_time_ms': LaunchConfiguration('decel_time_ms')},
             sim_time,
         ],
@@ -93,6 +95,8 @@ def generate_launch_description():
         DeclareLaunchArgument('joy', default_value='true',
                               description='true: joy_node + joy_teleop (PS4 thật); false: không tay cầm'),
         DeclareLaunchArgument('accel_time_ms', default_value='500'),
+        DeclareLaunchArgument('command_delay', default_value='0.15',
+                              description='trễ lệnh -> firmware (s). 0.15 + ~0.08 s nội tại sim ~ 0.26 s đo trên xe'),
         DeclareLaunchArgument('decel_time_ms', default_value='500'),
         DeclareLaunchArgument('camera', default_value='false', description='true: depth camera D435 (S3)'),
         sim_world,

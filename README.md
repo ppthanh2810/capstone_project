@@ -1,7 +1,7 @@
 # Capstone AMR: robot tự hành vi sai (ROS 2 Humble)
 
 Robot tròn Ø400 mm, 2 bánh chủ động (ZLAC8015D) + 2 bánh tự lựa, LiDAR RPLIDAR C1, IMU BNO055 (qua ESP32),
-camera RealSense D435. Chạy trên **phần cứng thật**, không có mô phỏng Gazebo.
+camera RealSense D435. Chạy trên **phần cứng thật**; có thêm mô phỏng Gazebo (`stage4_gazebo`) và Fast 2D (`stage5_benchmark`) cho benchmark SAC-DWA.
 
 Dự án làm theo từng giai đoạn (stage). Mỗi package có README riêng với phân tích chi tiết; file này là phần tổng quát.
 
@@ -11,10 +11,13 @@ Dự án làm theo từng giai đoạn (stage). Mỗi package có README riêng 
 | 1 | `stage1_odom` | Odometry bánh xe + IMU + EKF |
 | 2 | `stage2_slam` | LiDAR, vẽ bản đồ (SLAM), định vị (AMCL) |
 | 3 | `stage3_navigation` | Lập đường A\* + CustomDWB bám đường, tự né vật cản |
+| 4 | `stage4_gazebo` | Mô phỏng Gazebo Fortress toàn stack (chỉ sim) |
+| 5 | `stage5_benchmark` | Fast 2D + Scenario Generator + Evaluator + dataset (chỉ sim) |
 
 Các thư mục khác:
 - `hardware/`: driver motor, IMU, LiDAR, mô hình robot (URDF). Xem `hardware/README.md`.
 - `maps/`: bản đồ đã lưu (`map.yaml` + `map.pgm`).
+- `SAC_DWA_Research_Training_Master_Plan_v3.md`: kế hoạch nghiên cứu hiện hành (v3, 2026-11-26).
 - `da1/`: dự án cũ (YOLO + teleop Python), không dùng trong stage 0–3.
 
 ---

@@ -15,6 +15,7 @@ find_package(std_srvs REQUIRED)
 
 # Mô hình driver ZLAC8015D, không phụ thuộc ROS (dùng lại được trong unit test / plugin Gazebo sau này)
 add_library(zlac_driver_model src/s0_control/zlac_driver_model.cpp)
+set_target_properties(zlac_driver_model PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(zlac_driver_model PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -37,6 +38,7 @@ ament_target_dependencies(lidar_sim_adapter rclcpp sensor_msgs)
 target_compile_features(lidar_sim_adapter PUBLIC cxx_std_17)
 
 install(TARGETS zlac_driver_model
+  EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
@@ -55,6 +57,10 @@ install(PROGRAMS test/s0_check.py test/s1_check.py test/s2_check.py test/s3_chec
   scripts/fetch_husarion_office.sh scripts/husarion_office_to_world.py scripts/world_to_ref_map.py
   scripts/save_pose.py scripts/initial_pose.py
   DESTINATION lib/${PROJECT_NAME})
+
+# Xuất mô hình driver (ROS-free) cho stage5_benchmark (Fast 2D simulator dùng cùng ZlacDriverModel).
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+install(DIRECTORY include/ DESTINATION include)
 
 install(
   DIRECTORY

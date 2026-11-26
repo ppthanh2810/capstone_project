@@ -1,0 +1,6 @@
+wO=0.0 clear=1: SR 90.6 CR 7.95 STR 0.0 n 352 clr_min -0.036 p5 -0.009
+wO=0.0 clear=0: SR 63.4 CR 0.00 STR 34.9 n 352 clr_min 0.036 p5 0.053
+wO=1.0 clear=1: SR 96.0 CR 3.12 STR 0.0 n 352 clr_min -0.017 p5 0.022
+wO=1.0 clear=0: SR 91.5 CR 0.00 STR 7.1 n 352 clr_min 0.035 p5 0.062
+
+[exited with code 0]

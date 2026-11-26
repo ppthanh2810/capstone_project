@@ -1,0 +1,137 @@
+# Benchmark SAC-DWA (Master Plan v3). Tham số ĐIỀU HƯỚNG không nằm ở đây: chúng đọc từ
+# stage3_navigation/config/nav2_params.yaml (CustomDWB.*, goal_path_bridge.replan.*, costmap, controller) để Fast 2D,
+# Gazebo và robot thật dùng cùng một nguồn. File này chỉ chứa mô phỏng, episode, evaluator và generator.
+
+sim:
+  # robot + driver (= zlac_sim / zlac8015d_move). command_delay 0.15 = profile benchmark (Q3, A2), ramp 500 ms.
+  wheel_radius: 0.0535
+  wheel_distance: 0.34
+  accel_time: 0.5
+  decel_time: 0.5
+  command_delay: 0.15
+  command_timeout: 0.5
+  twist_mux_timeout: 0.5
+  robot_radius: 0.20          # thân thật, va chạm GT
+  # LiDAR RPLIDAR C1 sau scan_rotate + laser_filters
+  lidar_x: 0.15
+  lidar_beams: 720
+  lidar_half_fov: 1.57
+  lidar_noise: 0.01
+  lidar_range_min: 0.05
+  lidar_range_max: 16.0
+  # episode
+  physics_dt: 0.005
+  warmup: 1.0
+  post_terminal: 2.5
+  stuck_window: 30.0
+  stuck_radius: 0.25
+  odom_alpha: 0.2
+  watch_rate: 5.0
+  allow_unknown: 0.0
+
+# Episode Evaluator (Master Plan v3 §6.2) — dùng chung Fast 2D và Gazebo.
+eval:
+  collision_tolerance: 0.005      # m: clearance GT < -tol -> COLLISION
+  success_xy_fast2d: 0.15         # m GT (định vị hoàn hảo)
+  success_xy_gazebo: 0.25         # m GT (0.15 checker + 0.10 sai số AMCL đo trong sim)
+  success_yaw: 0.25               # rad
+  safe_stop_v: 0.02               # m/s
+  safe_stop_w: 0.05               # rad/s
+  safe_stop_hold: 2.0             # s
+  stuck_window: 30.0              # s
+  stuck_radius: 0.25              # m
+  timeout_base: 30.0              # T_max = base + factor * L_ref / v_ref
+  timeout_factor: 3.0
+  timeout_vref: 0.3
+  sensor_gap_error: 2.0           # s (Gazebo): TF / odom / scan mất lâu hơn -> SYSTEM_ERROR
+  rtf_min: 0.5                    # Gazebo RTF < rtf_min kéo dài > rtf_window -> SYSTEM_ERROR
+  rtf_window: 10.0
+
+# Scenario Generator (Master Plan v3 §4.3/§5.3). Đơn vị m.
+gen:
+  resolution: 0.05
+  obstacle_height: 0.6
+  margin: 0.6                     # viền ngoài layout (NavFn coi 7 ô biên là vật cản)
+  room_size: [4.0, 16.0]
+  corridor_width: [0.8, 2.5]
+  gap_feasible_min: 0.60          # khe mép-mép khả thi
+  gap_unsolvable_max: 0.40        # khe vô nghiệm (S1)
+  start_goal_clearance: 0.50
+  new_obstacle_min_from_start: 3.0   # dọc đường A* trên M (> obstacle_max_range 2.5 + 0.5)
+  new_obstacle_min_to_goal: 1.0
+  l_ref: [3.0, 15.0]
+  b1_size: [0.2, 0.4]
+  b2_size: [0.6, 1.0]
+  c1_gap: [0.60, 0.80]
+  c2_count: [3, 8]
+  c3_spacing: [1.0, 2.0]
+  c3_offset: [0.3, 0.6]
+  c4_cell: 0.15
+  c4_fill: [0.10, 0.35]
+  c4_smooth: 4
+  feasible_inflate: 0.30          # nở W 0.30 còn đường -> khả thi
+  unsolvable_inflate: 0.20        # nở W 0.20 hết đường -> vô nghiệm
+  detour_corridor: 1.0            # B1/B2: còn đường trong hành lang ±1.0 m quanh A*(M) (DWB tự né, max_path_deviation)
+  max_attempts: 200
+  max_detour_ratio: 3.0           # B3: L_W / L_M <= 3.0 (v2 4.3)
+  easy_max: 0.05                  # v3 (pilot2 2026-11-26, phân vị gộp ~ 1/3): Dscore < easy_max -> Easy
+  medium_max: 0.25                # v3 (pilot2, phân vị ~ 2/3)
+  c_width_easy: 1.60              # c: bề rộng lối đi >= 1.60 m -> 0, 0.60 m -> 1
+
+# Profile = ghi đè có tên (A-stage tests, Planner vs Full-system).
+profiles:
+  planner: {}                     # Planner Benchmark: localization hoàn hảo, không monitor (Fast 2D mặc định)
+  local4x4:
+    sim: {local_size: 4.0}
+  infl040:
+    sim: {local_inflation: 0.40}
+  infl050:
+    sim: {local_inflation: 0.50}
+  unknown_track:
+    sim: {local_track_unknown: 1.0}
+  unknown_track_inf:
+    sim: {local_track_unknown: 1.0, inf_is_valid: 1.0}
+  no_delay:
+    sim: {command_delay: 0.0}
+  fpclear_off:                    # local ObstacleLayer footprint_clearing_enabled: false (A1, va chạm B1 pilot0)
+    sim: {local_footprint_clearing: 0.0}
+  fpclear_on:
+    sim: {local_footprint_clearing: 1.0}
+
+# Dataset cố định (Master Plan v3 §7). Bảng 7.2 điều chỉnh theo pilot2 (2026-11-26, 393 scenario, ngưỡng v3):
+#   B3-Easy = 0 (luôn có đường vòng + replan -> δ, ρ > 0), C1 luôn Hard (khe 0.60–0.80 m -> c >= 0.8),
+#   N2-Easy = 0 (layout hành lang có góc), C3-Hard hiếm (3/45). Phần thiếu chuyển sang mức kề cùng type.
+#   Tổng vẫn 900 / 300 / 300; map mục tiêu 120 / 100 / 100 không ép mức (ghi phân bố thực tế).
+dataset:
+  splits:
+    general_train:
+      types: [N1, N2, N3, B1, B2, B3, C1, C2, C3, C4]
+      plan:
+        N1: {easy: 60, medium: 30, hard: 0}
+        N2: {easy: 0, medium: 60, hard: 30}
+        N3: {easy: 30, medium: 30, hard: 30}
+        B1: {easy: 40, medium: 30, hard: 20}
+        B2: {easy: 30, medium: 30, hard: 30}
+        B3: {easy: 0, medium: 45, hard: 45}
+        C1: {easy: 0, medium: 0, hard: 90}
+        C2: {easy: 30, medium: 30, hard: 30}
+        C3: {easy: 40, medium: 30, hard: 20}
+        C4: {easy: 30, medium: 30, hard: 30}
+    general_val:
+      types: [N1, N2, N3, B1, B2, B3, C1, C2, C3, C4]
+      plan: {per_level: 100, exclude: {N2: [easy], B3: [easy], C1: [easy, medium]}}
+    general_test:
+      types: [N1, N2, N3, B1, B2, B3, C1, C2, C3, C4]
+      plan: {per_level: 100, exclude: {N2: [easy], B3: [easy], C1: [easy, medium]}}
+    general_s1_val: {types: [S1], plan: {S1: {unsolvable: 30}}}
+    general_s1_test: {types: [S1], plan: {S1: {unsolvable: 30}}}
+    classroom_finetune: {map: classroom, types: [N1, N2, N3, B1, B2, B3, C1, C2, C3], plan: {any_total: 120}}
+    classroom_val: {map: classroom, types: [N1, N2, N3, B1, B2, B3, C1, C2, C3], plan: {any_total: 100}}
+    classroom_test: {map: classroom, types: [N1, N2, N3, B1, B2, B3, C1, C2, C3], plan: {any_total: 100}}
+    classroom_s1_val: {map: classroom, types: [S1], plan: {S1: {unsolvable: 10}}}
+    classroom_s1_test: {map: classroom, types: [S1], plan: {S1: {unsolvable: 10}}}
+    house_finetune: {map: house, types: [N1, N2, N3, B1, B2, B3, C1, C2, C3], plan: {any_total: 120}}
+    house_val: {map: house, types: [N1, N2, N3, B1, B2, B3, C1, C2, C3], plan: {any_total: 100}}
+    house_test: {map: house, types: [N1, N2, N3, B1, B2, B3, C1, C2, C3], plan: {any_total: 100}}
+    house_s1_val: {map: house, types: [S1], plan: {S1: {unsolvable: 10}}}
+    house_s1_test: {map: house, types: [S1], plan: {S1: {unsolvable: 10}}}

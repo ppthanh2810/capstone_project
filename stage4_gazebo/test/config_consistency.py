@@ -135,8 +135,12 @@ def main():
     row('PASS' if dwb['carrot_distance'] < half else 'WARN', 'carrot_distance < nửa local costmap',
         f'{dwb["carrot_distance"]} < {half}')
     # ---- trễ ----
-    row('WARN' if abs(zsim['command_delay']) < 1e-9 else 'PASS', 'trễ lệnh sim vs CustomDWB.control_latency',
-        f'zlac_sim.command_delay {zsim["command_delay"]} s; control_latency {lat} s (đo bag 2026-10-14, accel 200 ms)')
+    s0l = open(f'{R}/stage4_gazebo/launch/s0_control.launch.py').read()
+    mcd = re.search(r"DeclareLaunchArgument\('command_delay', default_value='([0-9.]+)'", s0l)
+    cdel = float(mcd.group(1)) if mcd else zsim['command_delay']
+    row('WARN' if abs(cdel) < 1e-9 else 'PASS', 'trễ lệnh sim vs CustomDWB.control_latency',
+        f'launch command_delay {cdel} s (+~0.08 s nội tại sim); control_latency {lat} s '
+        '(đo bag 2026-10-14, accel 200 ms)')
     row('WARN' if cpp_default(move, 'accel_time_ms') != 200 else 'PASS', 'control_latency đo ở accel 200 ms',
         f'driver hiện {cpp_default(move, "accel_time_ms"):.0f} ms -> trễ thật có thể > {lat} s (chưa đo lại)')
 
