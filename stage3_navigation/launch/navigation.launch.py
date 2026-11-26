@@ -224,6 +224,13 @@ def generate_launch_description():
             description="true: gửi FollowPath ngay khi A* tìm được đường. "
                         "false: chỉ khi gọi /goal_path_bridge/follow",
         ),
+        DeclareLaunchArgument(
+            "replan",
+            default_value="true",
+            description="true: đường A* bị vật cản mới chặn VÀ robot không tiến "
+                        "(goal_path_bridge replan.*), hoặc FollowPath abort -> A* lại từ vị trí "
+                        "hiện tại; không còn đường -> dừng, FAILED. false: như trước",
+        ),
 
         OpaqueFunction(function=_check_args),
 
@@ -275,6 +282,8 @@ def generate_launch_description():
                         LaunchConfiguration("auto_follow"), value_type=bool),
                     "require_localized": ParameterValue(require_localized, value_type=bool),
                     "controller_id": controller_id,
+                    "replan.enabled": ParameterValue(
+                        LaunchConfiguration("replan"), value_type=bool),
                 },
             ],
             arguments=["--ros-args", "--log-level", log_level],

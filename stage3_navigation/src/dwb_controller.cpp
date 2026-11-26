@@ -66,6 +66,7 @@ ParamRefs refs(DwbParams & p)
   r.i = {{"vx_samples", &p.vx_samples}, {"vtheta_samples", &p.vtheta_samples},
     {"trajectory_marker_stride", &p.trajectory_marker_stride}};
   r.b = {{"unknown_is_obstacle", &p.unknown_is_obstacle},
+    {"carrot_validation", &p.carrot_validation},
     {"publish_trajectories", &p.publish_trajectories}};
   r.s = {{"collision_check", &p.collision_check}, {"velocity_reference", &p.velocity_reference}};
   return r;
@@ -722,6 +723,8 @@ void DwbController::publishState(
     kv("v_ref", fmt(out->reference.v, 4));
     kv("w_ref", fmt(out->reference.w, 4));
     kv("heading_error", fmt(out->heading_error, 4));
+    kv("carrot_shift", fmt(out->carrot_shift, 3));
+    kv("carrot_blocked", out->carrot_blocked ? "true" : "false");
     kv("n_candidates", std::to_string(out->n_candidates));
     kv("n_valid", std::to_string(out->n_valid));
     kv("n_forward_valid", std::to_string(out->n_forward_valid));

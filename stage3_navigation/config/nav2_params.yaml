@@ -6,7 +6,8 @@
 planner_server:
   ros__parameters:
     use_sim_time: false
-    # Chỉ lập kế hoạch theo yêu cầu (action ComputePathToPose), không tự replan.
+    # Chỉ lập kế hoạch theo yêu cầu (action ComputePathToPose): goal mới, hoặc goal_path_bridge lập lại khi đường
+    # bị chặn + robot không tiến (replan.*, event-triggered). Không replan định kỳ.
     expected_planner_frequency: 1.0
     planner_plugins: ["GridBased"]
     GridBased:
@@ -30,9 +31,10 @@ global_costmap:
       robot_base_frame: base_footprint
       # Robot tròn Ø400 mm.
       robot_radius: 0.20
-      # Cập nhật/công bố chậm là đủ: chỉ có lớp tĩnh (bản đồ) + inflation.
-      update_frequency: 1.0
-      publish_frequency: 1.0
+      # 2 Hz: obstacle_layer (LiDAR) phải cập nhật đủ nhanh để goal_path_bridge thấy đường bị chặn (1 Hz khi chỉ có
+      # static + inflation, 2026-10-19 .. 2026-11-25). Mỗi lần publish gửi cả bản đồ (always_send_full_costmap).
+      update_frequency: 2.0
+      publish_frequency: 2.0
       transform_tolerance: 0.5
       # Kích thước/origin lấy theo /map (static layer). Với slam_toolbox, costmap tự đổi kích thước khi map lớn ra.
       rolling_window: false
@@ -45,7 +47,10 @@ global_costmap:
       unknown_cost_value: 255
       trinary_costmap: true
       always_send_full_costmap: true
-      plugins: ["static_layer", "inflation_layer"]
+      # static (bản đồ SLAM, KHÔNG bị sửa) -> obstacle (vật cản mới LiDAR thấy, chỉ trong costmap) -> inflation.
+      # obstacle_layer làm A* (lập lại) tránh vật cản chưa có trong bản đồ; goal_path_bridge (replan.*) đọc cùng
+      # costmap này để biết đường đang bám bị chặn. Khôi phục từ commit 1e87e65 (2026-11-25).
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_topic: /map
@@ -53,6 +58,31 @@ global_costmap:
         map_subscribe_transient_local: true
         # slam_toolbox / map_server không publish /map_updates đáng tin -> nhận cả map mới mỗi lần.
         subscribe_to_updates: false
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        footprint_clearing_enabled: true
+        combination_method: 1      # max với static layer (không xóa tường của bản đồ)
+        observation_sources: scan
+        scan:
+          # Giống local_costmap: chỉ nửa trước (±90°), nửa sau NaN -> không đánh dấu, không xóa. Vết vật cản đã ra
+          # sau robot ở lại trong frame map tới khi robot nhìn lại thấy trống (persistence tự nhiên).
+          topic: /scan_filtered
+          data_type: "LaserScan"
+          sensor_frame: ""
+          marking: true
+          clearing: true
+          inf_is_valid: false
+          obstacle_min_range: 0.0
+          obstacle_max_range: 2.5
+          raytrace_min_range: 0.0
+          raytrace_max_range: 3.0
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+          # 0.0: KHÔNG kiểm tra scan cũ ở global costmap (planner_server Humble chờ costmap "current" -> scan dừng
+          # sẽ treo A*). An toàn khi scan dừng do local_costmap (expected_update_rate 0.5).
+          expected_update_rate: 0.0
+          observation_persistence: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         # Khoảng an toàn: bán kính 0.20 m (nội tiếp, NavFn coi như vật cản) + vùng chi phí giảm dần tới 0.40 m
@@ -117,6 +147,33 @@ goal_path_bridge:
     # Đang bám đường: UNCERTAIN/INITIALIZING liên tục <= mức này được bỏ qua (LOST, status cũ -> hủy ngay).
     # Robot 2026-10-14: UNCERTAIN chập chờn 0.5-1 s khi quay/đi làm 6/8 lượt bị hủy. Bắt đầu vẫn đòi LOCALIZED.
     localization_uncertain_grace: 2.0  # s
+    # ---- Replanning event-triggered (Stage 3.3; khôi phục 1e87e65 + trigger "stall", 2026-11-25) ----
+    # Chỉ trong phiên đã kích hoạt (~/follow / auto_follow). Bị chặn = ô global_costmap (static + obstacle +
+    # inflation) dọc đường phía trước có chi phí >= blocked_cost, liên tục confirm_time. Lập lại A* (từ vị trí hiện
+    # tại tới cùng đích) chỉ khi đồng thời robot KHÔNG tiến >= stall_progress dọc đường trong stall_time (CustomDWB
+    # đang tự vòng qua thì không lập lại); hoặc FollowPath abort. Không có đường -> hủy FollowPath (robot dừng), thử lại
+    # mỗi min_interval tới wait_timeout -> FAILED (Safe Stop, robot giữ đứng yên). NOT_VERIFIED trên robot.
+    replan:
+      enabled: true               # navigation.launch.py replan:=false để tắt (abort là dừng hẳn, như 2026-10-19)
+      trigger: stall              # stall (event-triggered) | immediate (lập lại ngay khi chặn, hành vi 1e87e65)
+      lookahead_distance: 2.5     # m dọc đường phía trước robot được kiểm tra (= obstacle_max_range)
+      start_offset: 0.10          # m, bỏ qua đoạn ngay tại robot (viền footprint)
+      blocked_cost: 99            # 99 = nội tiếp (tâm robot ở đó là chạm), 100 = lethal. NavFn cũng coi >= 99 là vật cản
+      confirm_time: 0.5           # s, persistence: phải bị chặn liên tục ngần này (lọc nhiễu một lần quét)
+      clear_time: 1.0             # s, hysteresis: phải thông liên tục ngần này mới bỏ trạng thái chặn
+      stall_time: 4.0             # s không tiến (< progress checker 10 s, để lập lại trước khi controller abort)
+      stall_progress: 0.15        # m tiến dọc đường (~3 ô) được coi là "đang tiến"
+      min_interval: 2.0           # s, cooldown giữa hai lần gọi A* lập lại
+      max_obstacle_replans: 10    # lần lập lại do vật cản / phiên (<= 0: không giới hạn); quá -> FAILED
+      max_abort_replans: 3        # lần lập lại sau khi FollowPath bị abort (DWB kẹt / không tiến) / phiên
+      wait_timeout: 15.0          # s: không có đường -> robot dừng, thử lại mỗi min_interval tới hết rồi FAILED
+      costmap_timeout: 5.0        # s, /global_costmap/costmap cũ hơn -> không kiểm tra (cảnh báo)
+      # false (mặc định): KHÔNG xóa vết vật cản khi lập lại thất bại. Offline 2026-10-15: xóa làm A* quên tường đã
+      # thấy -> robot đi qua lại tới follow_timeout (livelock). Xóa tay: ros2 service call
+      # /global_costmap/clear_entirely_global_costmap nav2_msgs/srv/ClearEntireCostmap
+      clear_costmap_on_failure: false
+      clear_keep_distance: 5.0    # m, cạnh hình vuông giữ lại (±2.5 m = tầm LiDAR đánh dấu)
+      clear_costmap_service: /global_costmap/clear_except_global_costmap
 
 # ============================================================================================
 # Stage 3.2 — DWB local controller (chỉ chạy trong navigation.launch.py)
@@ -263,6 +320,9 @@ controller_server:
       local_plan_length: 1.5       # m đường A* phía trước được xét (còn bị cắt ở mép local costmap)
       # Cà rốt xa hơn -> nằm SAU vật cản nhỏ, kéo robot đi tiếp thay vì quay mặt vào vật cản.
       carrot_distance: 0.8         # m, điểm dẫn hướng dọc đường A* (cũ 0.6)
+      # true (2026-11-25): cà rốt rơi vào ô va chạm (>= INSCRIBED) / unknown / ngoài costmap -> dời tiến dọc đường tới
+      # điểm hợp lệ đầu tiên sau vật cản; không có -> lùi về điểm hợp lệ trước vật cản (/CustomDWB/state carrot_blocked)
+      carrot_validation: true
       closest_search_distance: 1.0 # m, cửa sổ tìm tiến trình phía trước (theo độ dài cung, không nhảy nhánh)
       # Đường vòng quanh vật cản lệch tới ~0.8 m (người/hộp 0.3 m) -> 0.8 cắt ngang lúc đang vòng.
       max_path_deviation: 1.0      # m, robot lệch đường A* hơn mức này -> từ chối (lệnh 0, abort; cũ 0.8)

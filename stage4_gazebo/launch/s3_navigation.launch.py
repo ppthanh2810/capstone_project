@@ -137,7 +137,7 @@ def launch_setup(context):
         arguments=ros_args,
     ))
 
-    # ---- goal_path_bridge (A* một lần mỗi goal, không replan) ----
+    # ---- goal_path_bridge (A* mỗi goal + replan event-triggered như xe thật; replan:=false để tắt) ----
     actions.append(Node(
         package='stage3_navigation',
         executable='goal_path_bridge',
@@ -148,6 +148,7 @@ def launch_setup(context):
             'auto_follow': is_true(arg('auto_follow')),
             'require_localized': require_localized,
             'controller_id': LOCAL_PLANNERS[planner],
+            'replan.enabled': is_true(arg('replan')),
         }],
         arguments=ros_args,
     ))
@@ -214,6 +215,8 @@ def generate_launch_description():
                               description='true: DWB -> /cmd_vel_nav -> twist_mux -> zlac_sim. false: /cmd_vel_dwb'),
         DeclareLaunchArgument('auto_follow', default_value='true',
                               description='true: bám đường ngay khi A* có đường. false: /goal_path_bridge/follow'),
+        DeclareLaunchArgument('replan', default_value='true',
+                              description='true: goal_path_bridge lập lại A* khi đường bị chặn + robot không tiến'),
         DeclareLaunchArgument('camera_layer', default_value='auto',
                               description='auto (fusion nếu camera:=true) | fusion | voxel | none'),
         DeclareLaunchArgument('allow_unknown', default_value='false'),

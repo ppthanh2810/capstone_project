@@ -1,0 +1,26 @@
+PASS  wheel_radius                                                move.cpp=0.0535, odom.cpp=0.0535, zlac_sim=0.0535, sim xacro=0.0535
+PASS  wheel_distance                                              move.cpp=0.34, odom.cpp=0.34, zlac_sim=0.34
+PASS  TRAVEL_IN_ONE_REV vs 2πr                                    0.336 vs 0.3362 (lệch -0.0 %, encoder dùng hằng số, lệnh dùng r)
+PASS  accel_time_ms (code thật / sim)                             move.cpp=500.0, zlac_sim=500.0
+PASS  decel_time_ms (code thật / sim)                             move.cpp=500.0, zlac_sim=500.0
+PASS  robot_radius global/local                                   global=0.2, local=0.2
+WARN  bán kính nội tiếp global/local                              0.21 / 0.25 m -> khe tối thiểu A* ~0.47 m, DWB ~0.55 m (A* có thể lập đường qua khe DWB không qua được)
+PASS  local inflation > inscribed                                 0.3 > 0.25
+PASS  global inflation > inscribed                                0.4 > 0.21
+PASS  global_costmap có obstacle_layer (replan thấy vật cản mới)  ['static_layer', 'obstacle_layer', 'inflation_layer']
+PASS  obstacle/raytrace range global/local                        g_obs=2.5, l_obs=2.5, g_ray=2.5, l_ray=2.5
+PASS  scan topic global/local                                     g=-6462472263774787491, l=-6462472263774787491
+PASS  replan.lookahead = obstacle_max_range                       lookahead=2.5, obs_range=2.5
+PASS  max_vel_x·sim_time trong local costmap                      0.3·2.0 = 0.60 m <= 0.95 m (T_sim tối đa 3.17 s ở 0.3 m/s; vượt -> ứng viên nhanh bị loại OFF_MAP)
+PASS  quãng phanh (latency + dt + v²/2a + margin)                 0.200 m < 0.75 m
+PASS  xy goal tolerance checker/CustomDWB                         checker=0.15, dwb=0.15
+PASS  yaw goal tolerance checker/CustomDWB                        checker=0.25, dwb=0.25
+PASS  replan.stall_time < progress checker                        4.0 < 10.0 s
+PASS  replan.stall_progress < required_movement_radius            0.15 < 0.25 m
+PASS  follow_timeout > replan.wait_timeout                        120.0 > 15.0
+PASS  max_path_deviation <= nửa local costmap                     1.0 <= 1.0
+PASS  carrot_distance < nửa local costmap                         0.8 < 1.0
+WARN  trễ lệnh sim vs CustomDWB.control_latency                   zlac_sim.command_delay 0.0 s; control_latency 0.2 s (đo bag 2026-10-14, accel 200 ms)
+WARN  control_latency đo ở accel 200 ms                           driver hiện 500 ms -> trễ thật có thể > 0.2 s (chưa đo lại)
+
+Dẫn xuất: {"R": 0.2, "inscribed_global": 0.21000000000000002, "inscribed_local": 0.25, "gap_min_astar": 0.47, "gap_min_dwb": 0.55, "braking_distance": 0.2, "sim_time_max_costmap": 3.17, "stop_time": 0.9}

@@ -33,8 +33,18 @@ find_package(visualization_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 # Bridge RViz Goal Pose -> ComputePathToPose -> /global_path; tùy chọn -> FollowPath (DWB) khi được kích hoạt.
+# path_blockage: kiểm tra đường A* bị chặn trên lưới costmap (không phụ thuộc ROS), dùng cho replanning
+# (khôi phục từ commit 1e87e65, 2026-11-25).
+add_library(path_blockage STATIC src/path_blockage.cpp)
+target_compile_features(path_blockage PUBLIC cxx_std_17)
+set_target_properties(path_blockage PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(path_blockage PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 add_executable(goal_path_bridge src/goal_path_bridge.cpp)
 target_compile_features(goal_path_bridge PUBLIC cxx_std_17)
+target_link_libraries(goal_path_bridge path_blockage)
 ament_target_dependencies(goal_path_bridge
   rclcpp rclcpp_action geometry_msgs nav_msgs nav2_msgs tf2 tf2_ros tf2_geometry_msgs
   std_msgs std_srvs diagnostic_msgs)

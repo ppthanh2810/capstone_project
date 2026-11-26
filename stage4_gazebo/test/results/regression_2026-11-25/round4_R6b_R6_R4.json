@@ -1,0 +1,120 @@
+[
+ {
+  "id": "R6b",
+  "name": "multi_spec",
+  "state": "SUCCEEDED",
+  "t": 26.2,
+  "clear": 0.106,
+  "gt_err": 0.082,
+  "dist": 7.26,
+  "path": 6.36,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.675,
+  "carrot_blocked_msgs": 25,
+  "paths": [
+   6.36
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    26.2,
+    "SUCCEEDED"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED"
+ },
+ {
+  "id": "R6",
+  "name": "multi",
+  "state": "SUCCEEDED",
+  "t": 26.5,
+  "clear": 0.009,
+  "gt_err": 0.086,
+  "dist": 5.76,
+  "path": 5.41,
+  "replans": 0,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.75,
+  "carrot_blocked_msgs": 29,
+  "paths": [
+   5.41
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    26.5,
+    "SUCCEEDED"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED"
+ },
+ {
+  "id": "R4",
+  "name": "replan",
+  "state": "SUCCEEDED",
+  "t": 35.2,
+  "clear": 0.106,
+  "gt_err": 0.099,
+  "dist": 7.96,
+  "path": 4.46,
+  "replans": 1,
+  "min_replan_gap": null,
+  "carrot_shift_max": 0.35,
+  "carrot_blocked_msgs": 5,
+  "paths": [
+   5.43,
+   4.46
+  ],
+  "hold_disp": NaN,
+  "hold_yaw": NaN,
+  "states": [
+   [
+    0.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    0.0,
+    "FOLLOWING"
+   ],
+   [
+    15.0,
+    "REPLANNING: obstacle on the path 0.13 m ahead at (0.06, -3.17), cost 99, no progress for 4.2 s"
+   ],
+   [
+    15.0,
+    "FOLLOW_REQUESTED"
+   ],
+   [
+    15.0,
+    "FOLLOWING (replanned 1x)"
+   ],
+   [
+    35.2,
+    "SUCCEEDED"
+   ]
+  ],
+  "verdict": "PASS",
+  "return": "SUCCEEDED"
+ }
+]

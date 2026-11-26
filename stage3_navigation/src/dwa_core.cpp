@@ -687,6 +687,48 @@ Pose2D pickCarrot(const std::vector<Pose2D> & local_path, double carrot_distance
   return local_path.back();
 }
 
+CarrotChoice pickValidCarrot(
+  const std::vector<Pose2D> & local_path, double carrot_distance, const CollisionModel & cm,
+  double min_dist)
+{
+  CarrotChoice c;
+  c.carrot = pickCarrot(local_path, carrot_distance);
+  unsigned char cost = 0;
+  if (cm.check(c.carrot, cost) == CellCheck::FREE) {
+    return c;
+  }
+  double total = 0.0;
+  for (std::size_t i = 1; i < local_path.size(); ++i) {
+    total +=
+      std::hypot(local_path[i].x - local_path[i - 1].x, local_path[i].y - local_path[i - 1].y);
+  }
+  const double s0 = std::min(carrot_distance, total);
+  const double step = std::max(0.5 * cm.resolution(), 1e-3);
+  c.shifted = true;
+  // Tiến: điểm hợp lệ đầu tiên SAU vật cản -> chi phí cà rốt kéo robot vòng qua thay vì lao vào vật cản.
+  for (double s = s0 + step; s <= total + 1e-9; s += step) {
+    const Pose2D q = pickCarrot(local_path, std::min(s, total));
+    if (cm.check(q, cost) == CellCheck::FREE) {
+      c.carrot = q;
+      c.shift = s - s0;
+      return c;
+    }
+  }
+  // Lùi: đường bị chặn tới mép costmap -> điểm hợp lệ gần nhất TRƯỚC vật cản (robot tới gần rồi chờ / replan).
+  c.blocked = true;
+  for (double s = s0 - step; s >= min_dist - 1e-9; s -= step) {
+    const Pose2D q = pickCarrot(local_path, std::max(s, 0.0));
+    if (cm.check(q, cost) == CellCheck::FREE) {
+      c.carrot = q;
+      c.shift = s - s0;
+      return c;
+    }
+  }
+  c.found = false;
+  c.shifted = false;
+  return c;
+}
+
 double distanceToPolyline(double x, double y, const std::vector<Pose2D> & path)
 {
   if (path.empty()) {
@@ -894,7 +936,14 @@ ControlOutput DwaCore::compute(
   }
 
   // (2) ROTATE_TO_PATH (có trễ: vào khi > ngưỡng, ra khi < ngưỡng/2).
-  out.carrot = pickCarrot(in.local_path, p.carrot_distance);
+  if (p.carrot_validation) {
+    const CarrotChoice cc = pickValidCarrot(in.local_path, p.carrot_distance, cm, kMinCarrotDist);
+    out.carrot = cc.carrot;
+    out.carrot_shift = cc.shift;
+    out.carrot_blocked = cc.blocked || !cc.found;
+  } else {
+    out.carrot = pickCarrot(in.local_path, p.carrot_distance);
+  }
   const double carrot_dist = std::hypot(out.carrot.x - in.robot.x, out.carrot.y - in.robot.y);
   if (carrot_dist > kMinCarrotDist) {
     const double herr =

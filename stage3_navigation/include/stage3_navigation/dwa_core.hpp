@@ -86,6 +86,9 @@ struct DwbParams
   // ---- Đường cục bộ + cà rốt ----
   double local_plan_length{1.5};        // m
   double carrot_distance{0.6};          // m
+  // true: cà rốt danh nghĩa rơi vào ô va chạm / unknown / ngoài costmap -> dời TIẾN dọc đường cục bộ tới điểm hợp lệ
+  // đầu tiên (sau vật cản); không có -> lùi về điểm hợp lệ gần nhất trước vật cản (carrot_blocked). false = cũ.
+  bool carrot_validation{true};
   double closest_search_distance{1.0};  // m, cửa sổ tìm tiến trình phía trước (theo độ dài cung)
   double max_path_deviation{0.8};       // m, robot lệch đường A* hơn mức này -> dừng (PlannerException)
 
@@ -290,6 +293,22 @@ private:
 
 // Điểm cách đầu đường cục bộ carrot_distance (nội suy); đường ngắn hơn -> điểm cuối.
 Pose2D pickCarrot(const std::vector<Pose2D> & local_path, double carrot_distance);
+
+// Cà rốt HỢP LỆ (ô FREE theo cm): bắt đầu ở carrot_distance; nếu không hợp lệ thì tìm TIẾN (bước nửa ô) tới cuối
+// đường cục bộ, rồi LÙI về phía robot (>= min_dist). shift = độ dời theo cung (m, + tiến / - lùi).
+// blocked = không còn điểm hợp lệ nào phía sau điểm danh nghĩa (đoạn đường trong costmap bị chặn tới mép).
+// Không có điểm hợp lệ nào -> trả về điểm danh nghĩa, found = false.
+struct CarrotChoice
+{
+  Pose2D carrot;
+  double shift{0.0};
+  bool shifted{false};
+  bool blocked{false};
+  bool found{true};
+};
+CarrotChoice pickValidCarrot(
+  const std::vector<Pose2D> & local_path, double carrot_distance, const CollisionModel & cm,
+  double min_dist);
 // Khoảng cách từ (x, y) tới polyline.
 double distanceToPolyline(double x, double y, const std::vector<Pose2D> & path);
 
@@ -352,6 +371,8 @@ struct ControlOutput
   Velocity2D cmd;
   Phase phase{Phase::IDLE};
   Pose2D carrot;
+  double carrot_shift{0.0};             // m dời cà rốt dọc đường (0 = danh nghĩa)
+  bool carrot_blocked{false};           // đường trong local costmap bị chặn tới mép (xem pickValidCarrot)
   DynamicWindow window;
   std::vector<Trajectory> candidates;   // chỉ khi keep_candidates
   int best{-1};                         // chỉ số trong candidates (khi giữ), -1 nếu không có

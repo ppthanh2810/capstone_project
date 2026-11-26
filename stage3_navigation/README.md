@@ -4,10 +4,12 @@ Package này giúp robot **tự đi tới một đích** chọn trên RViz, theo
 
 | Lớp | Làm gì | Biết gì |
 |---|---|---|
-| **A\*** (toàn cục) | Tìm **một** đường từ robot tới đích, **một lần** cho mỗi goal | Chỉ bản đồ tĩnh (`/map`) |
+| **A\*** (toàn cục) | Tìm đường từ robot tới đích; **lập lại** khi đường bị chặn và robot không tiến | Bản đồ tĩnh (`/map`) + vật cản LiDAR đã thấy (`obstacle_layer`) |
 | **DWB** (cục bộ) | Mỗi 0.1 s chọn vận tốc (v, ω) để bám đường A\* và **tự né vật cản** | Vật cản LiDAR đang thấy (local costmap 2 × 2 m) |
 
-- **Không có replanning.** Đường A\* không đổi trong cả lần bám. Vật cản mới chỉ do DWB xử lý (mục 9).
+- **Replanning event-triggered (từ 2026-11-25, mục 16).** DWB tự né trước; chỉ khi đường bị chặn **và** robot không tiến
+  4 s thì A\* lập lại từ vị trí hiện tại; không còn đường → đứng yên, `FAILED` (Safe Stop). `replan:=false` = hành vi cũ.
+- **Cà rốt hợp lệ (từ 2026-11-25):** cà rốt rơi vào vật cản được dời tới điểm hợp lệ dọc đường (`carrot_validation`).
 - Bộ điều khiển mặc định là **CustomDWB** (`stage3_navigation::DwbController`, tự viết). Nav2 DWB vẫn giữ để so sánh.
 - Tính năng replan (commit `0d553eb`, 2026-10-15) đã được gỡ ngày 2026-10-19. Code và tham số CustomDWB = bản trước đó
   (`a7c59a1`), cộng cổng serial mới. Từ 2026-10-20 có thêm lớp camera (M2, `camera:=true`); ảnh camera hiện ngay trong `planning.rviz`.
@@ -304,7 +306,7 @@ quỹ đạo trên RViz.
 | `use_final_approach_orientation` | `false` | Hướng cuối = hướng Goal Pose |
 | `expected_planner_frequency` | 1.0 | Chỉ để cảnh báo |
 
-A\* chạy **chỉ khi có goal mới**. Không lập lại định kỳ, không lập lại khi gặp vật cản.
+A\* chạy khi có goal mới, hoặc khi `goal_path_bridge` lập lại (mục 16). Không lập lại định kỳ.
 
 ### 6.2 `global_costmap` (cho A\*)
 
@@ -1564,3 +1566,31 @@ ros2 bag record -o ~/obstacle_run /cmd_vel_out /cmd_vel_nav /odometry/filtered /
 - **Mất IMU không bị phát hiện:** `imu_odom`, EKF và CustomDWB đều không báo; chỉ thấy qua `ros2 topic hz /imu_odom`.
 - **Driver tăng/giảm tốc 500 ms** (mặc định lại từ 2026-10-19) khác giả định `control_latency` 0.2 s → có thể quay lố.
 - **Không có PS4 lock / E-stop phần mềm:** PS4 chỉ ghi đè tạm thời. Dừng thật: `cancel`, Ctrl+C, E-stop phần cứng.
+
+---
+
+## 16. Cập nhật 2026-11-25: cà rốt hợp lệ + replanning event-triggered (System Characterization)
+
+Chi tiết, số liệu và kết quả kiểm thử: `../SYSTEM_CHARACTERIZATION_PLAN.md`. **Chưa chạy trên robot.**
+
+| Thành phần | Thay đổi |
+|---|---|
+| `dwa_core.cpp` | `pickValidCarrot()`: cà rốt ở ô ≥ INSCRIBED / unknown / ngoài costmap → dời tiến tới ô FREE đầu tiên; không có → lùi về ô FREE trước vật cản (`carrot_blocked`) |
+| `/CustomDWB/state` | thêm `carrot_shift`, `carrot_blocked` |
+| `global_costmap` | thêm `obstacle_layer` (`/scan_filtered`, giống local), 2 Hz. Map SLAM giữ nguyên |
+| `goal_path_bridge` | khôi phục replan của `1e87e65` + `replan.trigger: stall` |
+| `navigation.launch.py` | arg `replan` (mặc định `true`) |
+
+Quy tắc lập lại (`goal_path_bridge.replan.*`):
+
+| Điều kiện | Hành động |
+|---|---|
+| Ô ≥ 99 trên đường trong 2.5 m, liên tục 0.5 s | "bị chặn" |
+| Bị chặn nhưng tiến ≥ 0.15 m trong 4 s | không làm gì (DWB đang né) |
+| Bị chặn và không tiến 4 s | A\* lại (cooldown 2 s, tối đa 10) |
+| Thông liên tục 1 s | bỏ trạng thái chặn (hysteresis) |
+| FollowPath ABORTED | A\* lại (tối đa 3) |
+| A\* không có đường | hủy FollowPath (đứng yên), thử lại mỗi 2 s |
+| 15 s không có đường | `FAILED: …` (Safe Stop, đứng yên) |
+
+Trạng thái mới trên `/goal_path_bridge/follow_state`: `REPLANNING: …`, `FOLLOWING (replanned Nx)`, `WAITING: …`, `FAILED: …`.
