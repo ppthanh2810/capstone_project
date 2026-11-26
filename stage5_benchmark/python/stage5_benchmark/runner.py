@@ -64,6 +64,7 @@ def run_episode(sc, cfg, seed=0, dwb_override=None, sim_override=None, keep_trac
         'timed_out': r['timeout'], 'trace': tr if keep_trace else tr[:, :6],
         'min_clearance': r['min_clearance'], 'infra_error': r['error'],
         'replans': r['replans'], 'obstacle_replans': r['obstacle_replans'], 'abort_replans': r['abort_replans'],
+        'max_goal_stagnation': r['max_goal_stagnation'],
         'initial_path_length': r['initial_path_length'], 'plan_lengths': r['plan_lengths'],
         'controller_cycles': r['controller_cycles'], 'cycles_no_valid': r['cycles_no_valid'],
         'cycles_holding': r['cycles_holding'], 'rejects': r['rejects'], 'candidates': r['candidates'],
@@ -71,6 +72,8 @@ def run_episode(sc, cfg, seed=0, dwb_override=None, sim_override=None, keep_trac
         'compute_ms_max': r['compute_ms_max'], 'missed_deadlines': r['missed_deadlines'],
         'stale_cycles': r['stale_cycles'], 'events': [(round(t - warm, 2), s) for t, s in r['events']],
         'wall_s': time.time() - t0, 'sim_s': r['t_end'] - warm,
+        'plans': [(round(t - warm, 2), a) for t, a in r.get('plans', [])] if keep_trace else [],
+        'trace_columns': r.get('trace_columns'),
     })
     rec['eval'] = E.evaluate(rec, cfg['eval'])
     return rec
@@ -80,6 +83,7 @@ def _worker(args):
     sc, cfg, seed, dwb_o, sim_o = args
     rec = run_episode(sc, cfg, seed, dwb_o, sim_o)
     rec.pop('trace', None)      # không gửi trace lớn qua tiến trình
+    rec.pop('plans', None)
     return rec
 
 

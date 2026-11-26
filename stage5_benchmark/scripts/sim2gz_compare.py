@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """So sánh Fast 2D với Gazebo trên CÙNG scenario × NHIỀU bộ tham số DWA (Master Plan v3 C2, gate G3).
 
-  sim2gz_compare.py --manifest DIR --gazebo gz.jsonl --param-sets sets.json --out cmp.json [--seeds 0,1,2,3,4]
+  sim2gz_compare.py --manifest DIR[,DIR2] --gazebo gz.jsonl[,gz2.jsonl] --param-sets sets.json --out cmp.json
+      [--seeds 0,1,2,3,4]
+V4: Gazebo chạy `--mode planner_gt` (định vị GT) -> so NHÃN EVALUATOR (cùng dung sai đích, cùng hàm va chạm, cùng
+điều kiện kết thúc) — chỉ số chính `label_match_rate` (nhãn Gazebo == nhãn đa số Fast 2D), mục tiêu >= 95 %.
+Mỗi sai lệch được liệt kê kèm phân bố nhãn Fast 2D qua các seed (`mismatches`).
 Chỉ số mỗi (scenario, bộ tham số): nhãn Gazebo vs phân bố nhãn Fast 2D (nhiều seed), thời gian tới đích, quãng đường,
 khoảng hở nhỏ nhất, số replan, độ dài A* ban đầu. Tổng: tỷ lệ trùng nhãn, sai lệch tương đối thời gian/quãng đường,
 tương quan thứ hạng giữa các bộ tham số (Fast 2D có xếp hạng bộ tham số giống Gazebo không).
@@ -32,8 +36,17 @@ def main():
     a = ap.parse_args()
     cfg = C.load()
     sets = json.load(open(a.param_sets))
-    pool = {s['id']: s for s in IO.load_split(a.manifest)}
-    gz = [json.loads(line) for line in open(a.gazebo)]
+    pool = {s['id']: s for d in a.manifest.split(',') for s in IO.load_split(d)}
+    gz = [json.loads(line) for f in a.gazebo.split(',') for line in open(f)]
+    gz = [g for g in gz if 'param_set' in g]
+    # Chấm lại Gazebo bằng evaluator HIỆN TẠI: có trace -> evaluate đầy đủ; không có (bản ghi cũ) -> relabel_succeeded
+    from stage5_benchmark import evaluator as E
+    for g in gz:
+        if g.get('trace'):
+            g['trace'] = np.asarray(g['trace'])
+            g['eval'] = E.evaluate(g, cfg['eval'])
+        elif 'gt_xy_error' in g['eval']:
+            g['eval']['label'], g['eval']['sub_reason'] = E.relabel_succeeded(g['eval'], cfg['eval'])
     ids = sorted({g['scenario_id'] for g in gz})
     seeds = [int(s) for s in a.seeds.split(',')]
     rows = []
@@ -95,7 +108,20 @@ def main():
                'path_rel_err_median': float(np.median(rel_p)) if rel_p else None,
                'astar0_rel_err_median': float(np.median(rel_a)) if rel_a else None,
                'mean_time_by_param_set': rank}
-    json.dump({'rows': rows, 'summary': summary}, open(a.out, 'w'), indent=1, default=float)
+    valid = [r for r in rows if r['gazebo_label'] != 'SYSTEM_ERROR']
+    summary['n_valid'] = len(valid)
+    summary['label_match_rate_valid'] = float(np.mean([r['label_match'] for r in valid])) if valid else None
+    summary['by_param_set'] = {s: float(np.mean([r['label_match'] for r in valid if r['param_set'] == s] or [np.nan]))
+                               for s in sets}
+    summary['by_type'] = {t: float(np.mean([r['label_match'] for r in valid if r['type'] == t]))
+                          for t in sorted({r['type'] for r in valid})}
+    summary['collisions'] = {'gazebo': sum(r['gazebo_label'] == 'COLLISION' for r in rows),
+                             'fast2d_eps': sum(r['fast2d_labels'].get('COLLISION', 0) for r in rows)}
+    summary['fast2d_seed_unanimous_rate'] = float(np.mean([len(r['fast2d_labels']) == 1 for r in valid]))
+    mism = [{k: r[k] for k in ('scenario', 'type', 'param_set', 'gazebo_label', 'gazebo_sub', 'fast2d_labels',
+                               'gazebo_time', 'fast2d_time_mean', 'gazebo_clearance', 'fast2d_clearance_mean',
+                               'gazebo_replans', 'fast2d_replans_mean')} for r in valid if not r['label_match']]
+    json.dump({'rows': rows, 'summary': summary, 'mismatches': mism}, open(a.out, 'w'), indent=1, default=float)
     print(json.dumps(summary, indent=1, default=float))
     return 0
 

@@ -1,0 +1,5 @@
+{"base": {},
+ "timid_short": {"path_distance_scale": 1.5, "carrot_distance_scale": 1.0, "obstacle_scale": 1.0, "heading_scale": 1.0, "speed_scale": 0.5, "sim_time": 1.5},
+ "bold_long": {"path_distance_scale": 0.3, "carrot_distance_scale": 3.0, "obstacle_scale": 7.0, "heading_scale": 0.2, "speed_scale": 2.5, "sim_time": 3.0},
+ "wO_low": {"obstacle_scale": 0.5},
+ "fast_short": {"speed_scale": 3.0, "obstacle_scale": 2.0, "sim_time": 1.5, "heading_scale": 0.0}}

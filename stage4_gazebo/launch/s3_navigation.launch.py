@@ -33,7 +33,8 @@ LOCAL_PLANNERS = {'custom': 'CustomDWB', 'nav2_dwb': 'FollowPath'}
 CAMERA_LAYERS = {'fusion': 'camera_fusion.yaml', 'voxel': 'camera_voxel.yaml', 'none': None}
 
 # Tham số chuyển nguyên xuống s2_slam.launch.py
-S2_ARGS = ('mode', 'env', 'aws_dir', 'world_map', 'map', 'world', 'wall_height', 'csm', 'monitor', 'gui',
+S2_ARGS = ('mode', 'localization_source', 'env', 'aws_dir', 'world_map', 'map', 'world', 'wall_height', 'csm',
+           'monitor', 'gui',
            'x', 'y', 'yaw', 'init_pose', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'command_delay', 'camera')
 
 
@@ -64,7 +65,7 @@ def launch_setup(context):
     mode = arg('mode')
     localization = mode == 'localization'
     nav_enabled = is_true(arg('navigation_enabled'))
-    require_localized = localization and is_true(arg('monitor'))
+    require_localized = localization and is_true(arg('monitor')) and arg('localization_source') != 'ground_truth'
     log_level = arg('log_level')
     ros_args = ['--ros-args', '--log-level', log_level]
 
@@ -195,6 +196,8 @@ def generate_launch_description():
         DeclareLaunchArgument('world', default_value=''),
         DeclareLaunchArgument('wall_height', default_value='1.0'),
         DeclareLaunchArgument('csm', default_value='true'),
+        DeclareLaunchArgument('localization_source', default_value='amcl',
+                              description='amcl | ground_truth (Planner Benchmark GT, chỉ sim)'),
         DeclareLaunchArgument('monitor', default_value='true',
                               description='true: bridge chỉ bám đường khi LOCALIZED (như xe thật)'),
         DeclareLaunchArgument('gui', default_value='true'),

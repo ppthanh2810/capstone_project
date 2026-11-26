@@ -23,6 +23,7 @@ ACTION_LOW = np.array([0.0, 0.5, 0.0, 0.0, 0.0, 1.5])
 ACTION_HIGH = np.array([2.0, 4.0, 8.0, 1.5, 3.0, 3.0])
 PHASES = ['IDLE', 'FOLLOW_PATH', 'ROTATE_TO_PATH', 'ROTATE_TO_GOAL', 'BLOCKED']
 N_SECTORS = 36
+TERMINAL_STATES = ('SUCCEEDED', 'ABORTED', 'FAILED', 'CANCELED', 'REFUSED', 'REJECTED', 'PLANNING_FAILED')
 
 
 def action_to_params(a, low=ACTION_LOW, high=ACTION_HIGH):
@@ -80,8 +81,9 @@ class SacDwaEnv:
         if c['phase'] in PHASES:
             phase[PHASES.index(c['phase'])] = 1.0
         nc = max(1, c['n_candidates'])
+        # V4: số replan đọc TRONG episode (v3 chỉ có khi done -> luôn 0 lúc học)
         flags = [float(ep.blocked), float(c['carrot_blocked']), c['n_valid'] / nc, c['n_forward_valid'] / nc,
-                 min(1.0, ep.result()['replans'] / 5.0) if ep.done else 0.0]
+                 min(1.0, ep.replans / 5.0)]
         o = np.concatenate([
             sect / self.sector_range,
             [carrot_r[0] / 1.0, carrot_r[1] / 1.0, math.tanh(dg / 5.0), c['heading_error'] / math.pi,
@@ -111,7 +113,9 @@ class SacDwaEnv:
         self.ep = fast2d.Episode(RN.scenario_to_fast2d(self.sc), sim, dwb, self.cfg['replan'])
         self.ep.step(sim.get('warmup', 1.0) + 0.1)
         self.last_action = params_to_action({k: dwb[k] for k in ACTION_KEYS}, self.low, self.high)
-        self.prev_progress = 0.0
+        self.prev_progress = self.ep.progress
+        self.prev_replans = self.ep.replans
+        self.replan_resets = 0
         return self._obs(), {'scenario_id': self.sc.get('id')}
 
     def step(self, action):
@@ -121,14 +125,24 @@ class SacDwaEnv:
         r_smooth = self.rw['smooth'] * float(np.sum((a - self.last_action) ** 2))
         self.last_action = a if not err else self.last_action
         self.ep.step(self.dp)
+        # V4: bridge đã có trạng thái cuối -> chạy nốt post_terminal (đo đứng yên / trôi cho evaluator) trong CÙNG
+        # bước; các bước sau đó action không còn tác dụng (controller đã dừng) nên không cho policy thấy.
+        if not self.ep.done and self.ep.bridge_state.startswith(TERMINAL_STATES):
+            self.ep.run()
         prog = self.ep.progress
         clr = self.ep.gt_clearance()
+        # V4: replan -> đường mới, tiến trình dọc đường đặt lại về 0 (PathTracker). v3 phạt -0.5·10 = -5 mỗi lần
+        # replan (không do policy gây ra trực tiếp) -> bỏ phần chênh của bước có replan, tính lại từ đường mới.
+        if self.ep.replans != self.prev_replans:
+            self.prev_replans = self.ep.replans
+            self.prev_progress = prog
+            self.replan_resets += 1
         r = self.rw['progress'] * max(-0.5, prog - self.prev_progress) + self.rw['time'] + r_smooth
         if clr < self.rw['clearance_ref']:
             r += self.rw['clearance'] * (self.rw['clearance_ref'] - max(clr, 0.0)) / self.rw['clearance_ref']
         self.prev_progress = prog
         terminated = truncated = False
-        info = {'param_error': err}
+        info = {'param_error': err, 'replans': self.ep.replans}
         if self.ep.done:
             rec = self._record()
             lab = rec['eval']['label']
@@ -136,8 +150,12 @@ class SacDwaEnv:
             info['record'] = rec
             r += {'SUCCESS': self.rw['success'], 'COLLISION': self.rw['collision'],
                   'STUCK': self.rw['stuck']}.get(lab, 0.0)
+            # Kết thúc thật (MDP terminal, không bootstrap): SUCCESS/COLLISION/STUCK/SAFE_STOP.
+            # Cắt (bootstrap V(s')): TIMEOUT (giới hạn thời gian episode). SYSTEM_ERROR: cắt + info['discard']
+            # (không đưa transition cuối vào replay — lỗi hạ tầng, không phải hệ quả của action).
             terminated = lab in ('SUCCESS', 'COLLISION', 'STUCK', 'SAFE_STOP')
             truncated = not terminated
+            info['discard'] = lab == 'SYSTEM_ERROR'
         return self._obs(), float(r), terminated, truncated, info
 
     def _record(self):

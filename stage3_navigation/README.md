@@ -4,11 +4,13 @@ Package này giúp robot **tự đi tới một đích** chọn trên RViz, theo
 
 | Lớp | Làm gì | Biết gì |
 |---|---|---|
-| **A\*** (toàn cục) | Tìm đường từ robot tới đích; **lập lại** khi đường bị chặn và robot không tiến | Bản đồ tĩnh (`/map`) + vật cản LiDAR đã thấy (`obstacle_layer`) |
+| **A\*** (toàn cục) | Tìm đường từ robot tới đích; **lập lại** khi đường bị chặn và DWB không tự né được | Bản đồ tĩnh (`/map`) + vật cản LiDAR đã thấy (`obstacle_layer`) |
 | **DWB** (cục bộ) | Mỗi 0.1 s chọn vận tốc (v, ω) để bám đường A\* và **tự né vật cản** | Vật cản LiDAR đang thấy (local costmap 2 × 2 m) |
 
-- **Replanning event-triggered (từ 2026-11-25, mục 16).** DWB tự né trước; chỉ khi đường bị chặn **và** robot không tiến
-  4 s thì A\* lập lại từ vị trí hiện tại; không còn đường → đứng yên, `FAILED` (Safe Stop). `replan:=false` = hành vi cũ.
+- **Replanning "Local Avoidance First" (V5, từ 2026-11-27, mục 18).** Đường bị chặn **không** đủ để lập lại: DWB
+  tự né trước. A\* chỉ lập lại khi DWB hết khả năng tiến an toàn (hết cung tiến tự do / không còn quỹ đạo tiến,
+  liên tục 0.4 s) hoặc không tiến hữu ích 4 s; tới gần đoạn bị chặn thì giới hạn 0.15 m/s. Không còn đường → đứng
+  yên, `FAILED` (Safe Stop). `replan:=false` = không lập lại.
 - **Cà rốt hợp lệ (từ 2026-11-25):** cà rốt rơi vào vật cản được dời tới điểm hợp lệ dọc đường (`carrot_validation`).
 - Bộ điều khiển mặc định là **CustomDWB** (`stage3_navigation::DwbController`, tự viết). Nav2 DWB vẫn giữ để so sánh.
 - Tính năng replan (commit `0d553eb`, 2026-10-15) đã được gỡ ngày 2026-10-19. Code và tham số CustomDWB = bản trước đó
@@ -1615,3 +1617,54 @@ Hệ quả cần biết:
 - Nav2 DWB (`FollowPath`, chỉ để so sánh) chưa thử lại với 4×4 m.
 
 `goal_path_bridge` tham số mới: `localization_occluded_ratio` (0.5), `localization_occluded_grace` (8.0 s).
+
+## 18. Cập nhật 2026-11-27: Replanning V5 "Local Avoidance First — Global Replanning Second"
+
+Bằng chứng (Fast 2D train/dev, 8 bộ tham số, Gazebo): `../stage5_benchmark/docs/ACCEPTANCE_2026-11-27.md`.
+**Chưa chạy trên robot.** V4 (`early_distance` 1.0 m) đã tắt.
+
+Vì sao đổi: V4 lập lại A\* ngay khi ô bị chặn còn cách 1 m, trong khi CustomDWB chỉ bắt đầu né ở ~0.6 m
+(`obstacle_lookahead` = `max_vel_x` × `sim_time`). Kết quả: **A\* né thay DWB** (Local Avoidance Rate 0 %), replan cả ở
+114 đoạn dev mà DWB tự né được, và SR gần như **không phụ thuộc trọng số DWB** (98.9–100 % kể cả `obstacle_scale` 0).
+
+Trạng thái của `ReplanSupervisor` (`replan.trigger: conditional`):
+
+| Trạng thái | Khi nào | Hành động |
+|---|---|---|
+| NORMAL | đường thông | — |
+| PATH_BLOCKED | ô ≥ 99 trên đường trong 2.5 m, liên tục 0.5 s | **không** lập lại; ô chặn ≤ 1.2 m → giới hạn 0.15 m/s |
+| LOCAL_BLOCKED | bằng chứng DWB xấu liên tục 0.4 s, hoặc không tiến hữu ích 4 s | chuyển GLOBAL_BLOCKED |
+| GLOBAL_BLOCKED | A\* lập lại (cooldown 2 s, tối đa 10) | đường mới → NORMAL |
+| SAFE_STOP | hết lượt / không có đường 15 s | `FAILED`, đứng yên |
+
+Bằng chứng DWB xấu (mỗi báo cáo `/CustomDWB/state`):
+- DWB `BLOCKED` / lỗi; hoặc `FOLLOW_PATH` mà `n_forward_valid` = 0 (chỉ còn đứng yên / xoay: **không** coi là tiếp tục được).
+- Tỷ lệ cung tiến tự do `fs_forward_free / fs_arcs` < 0.15: 21 cung dài 0.6 m, |κ| ≤ 4 m⁻¹, kiểm tra như loại cứng.
+  Đo trên local costmap, **không phụ thuộc trọng số / `sim_time`**, nên SAC đổi `sim_time` không tự gây replan.
+- Pha xoay đủ không gian: trung tính. Tiến hữu ích = tiến ≥ 0.15 m dọc đường **hoặc** dịch chuyển ≥ 0.3 m (đi vòng).
+- Khoảng hở tâm robot (`fs_clearance`) chỉ để chẩn đoán: không tách được né thành công / kẹt (DWB né sát 0.04 m).
+
+Giới hạn tốc độ: bridge phát `nav2_msgs/SpeedLimit` (tuyệt đối, m/s) lên `/speed_limit` → `controller_server` →
+CustomDWB `setSpeedLimit`; 0 = gỡ. Lý do: bằng chứng cục bộ chỉ rõ khi còn ~0.3 m, ở 0.3 m/s robot trôi thêm
+0.12–0.2 m (trễ 0.15 s + ramp 0.5 s) vào ô INSCRIBED.
+
+Dev (550 scenario, bộ mặc định, Fast 2D):
+
+| Cơ chế | SR | STR | Replan % ep | LAR | t (s) |
+|---|---:|---:|---:|---:|---:|
+| V3 stall | 97.4 | 2.2 | 17.8 | 54 | 27.9 |
+| V4 1 m | 100.0 | 0.0 | 38.6 | 0 | 27.7 |
+| **V5 (chọn)** | 99.2 | 0.4 | 16.6 | 58 | 29.8 |
+| chỉ DWB | 83.8 | 16.0 | 0 | 58 | 27.8 |
+
+Độ nhạy trọng số (Fast 2D, general_train 125 scenario × 30 bộ × 2 seed): V4 SR 98.8–100 %, replan 37 % ep ở **mọi**
+bộ (trọng số gần như không đổi được kết cục); V5 SR 82.8–100 %, replan 14–38 % ep, CR 0 mọi bộ. Gazebo regression
+×3 với V5: 35/39, 0 va chạm. G3 Fast 2D ↔ Gazebo: khớp nhãn 97 %. Chi tiết:
+`stage5_benchmark/docs/ACCEPTANCE_2026-11-27.md`.
+
+CR = 0 ở mọi cơ chế và mọi bộ tham số. An toàn không phụ thuộc replan: không còn quỹ đạo hợp lệ → DwaCore
+không phát lệnh, controller dừng ngay (không đợi xác nhận replan).
+
+`/CustomDWB/state` thêm: `fs_clearance`, `fs_forward_free`, `fs_arcs`. Tham số bridge mới: `replan.local_free_ratio_min`,
+`local_hold_time`, `local_clearance_min` (0 = tắt), `useful_displacement`, `approach_speed`, `approach_distance`,
+`speed_limit_topic`. Log mới: `approach speed limit 0.15 m/s (path blocked ahead)`, `REPLANNING: … LOCAL_BLOCKED (free_space) …`.

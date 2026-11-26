@@ -98,8 +98,13 @@ def launch_setup(context):
     if mode not in ('mapping', 'localization'):
         raise RuntimeError(f"mode phải là 'mapping' hoặc 'localization' (nhận '{mode}')")
     localization = mode == 'localization'
-    csm = localization and is_true(arg('csm'))
-    monitor = localization and is_true(arg('monitor'))
+    loc_source = arg('localization_source')
+    if loc_source not in ('amcl', 'ground_truth'):
+        raise RuntimeError(f"localization_source phải là 'amcl' hoặc 'ground_truth' (nhận '{loc_source}')")
+    gt_loc = localization and loc_source == 'ground_truth'
+    # ground_truth (Planner Benchmark, CHỈ SIM): không AMCL -> không CSM, không monitor
+    csm = localization and not gt_loc and is_true(arg('csm'))
+    monitor = localization and not gt_loc and is_true(arg('monitor'))
 
     env = arg('env')
     world = arg('world')
@@ -139,7 +144,7 @@ def launch_setup(context):
     else:
         spawn, spawn_src = (0.0, 0.0, 0.0), 'mặc định'
     init_pose = arg('init_pose').strip().lower()
-    send_init = localization and init_pose in ('true', '1', 'yes')
+    send_init = localization and not gt_loc and init_pose in ('true', '1', 'yes')
 
     common = ['gui', 'follow', 'joy', 'accel_time_ms', 'decel_time_ms', 'command_delay', 'camera']
     s1_args = {k: arg(k) for k in common}
@@ -213,6 +218,18 @@ def launch_setup(context):
                 },
             ],
         ))
+    elif gt_loc:
+        # Planner Benchmark GT (V4): map_server + lifecycle manager + gt_localization (TF map->odom từ GT).
+        actions += [
+            Node(package='nav2_map_server', executable='map_server', name='map_server', output='screen',
+                 parameters=[{'yaml_filename': loc_map, 'use_sim_time': True, 'topic_name': 'map',
+                              'frame_id': 'map'}]),
+            Node(package='nav2_lifecycle_manager', executable='lifecycle_manager',
+                 name='lifecycle_manager_localization', output='screen',
+                 parameters=[{'use_sim_time': True, 'autostart': True, 'node_names': ['map_server']}]),
+            Node(package='stage4_gazebo', executable='gt_localization.py', name='gt_localization',
+                 output='screen', parameters=[sim_time]),
+        ]
     else:
         # Giống stage2_slam/launch/localization.launch.py; nav2_bringup tự RewrittenYaml use_sim_time
         actions.append(GroupAction(scoped=True, actions=[IncludeLaunchDescription(
@@ -285,6 +302,9 @@ def generate_launch_description():
                               description='Chiều cao tường sinh từ bản đồ (m)'),
         DeclareLaunchArgument('csm', default_value='true',
                               description='true: 2D Pose Estimate -> CSM -> /initialpose (như stage3)'),
+        DeclareLaunchArgument('localization_source', default_value='amcl',
+                              description='amcl (Full-system, như xe thật) | ground_truth (Planner Benchmark, '
+                                          'CHỈ SIM: TF map->odom từ /sim/ground_truth/odom, không AMCL/CSM/monitor)'),
         DeclareLaunchArgument('monitor', default_value='true',
                               description='true: localization_monitor -> /localization/status'),
         DeclareLaunchArgument('gui', default_value='true'),

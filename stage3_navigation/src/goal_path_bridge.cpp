@@ -34,6 +34,7 @@
 #include <csignal>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -46,6 +47,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav2_msgs/action/compute_path_to_pose.hpp"
 #include "nav2_msgs/action/follow_path.hpp"
+#include "nav2_msgs/msg/speed_limit.hpp"
 #include "nav2_msgs/srv/clear_costmap_except_region.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "nav_msgs/msg/path.hpp"
@@ -130,6 +132,22 @@ public:
     declare_parameter<int>("replan.max_obstacle_replans", 20);
     declare_parameter<int>("replan.max_abort_replans", 3);
     declare_parameter<double>("replan.wait_timeout", 15.0);
+    // Trigger sớm V4 (ReplanSupervisor): early_valid_ratio <= 0 = tắt (hành vi V3). Nguồn: /CustomDWB/state.
+    declare_parameter<double>("replan.early_valid_ratio", 0.0);
+    declare_parameter<double>("replan.early_valid_time", 0.5);
+    declare_parameter<double>("replan.early_distance", 0.0);
+    declare_parameter<double>("replan.early_max_deviation", 0.0);
+    declare_parameter<double>("replan.goal_progress_timeout", 0.0);   // s, <= 0 tắt (V3)
+    declare_parameter<double>("replan.goal_progress_min", 0.5);
+    // R2 Local Avoidance First (replan.trigger "conditional"): bằng chứng LOCAL_BLOCKED từ /CustomDWB/state.
+    declare_parameter<double>("replan.local_clearance_min", 0.0);
+    declare_parameter<double>("replan.local_free_ratio_min", 0.0);
+    declare_parameter<double>("replan.local_hold_time", 1.0);
+    declare_parameter<double>("replan.useful_displacement", 0.0);
+    declare_parameter<double>("replan.approach_speed", 0.0);     // m/s, <= 0 tắt
+    declare_parameter<double>("replan.approach_distance", 1.0);  // m
+    declare_parameter<std::string>("replan.speed_limit_topic", "speed_limit");
+    declare_parameter<std::string>("replan.controller_state_topic", "/CustomDWB/state");
     declare_parameter<double>("replan.costmap_timeout", 5.0);
     declare_parameter<bool>("replan.clear_costmap_on_failure", false);
     declare_parameter<double>("replan.clear_keep_distance", 5.0);
@@ -142,6 +160,9 @@ public:
     const auto latched = rclcpp::QoS(1).transient_local().reliable();
     path_pub_ = create_publisher<nav_msgs::msg::Path>(path_topic, latched);
     state_pub_ = create_publisher<std_msgs::msg::String>("~/follow_state", latched);
+    // R2 tiếp cận chậm: nav2_msgs/SpeedLimit tuyệt đối (m/s) -> controller_server (speed_limit_topic) -> CustomDWB.
+    speed_limit_pub_ = create_publisher<nav2_msgs::msg::SpeedLimit>(
+      get_parameter("replan.speed_limit_topic").as_string(), 10);
 
     // Chỉ ghi nhận đã có bản đồ (không giữ dữ liệu): planner_server tự đọc /map qua global_costmap.
     map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>(
@@ -182,6 +203,40 @@ public:
             loc_occluded_last_ = loc_status_time_;
           }
         }
+      });
+
+    // CustomDWB /CustomDWB/state (5 Hz + khi đổi pha): tỷ lệ quỹ đạo tiến hợp lệ cho trigger replan sớm.
+    // Nav2 DWB không phát topic này -> trigger sớm không bật.
+    controller_state_sub_ = create_subscription<DiagnosticStatus>(
+      get_parameter("replan.controller_state_topic").as_string(), 10,
+      [this](DiagnosticStatus::ConstSharedPtr msg) {
+        if (!session_ || !following_) {
+          return;
+        }
+        // Thiếu khóa (lỗi plan / pha không tính) -> 0 quỹ đạo tiến hợp lệ, không có chẩn đoán không gian trống.
+        ControllerReport rep;
+        std::string phase;
+        for (const auto & kv : msg->values) {
+          if (kv.key == "n_forward_valid") {
+            rep.n_forward_valid = std::max(0, std::atoi(kv.value.c_str()));
+          } else if (kv.key == "n_candidates") {
+            rep.n_candidates = std::max(0, std::atoi(kv.value.c_str()));
+          } else if (kv.key == "phase") {
+            phase = kv.value;
+          } else if (kv.key == "fs_clearance") {
+            rep.fs_clearance = std::atof(kv.value.c_str());
+            rep.fs_valid = true;
+          } else if (kv.key == "fs_forward_free") {
+            rep.fs_forward_free = std::atoi(kv.value.c_str());
+          } else if (kv.key == "fs_arcs") {
+            rep.fs_arcs = std::atoi(kv.value.c_str());
+          }
+        }
+        // level OK = có lệnh; WARN = lỗi / BLOCKED (publishState của CustomDWB)
+        rep.ok = msg->level == DiagnosticStatus::OK && phase != "BLOCKED";
+        rep.follow = rep.ok && phase == "FOLLOW_PATH";
+        rep.rotating = rep.ok && (phase == "ROTATE_TO_PATH" || phase == "ROTATE_TO_GOAL");
+        session_->sup.reportController(now().seconds(), rep, replanParams());
       });
 
     goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -257,6 +312,18 @@ private:
       static_cast<int>(get_parameter("replan.max_obstacle_replans").as_int());
     p.max_abort_replans = static_cast<int>(get_parameter("replan.max_abort_replans").as_int());
     p.wait_timeout = get_parameter("replan.wait_timeout").as_double();
+    p.early_valid_ratio = get_parameter("replan.early_valid_ratio").as_double();
+    p.early_valid_time = get_parameter("replan.early_valid_time").as_double();
+    p.early_distance = get_parameter("replan.early_distance").as_double();
+    p.early_max_deviation = get_parameter("replan.early_max_deviation").as_double();
+    p.goal_progress_timeout = get_parameter("replan.goal_progress_timeout").as_double();
+    p.goal_progress_min = get_parameter("replan.goal_progress_min").as_double();
+    p.local_clearance_min = get_parameter("replan.local_clearance_min").as_double();
+    p.local_free_ratio_min = get_parameter("replan.local_free_ratio_min").as_double();
+    p.local_hold_time = get_parameter("replan.local_hold_time").as_double();
+    p.useful_displacement = get_parameter("replan.useful_displacement").as_double();
+    p.approach_speed = get_parameter("replan.approach_speed").as_double();
+    p.approach_distance = get_parameter("replan.approach_distance").as_double();
     return p;
   }
 
@@ -559,6 +626,7 @@ private:
 
   void endSession(const std::string & state)
   {
+    publishSpeedLimit(0.0);
     stopFollowGoal();
     session_.reset();
     publishState(state);
@@ -620,6 +688,33 @@ private:
       checkBlockage();
     } else if (session_->sup.waiting()) {
       apply(session_->sup.retryWhileWaiting(now().seconds(), replanParams()));
+    }
+    // Watchdog tiến triển về đích (V4, replan.goal_progress_timeout > 0): cùng chu kỳ, sau kiểm tra chặn.
+    if (session_) {
+      const auto d = session_->sup.checkGoalProgress(now().seconds(), replanParams());
+      if (d.type == ReplanDecision::Type::END) {
+        apply(d);
+      }
+    }
+    // R2 tiếp cận chậm: chỉ phát khi giá trị đổi (0 = NO_SPEED_LIMIT)
+    publishSpeedLimit(session_ && following_ ? session_->sup.speedLimit(replanParams()) : 0.0);
+  }
+
+  void publishSpeedLimit(double limit)
+  {
+    if (limit == last_speed_limit_) {
+      return;
+    }
+    last_speed_limit_ = limit;
+    nav2_msgs::msg::SpeedLimit msg;
+    msg.header.stamp = now();
+    msg.percentage = false;
+    msg.speed_limit = limit;     // 0.0 = nav2_costmap_2d::NO_SPEED_LIMIT
+    speed_limit_pub_->publish(msg);
+    if (limit > 0.0) {
+      RCLCPP_INFO(get_logger(), "approach speed limit %.2f m/s (path blocked ahead)", limit);
+    } else {
+      RCLCPP_INFO(get_logger(), "approach speed limit released");
     }
   }
 
@@ -1018,6 +1113,9 @@ private:
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr costmap_sub_;
   rclcpp::Subscription<DiagnosticStatus>::SharedPtr status_sub_;
+  rclcpp::Subscription<DiagnosticStatus>::SharedPtr controller_state_sub_;
+  rclcpp::Publisher<nav2_msgs::msg::SpeedLimit>::SharedPtr speed_limit_pub_;
+  double last_speed_limit_{0.0};
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   rclcpp_action::Client<ComputePathToPose>::SharedPtr client_;
   rclcpp_action::Client<FollowPath>::SharedPtr follow_client_;

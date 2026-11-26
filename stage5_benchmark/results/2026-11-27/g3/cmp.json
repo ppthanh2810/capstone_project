@@ -1,0 +1,4051 @@
+{
+ "rows": [
+  {
+   "scenario": "general_s1_val_S1_u_0004",
+   "type": "S1",
+   "param_set": "base",
+   "gazebo_label": "SAFE_STOP",
+   "gazebo_sub": "FAILED",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": true,
+   "gazebo_outcome": "FAILED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.016000000000005,
+   "fast2d_time_mean": null,
+   "gazebo_path": 3.9648683778700757,
+   "fast2d_path_mean": 3.944643215571742,
+   "gazebo_clearance": 0.203181850297812,
+   "fast2d_clearance_mean": 0.2087296281443992,
+   "gazebo_replans": 8,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 13.366595455007008,
+   "fast2d_astar0": 13.296409184768589
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "base",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.028000000000002245,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 4.332751299869104,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.1355132688239359,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.050580856483931,
+   "fast2d_astar0": 7.06940843404657
+  },
+  {
+   "scenario": "general_val_B1_e_0008",
+   "type": "B1",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0030061258743949697,
+   "label_in_fast2d": true,
+   "gazebo_time": 39.374,
+   "fast2d_time_mean": 39.03500000000203,
+   "gazebo_path": 9.322907626527687,
+   "fast2d_path_mean": 9.2677000287843,
+   "gazebo_clearance": 0.1215579565694258,
+   "fast2d_clearance_mean": 0.1163943116671308,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.099780010800693,
+   "fast2d_astar0": 9.109736203144672
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "base",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "TIMEOUT": 2,
+    "SUCCESS": 3
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "none": 2,
+    "SUCCEEDED": 3
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.030999999999998806,
+   "fast2d_time_mean": 41.95500000000352,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.981740565835091,
+   "gazebo_clearance": 0.49800000000000016,
+   "fast2d_clearance_mean": 0.10460729295813764,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 2.0,
+   "gazebo_astar0": 8.708385901481968,
+   "fast2d_astar0": 8.697602030227117
+  },
+  {
+   "scenario": "general_val_B1_m_0006",
+   "type": "B1",
+   "param_set": "base",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.989,
+   "fast2d_time_mean": 35.83500000000039,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.845685306082812,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.12410300202334017,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 7.64479442091113
+  },
+  {
+   "scenario": "general_val_B2_e_0006",
+   "type": "B2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006277665557297034,
+   "label_in_fast2d": true,
+   "gazebo_time": 39.24300000000001,
+   "fast2d_time_mean": 39.13500000000208,
+   "gazebo_path": 8.707091189840622,
+   "fast2d_path_mean": 8.727302330528687,
+   "gazebo_clearance": 0.12157724364026495,
+   "fast2d_clearance_mean": 0.12286693474029517,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.373423453915972,
+   "fast2d_astar0": 8.363563574907179
+  },
+  {
+   "scenario": "general_val_B2_h_0007",
+   "type": "B2",
+   "param_set": "base",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.99,
+   "fast2d_time_mean": 46.255000000005715,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 10.051144980210513,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.12283812522245985,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.8,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 8.495782628180773
+  },
+  {
+   "scenario": "general_val_B2_m_0000",
+   "type": "B2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0004464221221792763,
+   "label_in_fast2d": true,
+   "gazebo_time": 39.737,
+   "fast2d_time_mean": 39.91500000000248,
+   "gazebo_path": 8.161344381934327,
+   "fast2d_path_mean": 8.185368283523472,
+   "gazebo_clearance": 0.10833098914665551,
+   "fast2d_clearance_mean": 0.11145057442079102,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.662384473812549,
+   "fast2d_astar0": 7.663516047621053
+  },
+  {
+   "scenario": "general_val_B3_h_0001",
+   "type": "B3",
+   "param_set": "base",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "TIMEOUT": 5
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "none": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.987,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 25.037535411973,
+   "gazebo_clearance": 0.3249999999999997,
+   "fast2d_clearance_mean": 0.12486416602402128,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.491336811821897
+  },
+  {
+   "scenario": "general_val_B3_h_0009",
+   "type": "B3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 78.69,
+   "fast2d_time_mean": 78.55500000000013,
+   "gazebo_path": 20.786129048410483,
+   "fast2d_path_mean": 20.775181806523538,
+   "gazebo_clearance": 0.12283830955585345,
+   "fast2d_clearance_mean": 0.12519931034348236,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.624849069809104,
+   "fast2d_astar0": 7.707319478379939
+  },
+  {
+   "scenario": "general_val_B3_m_0004",
+   "type": "B3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 7.122316764287603e-05,
+   "label_in_fast2d": true,
+   "gazebo_time": 68.071,
+   "fast2d_time_mean": 68.07500000000967,
+   "gazebo_path": 15.866769312957908,
+   "fast2d_path_mean": 15.900351955322261,
+   "gazebo_clearance": 0.1300925858036946,
+   "fast2d_clearance_mean": 0.12272417437140723,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 6.62672012279903,
+   "fast2d_astar0": 6.6295574197474565
+  },
+  {
+   "scenario": "general_val_C1_h_0000",
+   "type": "C1",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0009488568369894503,
+   "label_in_fast2d": true,
+   "gazebo_time": 30.06,
+   "fast2d_time_mean": 30.55499999999818,
+   "gazebo_path": 8.510432358686124,
+   "fast2d_path_mean": 8.53364858095254,
+   "gazebo_clearance": 0.0966229600122796,
+   "fast2d_clearance_mean": 0.10207685160911506,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.858784033599168,
+   "fast2d_astar0": 9.21343722261722
+  },
+  {
+   "scenario": "general_val_C1_h_0005",
+   "type": "C1",
+   "param_set": "base",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.988,
+   "fast2d_time_mean": 20.79499999999995,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 5.933910221211355,
+   "gazebo_clearance": 0.44800000000000056,
+   "fast2d_clearance_mean": 0.11450282691673234,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.174401064782271
+  },
+  {
+   "scenario": "general_val_C1_h_0006",
+   "type": "C1",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0008421993213449422,
+   "label_in_fast2d": true,
+   "gazebo_time": 23.346000000000004,
+   "fast2d_time_mean": 23.534999999999403,
+   "gazebo_path": 6.313401784550212,
+   "fast2d_path_mean": 6.303550294924909,
+   "gazebo_clearance": 0.1123118518138641,
+   "fast2d_clearance_mean": 0.10422785758392177,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.856547380261182,
+   "fast2d_astar0": 6.731567117277876
+  },
+  {
+   "scenario": "general_val_C2_e_0013",
+   "type": "C2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 38.139,
+   "fast2d_time_mean": 38.11500000000156,
+   "gazebo_path": 9.016551441079143,
+   "fast2d_path_mean": 9.016222841432622,
+   "gazebo_clearance": 0.1188855025999363,
+   "fast2d_clearance_mean": 0.12384675682723938,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.040318632274747,
+   "fast2d_astar0": 9.046403790125023
+  },
+  {
+   "scenario": "general_val_C2_h_0001",
+   "type": "C2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.009367879937103177,
+   "label_in_fast2d": true,
+   "gazebo_time": 25.647,
+   "fast2d_time_mean": 26.054999999998905,
+   "gazebo_path": 7.380522127956399,
+   "fast2d_path_mean": 7.386741573289987,
+   "gazebo_clearance": 0.12115568427075812,
+   "fast2d_clearance_mean": 0.11815947126448734,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.765253021008576,
+   "fast2d_astar0": 7.767898452370029
+  },
+  {
+   "scenario": "general_val_C2_m_0008",
+   "type": "C2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006053274666771341,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.861000000000004,
+   "fast2d_time_mean": 32.85499999999887,
+   "gazebo_path": 6.974142664190347,
+   "fast2d_path_mean": 6.985298327532165,
+   "gazebo_clearance": 0.11221461448546416,
+   "fast2d_clearance_mean": 0.1159580840135451,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.009240758576871,
+   "fast2d_astar0": 7.0111187519409
+  },
+  {
+   "scenario": "general_val_C3_e_0012",
+   "type": "C3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006122653527552396,
+   "label_in_fast2d": true,
+   "gazebo_time": 30.973000000000003,
+   "fast2d_time_mean": 30.994999999997937,
+   "gazebo_path": 8.978391211060577,
+   "fast2d_path_mean": 8.988149343831576,
+   "gazebo_clearance": 0.19235599608001414,
+   "fast2d_clearance_mean": 0.18191500180551068,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.205472589919271,
+   "fast2d_astar0": 9.262010105585649
+  },
+  {
+   "scenario": "general_val_C3_h_0009",
+   "type": "C3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.003100625934189265,
+   "label_in_fast2d": true,
+   "gazebo_time": 30.032,
+   "fast2d_time_mean": 29.934999999998134,
+   "gazebo_path": 8.508454765695678,
+   "fast2d_path_mean": 8.498313258911486,
+   "gazebo_clearance": 0.12128584360385325,
+   "fast2d_clearance_mean": 0.11783633496051911,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.317413991321484,
+   "fast2d_astar0": 9.324210986408197
+  },
+  {
+   "scenario": "general_val_C3_m_0006",
+   "type": "C3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.003258134043165431,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.31,
+   "fast2d_time_mean": 32.39499999999863,
+   "gazebo_path": 9.392977568781031,
+   "fast2d_path_mean": 9.402652771517797,
+   "gazebo_clearance": 0.1610368853767553,
+   "fast2d_clearance_mean": 0.16247870454142568,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.731790330494452,
+   "fast2d_astar0": 9.741789317249488
+  },
+  {
+   "scenario": "general_val_C4_e_0007",
+   "type": "C4",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006146069031898093,
+   "label_in_fast2d": true,
+   "gazebo_time": 20.499000000000002,
+   "fast2d_time_mean": 20.475000000000012,
+   "gazebo_path": 5.8389942394852525,
+   "fast2d_path_mean": 5.840378410485124,
+   "gazebo_clearance": 0.4540435847177294,
+   "fast2d_clearance_mean": 0.4620008074582757,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.958832291924308,
+   "fast2d_astar0": 5.9591137003367125
+  },
+  {
+   "scenario": "general_val_C4_h_0003",
+   "type": "C4",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 14.894000000000002,
+   "fast2d_time_mean": 14.895000000001081,
+   "gazebo_path": 4.143617632658857,
+   "fast2d_path_mean": 4.149595835887861,
+   "gazebo_clearance": 0.20219170821494725,
+   "fast2d_clearance_mean": 0.1883063945551462,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.316527602929693,
+   "fast2d_astar0": 4.33970640286386
+  },
+  {
+   "scenario": "general_val_C4_m_0001",
+   "type": "C4",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.005913159920404411,
+   "label_in_fast2d": true,
+   "gazebo_time": 19.999,
+   "fast2d_time_mean": 19.995000000000108,
+   "gazebo_path": 5.672907743170555,
+   "fast2d_path_mean": 5.675183130585053,
+   "gazebo_clearance": 0.28123721717575745,
+   "fast2d_clearance_mean": 0.28039497425529425,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.809685773625064,
+   "fast2d_astar0": 5.811065819323561
+  },
+  {
+   "scenario": "general_val_N1_h_0001",
+   "type": "N1",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006051009013310486,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.805,
+   "fast2d_time_mean": 15.775000000000947,
+   "gazebo_path": 4.439918101113546,
+   "fast2d_path_mean": 4.438779055166565,
+   "gazebo_clearance": 0.44430993615465425,
+   "fast2d_clearance_mean": 0.429616637375182,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.51910507275444,
+   "fast2d_astar0": 4.569566585379839
+  },
+  {
+   "scenario": "general_val_N2_h_0001",
+   "type": "N2",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0031191022900345883,
+   "label_in_fast2d": true,
+   "gazebo_time": 16.115000000000002,
+   "fast2d_time_mean": 16.655000000000772,
+   "gazebo_path": 4.512940746511709,
+   "fast2d_path_mean": 4.56106930322242,
+   "gazebo_clearance": 0.16561611631305684,
+   "fast2d_clearance_mean": 0.18913399172536713,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.767478113220466,
+   "fast2d_astar0": 4.908716825954582
+  },
+  {
+   "scenario": "general_val_N3_h_0007",
+   "type": "N3",
+   "param_set": "base",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006165196545222028,
+   "label_in_fast2d": true,
+   "gazebo_time": 16.107,
+   "fast2d_time_mean": 16.11500000000088,
+   "gazebo_path": 4.510275292525797,
+   "fast2d_path_mean": 4.522466052920573,
+   "gazebo_clearance": 0.20422734613637156,
+   "fast2d_clearance_mean": 0.2095061203453293,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.888540088910277,
+   "fast2d_astar0": 4.89055128492056
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0004",
+   "type": "S1",
+   "param_set": "timid_short",
+   "gazebo_label": "SAFE_STOP",
+   "gazebo_sub": "FAILED",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": true,
+   "gazebo_outcome": "FAILED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.689,
+   "fast2d_time_mean": null,
+   "gazebo_path": 4.042443574417011,
+   "fast2d_path_mean": 4.018427342012401,
+   "gazebo_clearance": 0.14144254295426012,
+   "fast2d_clearance_mean": 0.1448133698725374,
+   "gazebo_replans": 8,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 13.247025089043511,
+   "fast2d_astar0": 13.296409184768589
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "timid_short",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03200000000000003,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 3.652924585577187,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.1372053216204528,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.0601519893669575,
+   "fast2d_astar0": 7.06940843404657
+  },
+  {
+   "scenario": "general_val_B1_e_0008",
+   "type": "B1",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "TIMEOUT": 3,
+    "SUCCESS": 1,
+    "STUCK": 1
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "none": 3,
+    "SUCCEEDED": 1,
+    "ABORTED": 1
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.00038477696405990117,
+   "label_in_fast2d": true,
+   "gazebo_time": 51.53699999999999,
+   "fast2d_time_mean": 39.7550000000024,
+   "gazebo_path": 9.58322273805214,
+   "fast2d_path_mean": 6.318987280932104,
+   "gazebo_clearance": 0.1300277215764028,
+   "fast2d_clearance_mean": 0.09422244809788893,
+   "gazebo_replans": 2,
+   "fast2d_replans_mean": 3.2,
+   "gazebo_astar0": 9.099780010800693,
+   "fast2d_astar0": 9.109736203144672
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03500000000000014,
+   "fast2d_time_mean": 36.51500000000074,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 8.947313940823964,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.08381582767503536,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 8.664599061500791,
+   "fast2d_astar0": 8.697602030227117
+  },
+  {
+   "scenario": "general_val_B1_m_0006",
+   "type": "B1",
+   "param_set": "timid_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "STUCK": 1,
+    "SUCCESS": 3,
+    "TIMEOUT": 1
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "ABORTED": 1,
+    "SUCCEEDED": 3,
+    "none": 1
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.99,
+   "fast2d_time_mean": 35.95500000000045,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 6.7756289964598055,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.09073360535781794,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.8,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 7.64479442091113
+  },
+  {
+   "scenario": "general_val_B2_e_0006",
+   "type": "B2",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 53.750000000000014,
+   "fast2d_time_mean": 42.275000000003686,
+   "gazebo_path": 9.376595500957716,
+   "fast2d_path_mean": 9.270173056697267,
+   "gazebo_clearance": 0.05564084293769278,
+   "fast2d_clearance_mean": 0.11474639573227952,
+   "gazebo_replans": 2,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 8.42273403146561,
+   "fast2d_astar0": 8.363563574907179
+  },
+  {
+   "scenario": "general_val_B2_h_0007",
+   "type": "B2",
+   "param_set": "timid_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "TIMEOUT": 2,
+    "SUCCESS": 3
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "none": 2,
+    "SUCCEEDED": 3
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.99,
+   "fast2d_time_mean": 43.02166666667074,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.031574821247695,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.10487081844070545,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 2.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 8.495782628180773
+  },
+  {
+   "scenario": "general_val_B2_m_0000",
+   "type": "B2",
+   "param_set": "timid_short",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "TIMEOUT": 2,
+    "SUCCESS": 2,
+    "STUCK": 1
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": true,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "none": 2,
+    "SUCCEEDED": 2,
+    "ABORTED": 1
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": true,
+   "gazebo_time": 47.326,
+   "fast2d_time_mean": 38.05500000000153,
+   "gazebo_path": 4.443819387899838,
+   "fast2d_path_mean": 5.986403290424892,
+   "gazebo_clearance": 0.07296484935097669,
+   "fast2d_clearance_mean": 0.0783495181176169,
+   "gazebo_replans": 3,
+   "fast2d_replans_mean": 2.6,
+   "gazebo_astar0": 7.66238358669707,
+   "fast2d_astar0": 7.663516047621053
+  },
+  {
+   "scenario": "general_val_B3_h_0001",
+   "type": "B3",
+   "param_set": "timid_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 4,
+    "TIMEOUT": 1
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 4,
+    "none": 1
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.991,
+   "fast2d_time_mean": 91.17999999998865,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 24.51322126309435,
+   "gazebo_clearance": 0.3249999999999997,
+   "fast2d_clearance_mean": 0.11790056082652826,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.491336811821897
+  },
+  {
+   "scenario": "general_val_B3_h_0009",
+   "type": "B3",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 2.434909185329438e-15,
+   "label_in_fast2d": true,
+   "gazebo_time": 78.041,
+   "fast2d_time_mean": 80.87499999999802,
+   "gazebo_path": 20.75556535946838,
+   "fast2d_path_mean": 20.870601924582264,
+   "gazebo_clearance": 0.12397904300880186,
+   "fast2d_clearance_mean": 0.11266816171420664,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.654206012721297,
+   "fast2d_astar0": 7.707319478379939
+  },
+  {
+   "scenario": "general_val_B3_m_0004",
+   "type": "B3",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.00012072532937858352,
+   "label_in_fast2d": true,
+   "gazebo_time": 61.83400000000002,
+   "fast2d_time_mean": 61.57500000001356,
+   "gazebo_path": 15.237000404583576,
+   "fast2d_path_mean": 15.185729924316433,
+   "gazebo_clearance": 0.11595080808264746,
+   "fast2d_clearance_mean": 0.11118137360015976,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 6.608534187524595,
+   "fast2d_astar0": 6.6295574197474565
+  },
+  {
+   "scenario": "general_val_C1_h_0000",
+   "type": "C1",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 29.04200000000001,
+   "fast2d_time_mean": 30.074999999998106,
+   "gazebo_path": 8.449410991042146,
+   "fast2d_path_mean": 8.503963034872498,
+   "gazebo_clearance": 0.10155499606587642,
+   "fast2d_clearance_mean": 0.10199498023654381,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.862216070963514,
+   "fast2d_astar0": 9.21343722261722
+  },
+  {
+   "scenario": "general_val_C1_h_0005",
+   "type": "C1",
+   "param_set": "timid_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.991,
+   "fast2d_time_mean": 20.554999999999996,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 5.91758883057238,
+   "gazebo_clearance": 0.4479999999999988,
+   "fast2d_clearance_mean": 0.10245984186364052,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.174401064782271
+  },
+  {
+   "scenario": "general_val_C1_h_0006",
+   "type": "C1",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0007965287822078696,
+   "label_in_fast2d": true,
+   "gazebo_time": 22.808,
+   "fast2d_time_mean": 23.174999999999475,
+   "gazebo_path": 6.317647704528716,
+   "fast2d_path_mean": 6.309889009125748,
+   "gazebo_clearance": 0.10597844465950973,
+   "fast2d_clearance_mean": 0.10127568486991163,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.856547380261182,
+   "fast2d_astar0": 6.731567117277876
+  },
+  {
+   "scenario": "general_val_C2_e_0013",
+   "type": "C2",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "ABORTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "ABORTED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 24.289,
+   "fast2d_time_mean": 38.01500000000151,
+   "gazebo_path": 4.819160793996204,
+   "fast2d_path_mean": 9.052819460968498,
+   "gazebo_clearance": 0.0472533504858553,
+   "fast2d_clearance_mean": 0.12267750432048538,
+   "gazebo_replans": 4,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.040318632274747,
+   "fast2d_astar0": 9.046403790125023
+  },
+  {
+   "scenario": "general_val_C2_h_0001",
+   "type": "C2",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.007682070930338524,
+   "label_in_fast2d": true,
+   "gazebo_time": 25.34700000000001,
+   "fast2d_time_mean": 25.694999999998977,
+   "gazebo_path": 7.340024920435381,
+   "fast2d_path_mean": 7.34586339850856,
+   "gazebo_clearance": 0.09801389329661453,
+   "fast2d_clearance_mean": 0.09487888999917676,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.784425701937882,
+   "fast2d_astar0": 7.767898452370029
+  },
+  {
+   "scenario": "general_val_C2_m_0008",
+   "type": "C2",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.003660691203363578,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.577,
+   "fast2d_time_mean": 32.774999999998826,
+   "gazebo_path": 6.950555253194484,
+   "fast2d_path_mean": 6.991003388024801,
+   "gazebo_clearance": 0.08513833384673436,
+   "fast2d_clearance_mean": 0.11234565815173621,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.009240758576871,
+   "fast2d_astar0": 7.0111187519409
+  },
+  {
+   "scenario": "general_val_C3_e_0012",
+   "type": "C3",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.007497119603734499,
+   "label_in_fast2d": true,
+   "gazebo_time": 30.869000000000007,
+   "fast2d_time_mean": 30.81499999999796,
+   "gazebo_path": 8.999078561099909,
+   "fast2d_path_mean": 8.99343366771654,
+   "gazebo_clearance": 0.18283959465813243,
+   "fast2d_clearance_mean": 0.18758799635470852,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.301617458419829,
+   "fast2d_astar0": 9.262010105585649
+  },
+  {
+   "scenario": "general_val_C3_h_0009",
+   "type": "C3",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0037415763966239385,
+   "label_in_fast2d": true,
+   "gazebo_time": 29.366999999999997,
+   "fast2d_time_mean": 29.394999999998237,
+   "gazebo_path": 8.483921926691004,
+   "fast2d_path_mean": 8.496642328555078,
+   "gazebo_clearance": 0.1157336450808702,
+   "fast2d_clearance_mean": 0.11518356781077414,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.317413991321484,
+   "fast2d_astar0": 9.324210986408197
+  },
+  {
+   "scenario": "general_val_C3_m_0006",
+   "type": "C3",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.007595031721985906,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.16100000000001,
+   "fast2d_time_mean": 32.19499999999853,
+   "gazebo_path": 9.392254865239005,
+   "fast2d_path_mean": 9.396566538737337,
+   "gazebo_clearance": 0.16940043620160977,
+   "fast2d_clearance_mean": 0.1695954372047827,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.681794330259752,
+   "fast2d_astar0": 9.741789317249488
+  },
+  {
+   "scenario": "general_val_C4_e_0007",
+   "type": "C4",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0038076806674218187,
+   "label_in_fast2d": true,
+   "gazebo_time": 20.287000000000006,
+   "fast2d_time_mean": 20.315000000000044,
+   "gazebo_path": 5.843310930181486,
+   "fast2d_path_mean": 5.846209812280529,
+   "gazebo_clearance": 0.4070015296072986,
+   "fast2d_clearance_mean": 0.44562344101345025,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.957474409719907,
+   "fast2d_astar0": 5.9591137003367125
+  },
+  {
+   "scenario": "general_val_C4_h_0003",
+   "type": "C4",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0035647490621576964,
+   "label_in_fast2d": true,
+   "gazebo_time": 14.700000000000003,
+   "fast2d_time_mean": 14.695000000001054,
+   "gazebo_path": 4.149016450478738,
+   "fast2d_path_mean": 4.151893867049623,
+   "gazebo_clearance": 0.18772088933391323,
+   "fast2d_clearance_mean": 0.1789324832996681,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.268374977472474,
+   "fast2d_astar0": 4.33970640286386
+  },
+  {
+   "scenario": "general_val_C4_m_0001",
+   "type": "C4",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0037940078746655772,
+   "label_in_fast2d": true,
+   "gazebo_time": 19.793,
+   "fast2d_time_mean": 19.83500000000014,
+   "gazebo_path": 5.688119320807427,
+   "fast2d_path_mean": 5.6938463589149535,
+   "gazebo_clearance": 0.27979757065441563,
+   "fast2d_clearance_mean": 0.28050966726951515,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.809685773625064,
+   "fast2d_astar0": 5.811065819323561
+  },
+  {
+   "scenario": "general_val_N1_h_0001",
+   "type": "N1",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.011310835409514398,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.600000000000001,
+   "fast2d_time_mean": 15.595000000000983,
+   "gazebo_path": 4.438129193801215,
+   "fast2d_path_mean": 4.444060399250999,
+   "gazebo_clearance": 0.44858718813946624,
+   "fast2d_clearance_mean": 0.4308017866671851,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.51910507275444,
+   "fast2d_astar0": 4.569566585379839
+  },
+  {
+   "scenario": "general_val_N2_h_0001",
+   "type": "N2",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.007239562428805269,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.887000000000008,
+   "fast2d_time_mean": 16.41500000000082,
+   "gazebo_path": 4.490401288098534,
+   "fast2d_path_mean": 4.548290234672381,
+   "gazebo_clearance": 0.13702425847456562,
+   "fast2d_clearance_mean": 0.1744820262964681,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.739544332818475,
+   "fast2d_astar0": 4.908716825954582
+  },
+  {
+   "scenario": "general_val_N3_h_0007",
+   "type": "N3",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.688000000000002,
+   "fast2d_time_mean": 15.795000000000943,
+   "gazebo_path": 4.453128262088294,
+   "fast2d_path_mean": 4.473927075538782,
+   "gazebo_clearance": 0.16731257108653846,
+   "fast2d_clearance_mean": 0.17244974221718992,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.888540088910277,
+   "fast2d_astar0": 4.89055128492056
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0004",
+   "type": "S1",
+   "param_set": "bold_long",
+   "gazebo_label": "SAFE_STOP",
+   "gazebo_sub": "FAILED",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": true,
+   "gazebo_outcome": "FAILED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.15100000000001,
+   "fast2d_time_mean": null,
+   "gazebo_path": 3.878632211421025,
+   "fast2d_path_mean": 3.8934457948362096,
+   "gazebo_clearance": 0.2727176629766874,
+   "fast2d_clearance_mean": 0.2522849025913822,
+   "gazebo_replans": 8,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 13.247025089043511,
+   "fast2d_astar0": 13.296409184768589
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "bold_long",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03300000000000125,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 4.414431855810088,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.13080756903166144,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.094546249710016,
+   "fast2d_astar0": 7.06940843404657
+  },
+  {
+   "scenario": "general_val_B1_e_0008",
+   "type": "B1",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0013416578619174536,
+   "label_in_fast2d": true,
+   "gazebo_time": 41.47,
+   "fast2d_time_mean": 41.57500000000333,
+   "gazebo_path": 9.177120930856375,
+   "fast2d_path_mean": 9.202616782287729,
+   "gazebo_clearance": 0.11106797488738346,
+   "fast2d_clearance_mean": 0.11206070895821643,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.099780010800693,
+   "fast2d_astar0": 9.109736203144672
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03399999999999892,
+   "fast2d_time_mean": 43.59500000000436,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 8.99603536339368,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.06065773434199284,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.2,
+   "gazebo_astar0": 8.711902789493946,
+   "fast2d_astar0": 8.697602030227117
+  },
+  {
+   "scenario": "general_val_B1_m_0006",
+   "type": "B1",
+   "param_set": "bold_long",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.935,
+   "fast2d_time_mean": 38.615000000001814,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.7998644914668604,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.12538689660642524,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 7.64479442091113
+  },
+  {
+   "scenario": "general_val_B2_e_0006",
+   "type": "B2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.002744420107888149,
+   "label_in_fast2d": true,
+   "gazebo_time": 42.13899999999998,
+   "fast2d_time_mean": 41.67500000000338,
+   "gazebo_path": 8.758249507939832,
+   "fast2d_path_mean": 8.66334541765643,
+   "gazebo_clearance": 0.1225392103492155,
+   "fast2d_clearance_mean": 0.10718032571030331,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.373423453915972,
+   "fast2d_astar0": 8.363563574907179
+  },
+  {
+   "scenario": "general_val_B2_h_0007",
+   "type": "B2",
+   "param_set": "bold_long",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.936,
+   "fast2d_time_mean": 44.01500000000458,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 8.617398888847665,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.09856472515868812,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.4,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 8.495782628180773
+  },
+  {
+   "scenario": "general_val_B2_m_0000",
+   "type": "B2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 8.728512735598748e-05,
+   "label_in_fast2d": true,
+   "gazebo_time": 42.548000000000016,
+   "fast2d_time_mean": 42.235000000003666,
+   "gazebo_path": 8.164002877699673,
+   "fast2d_path_mean": 8.124644697488439,
+   "gazebo_clearance": 0.12020794512436561,
+   "fast2d_clearance_mean": 0.10996638639485505,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.66238358669707,
+   "fast2d_astar0": 7.663516047621053
+  },
+  {
+   "scenario": "general_val_B3_h_0001",
+   "type": "B3",
+   "param_set": "bold_long",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "TIMEOUT": 5
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "none": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.935,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 22.77576112419793,
+   "gazebo_clearance": 0.3249999999999997,
+   "fast2d_clearance_mean": 0.13108080845928813,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.491336811821897
+  },
+  {
+   "scenario": "general_val_B3_h_0009",
+   "type": "B3",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 92.40299999999999,
+   "fast2d_time_mean": 93.53499999998651,
+   "gazebo_path": 20.95637513771365,
+   "fast2d_path_mean": 21.169887471875263,
+   "gazebo_clearance": 0.12300090059607405,
+   "fast2d_clearance_mean": 0.1229321300279986,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.663639734282679,
+   "fast2d_astar0": 7.707319478379939
+  },
+  {
+   "scenario": "general_val_B3_m_0004",
+   "type": "B3",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 2.9005166980021614e-05,
+   "label_in_fast2d": true,
+   "gazebo_time": 72.70600000000002,
+   "fast2d_time_mean": 73.15500000000505,
+   "gazebo_path": 15.544668806248911,
+   "fast2d_path_mean": 15.710185492658772,
+   "gazebo_clearance": 0.16190567948525864,
+   "fast2d_clearance_mean": 0.14000297113117757,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 6.625941971505999,
+   "fast2d_astar0": 6.6295574197474565
+  },
+  {
+   "scenario": "general_val_C1_h_0000",
+   "type": "C1",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.001600456471647015,
+   "label_in_fast2d": true,
+   "gazebo_time": 34.34400000000001,
+   "fast2d_time_mean": 35.81500000000038,
+   "gazebo_path": 8.45381892060383,
+   "fast2d_path_mean": 8.484249867975612,
+   "gazebo_clearance": 0.09460273757327592,
+   "fast2d_clearance_mean": 0.09630825353493783,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.89295048813286,
+   "fast2d_astar0": 9.21343722261722
+  },
+  {
+   "scenario": "general_val_C1_h_0005",
+   "type": "C1",
+   "param_set": "bold_long",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.934,
+   "fast2d_time_mean": 23.834999999999344,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 5.910365933350585,
+   "gazebo_clearance": 0.4479999999999997,
+   "fast2d_clearance_mean": 0.09312255947593448,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.174401064782271
+  },
+  {
+   "scenario": "general_val_C1_h_0006",
+   "type": "C1",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0010661732942144914,
+   "label_in_fast2d": true,
+   "gazebo_time": 27.464000000000013,
+   "fast2d_time_mean": 27.13499999999869,
+   "gazebo_path": 6.261802891595003,
+   "fast2d_path_mean": 6.244189266570009,
+   "gazebo_clearance": 0.11505140963534027,
+   "fast2d_clearance_mean": 0.1119765932975949,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.856547380261182,
+   "fast2d_astar0": 6.731567117277876
+  },
+  {
+   "scenario": "general_val_C2_e_0013",
+   "type": "C2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 40.92400000000002,
+   "fast2d_time_mean": 40.65500000000286,
+   "gazebo_path": 8.946355186159863,
+   "fast2d_path_mean": 8.948949396976786,
+   "gazebo_clearance": 0.12252017043588564,
+   "fast2d_clearance_mean": 0.11579189815863597,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.040318632274747,
+   "fast2d_astar0": 9.046403790125023
+  },
+  {
+   "scenario": "general_val_C2_h_0001",
+   "type": "C2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.004048080043918551,
+   "label_in_fast2d": true,
+   "gazebo_time": 29.589,
+   "fast2d_time_mean": 30.07499999999815,
+   "gazebo_path": 7.378789975172667,
+   "fast2d_path_mean": 7.374554726096855,
+   "gazebo_clearance": 0.08962470359919833,
+   "fast2d_clearance_mean": 0.09653494358663346,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.7632221942863815,
+   "fast2d_astar0": 7.767898452370029
+  },
+  {
+   "scenario": "general_val_C2_m_0008",
+   "type": "C2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0004366197886480561,
+   "label_in_fast2d": true,
+   "gazebo_time": 36.53399999999999,
+   "fast2d_time_mean": 35.51500000000023,
+   "gazebo_path": 7.4732354159547025,
+   "fast2d_path_mean": 7.068348623780102,
+   "gazebo_clearance": 0.07157248739945493,
+   "fast2d_clearance_mean": 0.11619505934240537,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.2,
+   "gazebo_astar0": 7.009240758576871,
+   "fast2d_astar0": 7.0111187519409
+  },
+  {
+   "scenario": "general_val_C3_e_0012",
+   "type": "C3",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0026544397574893553,
+   "label_in_fast2d": true,
+   "gazebo_time": 35.07900000000001,
+   "fast2d_time_mean": 34.83499999999988,
+   "gazebo_path": 8.96884601861349,
+   "fast2d_path_mean": 8.95587812719136,
+   "gazebo_clearance": 0.16403791086692115,
+   "fast2d_clearance_mean": 0.17243557864974937,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.301617458419829,
+   "fast2d_astar0": 9.262010105585649
+  },
+  {
+   "scenario": "general_val_C3_h_0009",
+   "type": "C3",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.002800715980606293,
+   "label_in_fast2d": true,
+   "gazebo_time": 35.466999999999985,
+   "fast2d_time_mean": 35.43500000000019,
+   "gazebo_path": 8.45021109700264,
+   "fast2d_path_mean": 8.438576471149352,
+   "gazebo_clearance": 0.09790502395500716,
+   "fast2d_clearance_mean": 0.09321915672156264,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.317413991321484,
+   "fast2d_astar0": 9.324210986408197
+  },
+  {
+   "scenario": "general_val_C3_m_0006",
+   "type": "C3",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 36.609999999999985,
+   "fast2d_time_mean": 36.67500000000082,
+   "gazebo_path": 9.369799860442562,
+   "fast2d_path_mean": 9.369375846462512,
+   "gazebo_clearance": 0.15002941252891955,
+   "fast2d_clearance_mean": 0.14761786586055448,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.730516141439072,
+   "fast2d_astar0": 9.741789317249488
+  },
+  {
+   "scenario": "general_val_C4_e_0007",
+   "type": "C4",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.004933386709119931,
+   "label_in_fast2d": true,
+   "gazebo_time": 22.804999999999993,
+   "fast2d_time_mean": 22.89499999999953,
+   "gazebo_path": 5.808326885309961,
+   "fast2d_path_mean": 5.813547610694142,
+   "gazebo_clearance": 0.4594985441607205,
+   "fast2d_clearance_mean": 0.4767062442722702,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.957474409719907,
+   "fast2d_astar0": 5.9591137003367125
+  },
+  {
+   "scenario": "general_val_C4_h_0003",
+   "type": "C4",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.001813668190343355,
+   "label_in_fast2d": true,
+   "gazebo_time": 16.817999999999998,
+   "fast2d_time_mean": 17.155000000000673,
+   "gazebo_path": 4.136804375215927,
+   "fast2d_path_mean": 4.140798731023193,
+   "gazebo_clearance": 0.21651043088220984,
+   "fast2d_clearance_mean": 0.19452351946403607,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.3165397756521635,
+   "fast2d_astar0": 4.33970640286386
+  },
+  {
+   "scenario": "general_val_C4_m_0001",
+   "type": "C4",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.000189372171245318,
+   "label_in_fast2d": true,
+   "gazebo_time": 23.950000000000003,
+   "fast2d_time_mean": 23.914999999999328,
+   "gazebo_path": 5.683021254827154,
+   "fast2d_path_mean": 5.6820533215033535,
+   "gazebo_clearance": 0.27918494260378063,
+   "fast2d_clearance_mean": 0.27872864418720855,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.809685773625064,
+   "fast2d_astar0": 5.811065819323561
+  },
+  {
+   "scenario": "general_val_N1_h_0001",
+   "type": "N1",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.001339046246990808,
+   "label_in_fast2d": true,
+   "gazebo_time": 17.986000000000004,
+   "fast2d_time_mean": 18.07500000000049,
+   "gazebo_path": 4.3991143041257,
+   "fast2d_path_mean": 4.4017944976008305,
+   "gazebo_clearance": 0.4411991219487091,
+   "fast2d_clearance_mean": 0.42557518506264647,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.51910507275444,
+   "fast2d_astar0": 4.569566585379839
+  },
+  {
+   "scenario": "general_val_N2_h_0001",
+   "type": "N2",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 18.982,
+   "fast2d_time_mean": 19.155000000000275,
+   "gazebo_path": 4.509985192383091,
+   "fast2d_path_mean": 4.535126362706554,
+   "gazebo_clearance": 0.17843963942223634,
+   "fast2d_clearance_mean": 0.19615779835301073,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.795284823750777,
+   "fast2d_astar0": 4.908716825954582
+  },
+  {
+   "scenario": "general_val_N3_h_0007",
+   "type": "N3",
+   "param_set": "bold_long",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0013687154546192088,
+   "label_in_fast2d": true,
+   "gazebo_time": 19.385000000000005,
+   "fast2d_time_mean": 19.355000000000235,
+   "gazebo_path": 4.555537588774829,
+   "fast2d_path_mean": 4.564932802695383,
+   "gazebo_clearance": 0.2277995185836741,
+   "fast2d_clearance_mean": 0.2171820073323377,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.888540088910277,
+   "fast2d_astar0": 4.89055128492056
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0004",
+   "type": "S1",
+   "param_set": "wO_low",
+   "gazebo_label": "SAFE_STOP",
+   "gazebo_sub": "FAILED",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": true,
+   "gazebo_outcome": "FAILED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 31.694999999999993,
+   "fast2d_time_mean": null,
+   "gazebo_path": 3.92456264330559,
+   "fast2d_path_mean": 3.944889778970449,
+   "gazebo_clearance": 0.22736342641601925,
+   "fast2d_clearance_mean": 0.20700684236394612,
+   "gazebo_replans": 8,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 13.376066030281537,
+   "fast2d_astar0": 13.296409184768589
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "wO_low",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.028999999999996362,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 4.515707456413789,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.0962176690416089,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.067173642846463,
+   "fast2d_astar0": 7.06940843404657
+  },
+  {
+   "scenario": "general_val_B1_e_0008",
+   "type": "B1",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.005969473178383036,
+   "label_in_fast2d": true,
+   "gazebo_time": 38.442999999999984,
+   "fast2d_time_mean": 39.11500000000207,
+   "gazebo_path": 9.176379872283785,
+   "fast2d_path_mean": 9.250321416267628,
+   "gazebo_clearance": 0.04958914749821752,
+   "fast2d_clearance_mean": 0.08362747513599726,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.2,
+   "gazebo_astar0": 9.050005221803225,
+   "fast2d_astar0": 9.109736203144672
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "wO_low",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03499999999999659,
+   "fast2d_time_mean": 36.45500000000071,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 8.802325853135596,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.049671838245263215,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.6,
+   "gazebo_astar0": 8.66289934543373,
+   "fast2d_astar0": 8.697602030227117
+  },
+  {
+   "scenario": "general_val_B1_m_0006",
+   "type": "B1",
+   "param_set": "wO_low",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.934,
+   "fast2d_time_mean": 35.93500000000044,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.825046314617353,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.10522736541263789,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 7.64479442091113
+  },
+  {
+   "scenario": "general_val_B2_e_0006",
+   "type": "B2",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.00013387843162477345,
+   "label_in_fast2d": true,
+   "gazebo_time": 39.47,
+   "fast2d_time_mean": 38.95500000000199,
+   "gazebo_path": 8.819471984292665,
+   "fast2d_path_mean": 8.682906255574723,
+   "gazebo_clearance": 0.06575278643147037,
+   "fast2d_clearance_mean": 0.08169914578466819,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 0.2,
+   "gazebo_astar0": 8.373423453915972,
+   "fast2d_astar0": 8.363563574907179
+  },
+  {
+   "scenario": "general_val_B2_h_0007",
+   "type": "B2",
+   "param_set": "wO_low",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 3,
+    "STUCK": 2
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 3,
+    "ABORTED": 2
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.933,
+   "fast2d_time_mean": 46.88833333333938,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.989576290793008,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.09989481551877534,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 2.2,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 8.495782628180773
+  },
+  {
+   "scenario": "general_val_B2_m_0000",
+   "type": "B2",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.003089049634566904,
+   "label_in_fast2d": true,
+   "gazebo_time": 37.611999999999995,
+   "fast2d_time_mean": 39.85500000000245,
+   "gazebo_path": 8.268440389721942,
+   "fast2d_path_mean": 8.18263272927923,
+   "gazebo_clearance": 0.07693932030263395,
+   "fast2d_clearance_mean": 0.10124649204081652,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.66238358669707,
+   "fast2d_astar0": 7.663516047621053
+  },
+  {
+   "scenario": "general_val_B3_h_0001",
+   "type": "B3",
+   "param_set": "wO_low",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "STUCK": 1,
+    "TIMEOUT": 4
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "ABORTED": 1,
+    "none": 4
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.934,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 21.13159047568664,
+   "gazebo_clearance": 0.3249999999999997,
+   "fast2d_clearance_mean": 0.09540820040350964,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.4,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.491336811821897
+  },
+  {
+   "scenario": "general_val_B3_h_0009",
+   "type": "B3",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 78.21600000000001,
+   "fast2d_time_mean": 78.79499999999992,
+   "gazebo_path": 20.811294541333375,
+   "fast2d_path_mean": 20.79411222141178,
+   "gazebo_clearance": 0.12172513208543023,
+   "fast2d_clearance_mean": 0.12391205481448438,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.962188429797672,
+   "fast2d_astar0": 7.707319478379939
+  },
+  {
+   "scenario": "general_val_B3_m_0004",
+   "type": "B3",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 4,
+    "STUCK": 1
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 4,
+    "ABORTED": 1
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 65.77300000000002,
+   "fast2d_time_mean": 66.23000000001134,
+   "gazebo_path": 16.436432585661088,
+   "fast2d_path_mean": 13.995856452535344,
+   "gazebo_clearance": 0.07169184443721721,
+   "fast2d_clearance_mean": 0.08171392182754313,
+   "gazebo_replans": 3,
+   "fast2d_replans_mean": 1.8,
+   "gazebo_astar0": 6.625881868407697,
+   "fast2d_astar0": 6.6295574197474565
+  },
+  {
+   "scenario": "general_val_C1_h_0000",
+   "type": "C1",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006396386824457747,
+   "label_in_fast2d": true,
+   "gazebo_time": 29.273000000000025,
+   "fast2d_time_mean": 30.5549999999982,
+   "gazebo_path": 8.46759809671101,
+   "fast2d_path_mean": 8.52114982803225,
+   "gazebo_clearance": 0.10380536974915083,
+   "fast2d_clearance_mean": 0.0992302301478664,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.883656906534798,
+   "fast2d_astar0": 9.21343722261722
+  },
+  {
+   "scenario": "general_val_C1_h_0005",
+   "type": "C1",
+   "param_set": "wO_low",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.934,
+   "fast2d_time_mean": 20.79499999999995,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 5.93425629008533,
+   "gazebo_clearance": 0.4479999999999988,
+   "fast2d_clearance_mean": 0.11344030141251213,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.174401064782271
+  },
+  {
+   "scenario": "general_val_C1_h_0006",
+   "type": "C1",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0008446848732367636,
+   "label_in_fast2d": true,
+   "gazebo_time": 23.355000000000004,
+   "fast2d_time_mean": 23.5549999999994,
+   "gazebo_path": 6.316904541022027,
+   "fast2d_path_mean": 6.302504405434061,
+   "gazebo_clearance": 0.09658190075507916,
+   "fast2d_clearance_mean": 0.09859554842056148,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.856547380261182,
+   "fast2d_astar0": 6.731567117277876
+  },
+  {
+   "scenario": "general_val_C2_e_0013",
+   "type": "C2",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 37.52199999999999,
+   "fast2d_time_mean": 38.07500000000154,
+   "gazebo_path": 8.962002432759604,
+   "fast2d_path_mean": 9.000948132707032,
+   "gazebo_clearance": 0.06982864038381476,
+   "fast2d_clearance_mean": 0.09426495160449115,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.2,
+   "gazebo_astar0": 9.040318632274747,
+   "fast2d_astar0": 9.046403790125023
+  },
+  {
+   "scenario": "general_val_C2_h_0001",
+   "type": "C2",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 25.641999999999996,
+   "fast2d_time_mean": 26.054999999998905,
+   "gazebo_path": 7.378753472074456,
+   "fast2d_path_mean": 7.385763324883667,
+   "gazebo_clearance": 0.11761755577966448,
+   "fast2d_clearance_mean": 0.11811672505672206,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.7632221942863815,
+   "fast2d_astar0": 7.767898452370029
+  },
+  {
+   "scenario": "general_val_C2_m_0008",
+   "type": "C2",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0030672704195153686,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.75800000000001,
+   "fast2d_time_mean": 32.81499999999885,
+   "gazebo_path": 6.974067472372291,
+   "fast2d_path_mean": 6.980348816891673,
+   "gazebo_clearance": 0.11579858189369163,
+   "fast2d_clearance_mean": 0.11045743906103538,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.009240758576871,
+   "fast2d_astar0": 7.0111187519409
+  },
+  {
+   "scenario": "general_val_C3_e_0012",
+   "type": "C3",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0030568781856813005,
+   "label_in_fast2d": true,
+   "gazebo_time": 31.04600000000002,
+   "fast2d_time_mean": 30.994999999997937,
+   "gazebo_path": 8.994677818262922,
+   "fast2d_path_mean": 8.988149343831576,
+   "gazebo_clearance": 0.17404372633154785,
+   "fast2d_clearance_mean": 0.18191500180551068,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.301617458419829,
+   "fast2d_astar0": 9.262010105585649
+  },
+  {
+   "scenario": "general_val_C3_h_0009",
+   "type": "C3",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.003130849318177063,
+   "label_in_fast2d": true,
+   "gazebo_time": 30.034999999999997,
+   "fast2d_time_mean": 29.934999999998134,
+   "gazebo_path": 8.513816557809779,
+   "fast2d_path_mean": 8.498313258911486,
+   "gazebo_clearance": 0.12213117101525439,
+   "fast2d_clearance_mean": 0.11783633496051911,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.317413991321484,
+   "fast2d_astar0": 9.324210986408197
+  },
+  {
+   "scenario": "general_val_C3_m_0006",
+   "type": "C3",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.351,
+   "fast2d_time_mean": 32.39499999999863,
+   "gazebo_path": 9.393474671861838,
+   "fast2d_path_mean": 9.402652771517797,
+   "gazebo_clearance": 0.1655557552647382,
+   "fast2d_clearance_mean": 0.16247870454142568,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.730516141439072,
+   "fast2d_astar0": 9.741789317249488
+  },
+  {
+   "scenario": "general_val_C4_e_0007",
+   "type": "C4",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.003110022461349939,
+   "label_in_fast2d": true,
+   "gazebo_time": 20.486999999999995,
+   "fast2d_time_mean": 20.475000000000012,
+   "gazebo_path": 5.84125109832676,
+   "fast2d_path_mean": 5.840378410485124,
+   "gazebo_clearance": 0.45361383157764373,
+   "fast2d_clearance_mean": 0.4620008074582757,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.9088311981733135,
+   "fast2d_astar0": 5.9591137003367125
+  },
+  {
+   "scenario": "general_val_C4_h_0003",
+   "type": "C4",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.005823768672626335,
+   "label_in_fast2d": true,
+   "gazebo_time": 14.897000000000006,
+   "fast2d_time_mean": 14.895000000001081,
+   "gazebo_path": 4.141816129710343,
+   "fast2d_path_mean": 4.149595835887861,
+   "gazebo_clearance": 0.20455711618296352,
+   "fast2d_clearance_mean": 0.1883063945551462,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.316527602929693,
+   "fast2d_astar0": 4.33970640286386
+  },
+  {
+   "scenario": "general_val_C4_m_0001",
+   "type": "C4",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0029183928276038367,
+   "label_in_fast2d": true,
+   "gazebo_time": 19.99300000000001,
+   "fast2d_time_mean": 19.995000000000108,
+   "gazebo_path": 5.674871581154373,
+   "fast2d_path_mean": 5.675183130585053,
+   "gazebo_clearance": 0.28100704982481306,
+   "fast2d_clearance_mean": 0.28039497425529425,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.759999633505762,
+   "fast2d_astar0": 5.811065819323561
+  },
+  {
+   "scenario": "general_val_N1_h_0001",
+   "type": "N1",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.710000000000008,
+   "fast2d_time_mean": 15.775000000000947,
+   "gazebo_path": 4.4275020714027935,
+   "fast2d_path_mean": 4.438779055166565,
+   "gazebo_clearance": 0.4442583974739765,
+   "fast2d_clearance_mean": 0.429616637375182,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.51910507275444,
+   "fast2d_astar0": 4.569566585379839
+  },
+  {
+   "scenario": "general_val_N2_h_0001",
+   "type": "N2",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0031062730475948,
+   "label_in_fast2d": true,
+   "gazebo_time": 16.095,
+   "fast2d_time_mean": 16.655000000000772,
+   "gazebo_path": 4.5021314368455165,
+   "fast2d_path_mean": 4.56106930322242,
+   "gazebo_clearance": 0.15744253067612868,
+   "fast2d_clearance_mean": 0.18913399172536713,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.739137367998196,
+   "fast2d_astar0": 4.908716825954582
+  },
+  {
+   "scenario": "general_val_N3_h_0007",
+   "type": "N3",
+   "param_set": "wO_low",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.009225023480639763,
+   "label_in_fast2d": true,
+   "gazebo_time": 16.120999999999995,
+   "fast2d_time_mean": 16.11500000000088,
+   "gazebo_path": 4.512657644149314,
+   "fast2d_path_mean": 4.522466052920573,
+   "gazebo_clearance": 0.20347033672385684,
+   "fast2d_clearance_mean": 0.2095061203453293,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.888540088910277,
+   "fast2d_astar0": 4.89055128492056
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0004",
+   "type": "S1",
+   "param_set": "fast_short",
+   "gazebo_label": "SAFE_STOP",
+   "gazebo_sub": "FAILED",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": true,
+   "gazebo_outcome": "FAILED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 31.92100000000002,
+   "fast2d_time_mean": null,
+   "gazebo_path": 3.968358552571121,
+   "fast2d_path_mean": 3.994548767153622,
+   "gazebo_clearance": 0.18820449583786492,
+   "fast2d_clearance_mean": 0.17116647763402784,
+   "gazebo_replans": 8,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 13.339698633482755,
+   "fast2d_astar0": 13.296409184768589
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "fast_short",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "fast2d_majority": "SAFE_STOP",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "FAILED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03100000000000591,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 4.559767974011917,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.12510413066797132,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.060074057831956,
+   "fast2d_astar0": 7.06940843404657
+  },
+  {
+   "scenario": "general_val_B1_e_0008",
+   "type": "B1",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0059946760122565465,
+   "label_in_fast2d": true,
+   "gazebo_time": 39.38700000000003,
+   "fast2d_time_mean": 39.19500000000211,
+   "gazebo_path": 9.420695970036467,
+   "fast2d_path_mean": 9.42193979405699,
+   "gazebo_clearance": 0.11762289026784084,
+   "fast2d_clearance_mean": 0.11571099960798432,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.050005221803225,
+   "fast2d_astar0": 9.109736203144672
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "fast_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "REJECTED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": false,
+   "gazebo_time": 0.03499999999999659,
+   "fast2d_time_mean": 39.35500000000219,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 9.16397331482479,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.10835511787121477,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.2,
+   "gazebo_astar0": 8.66466439952912,
+   "fast2d_astar0": 8.697602030227117
+  },
+  {
+   "scenario": "general_val_B1_m_0006",
+   "type": "B1",
+   "param_set": "fast_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.937,
+   "fast2d_time_mean": 36.77500000000087,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 8.1204880421318,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.12263456429489508,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 7.64479442091113
+  },
+  {
+   "scenario": "general_val_B2_e_0006",
+   "type": "B2",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.005996489811294831,
+   "label_in_fast2d": true,
+   "gazebo_time": 38.923,
+   "fast2d_time_mean": 38.975000000002,
+   "gazebo_path": 8.853344275089313,
+   "fast2d_path_mean": 8.827466992971999,
+   "gazebo_clearance": 0.13028994957011303,
+   "fast2d_clearance_mean": 0.11278516375122116,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.373423453915972,
+   "fast2d_astar0": 8.363563574907179
+  },
+  {
+   "scenario": "general_val_B2_h_0007",
+   "type": "B2",
+   "param_set": "fast_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 3,
+    "STUCK": 2
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 3,
+    "ABORTED": 2
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.936,
+   "fast2d_time_mean": 43.88833333333785,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 7.917996205909219,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.078433207511894,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 2.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 8.495782628180773
+  },
+  {
+   "scenario": "general_val_B2_m_0000",
+   "type": "B2",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.004928418616353097,
+   "label_in_fast2d": true,
+   "gazebo_time": 38.53899999999999,
+   "fast2d_time_mean": 39.25500000000214,
+   "gazebo_path": 8.433038370243217,
+   "fast2d_path_mean": 8.438222350658616,
+   "gazebo_clearance": 0.11666517820099942,
+   "fast2d_clearance_mean": 0.10989149727258932,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.66238358669707,
+   "fast2d_astar0": 7.663516047621053
+  },
+  {
+   "scenario": "general_val_B3_h_0001",
+   "type": "B3",
+   "param_set": "fast_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "TIMEOUT": 5
+   },
+   "fast2d_majority": "TIMEOUT",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "none": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.935,
+   "fast2d_time_mean": null,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 23.207415607439465,
+   "gazebo_clearance": 0.3249999999999997,
+   "fast2d_clearance_mean": 0.11453128948940638,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.8,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.491336811821897
+  },
+  {
+   "scenario": "general_val_B3_h_0009",
+   "type": "B3",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 78.0,
+   "fast2d_time_mean": 84.57499999999466,
+   "gazebo_path": 21.040346949074596,
+   "fast2d_path_mean": 21.638494044528983,
+   "gazebo_clearance": 0.1294869546408624,
+   "fast2d_clearance_mean": 0.13048090328881662,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 1.0,
+   "gazebo_astar0": 7.626075144107392,
+   "fast2d_astar0": 7.707319478379939
+  },
+  {
+   "scenario": "general_val_B3_m_0004",
+   "type": "B3",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "STUCK": 2,
+    "SUCCESS": 3
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "ABORTED": 2,
+    "SUCCEEDED": 3
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.002203587061242059,
+   "label_in_fast2d": true,
+   "gazebo_time": 61.66100000000006,
+   "fast2d_time_mean": 68.98833333334217,
+   "gazebo_path": 16.397925355981627,
+   "fast2d_path_mean": 11.92957676177537,
+   "gazebo_clearance": 0.1303918553927062,
+   "fast2d_clearance_mean": 0.09849438796169532,
+   "gazebo_replans": 1,
+   "fast2d_replans_mean": 2.4,
+   "gazebo_astar0": 6.614448248305334,
+   "fast2d_astar0": 6.6295574197474565
+  },
+  {
+   "scenario": "general_val_C1_h_0000",
+   "type": "C1",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0005658916601955628,
+   "label_in_fast2d": true,
+   "gazebo_time": 31.00200000000001,
+   "fast2d_time_mean": 30.474999999998147,
+   "gazebo_path": 8.782770548867738,
+   "fast2d_path_mean": 8.720766976356495,
+   "gazebo_clearance": 0.10598894821236743,
+   "fast2d_clearance_mean": 0.11027107708118225,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.879922211444708,
+   "fast2d_astar0": 9.21343722261722
+  },
+  {
+   "scenario": "general_val_C1_h_0005",
+   "type": "C1",
+   "param_set": "fast_short",
+   "gazebo_label": "SYSTEM_ERROR",
+   "gazebo_sub": "bridge published no state in 15 s (map / localization / planner not up)",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": false,
+   "gazebo_outcome": "none",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": false,
+   "gazebo_loc_error": null,
+   "label_in_fast2d": false,
+   "gazebo_time": 14.934,
+   "fast2d_time_mean": 20.554999999999996,
+   "gazebo_path": 0.0,
+   "fast2d_path_mean": 6.0136424249649565,
+   "gazebo_clearance": 0.4479999999999988,
+   "fast2d_clearance_mean": 0.10421267168664503,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 0.0,
+   "fast2d_astar0": 6.174401064782271
+  },
+  {
+   "scenario": "general_val_C1_h_0006",
+   "type": "C1",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0011130176921418109,
+   "label_in_fast2d": true,
+   "gazebo_time": 24.233000000000004,
+   "fast2d_time_mean": 23.834999999999344,
+   "gazebo_path": 6.528254963650178,
+   "fast2d_path_mean": 6.516233557973031,
+   "gazebo_clearance": 0.10521425525284012,
+   "fast2d_clearance_mean": 0.09533741664939449,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 6.856547380261182,
+   "fast2d_astar0": 6.731567117277876
+  },
+  {
+   "scenario": "general_val_C2_e_0013",
+   "type": "C2",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.011989361194508621,
+   "label_in_fast2d": true,
+   "gazebo_time": 37.90199999999999,
+   "fast2d_time_mean": 37.895000000001446,
+   "gazebo_path": 9.131213055911315,
+   "fast2d_path_mean": 9.113447195676958,
+   "gazebo_clearance": 0.11581103622338895,
+   "fast2d_clearance_mean": 0.11806525411216354,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 8.99932124326589,
+   "fast2d_astar0": 9.046403790125023
+  },
+  {
+   "scenario": "general_val_C2_h_0001",
+   "type": "C2",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.01798375283188096,
+   "label_in_fast2d": true,
+   "gazebo_time": 25.37899999999999,
+   "fast2d_time_mean": 26.054999999998905,
+   "gazebo_path": 7.446253372685474,
+   "fast2d_path_mean": 7.52968360990818,
+   "gazebo_clearance": 0.09868106235119822,
+   "fast2d_clearance_mean": 0.09799506482850258,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.708897136565794,
+   "fast2d_astar0": 7.767898452370029
+  },
+  {
+   "scenario": "general_val_C2_m_0008",
+   "type": "C2",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.00599521330835444,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.54900000000001,
+   "fast2d_time_mean": 32.5349999999987,
+   "gazebo_path": 7.064475889920601,
+   "fast2d_path_mean": 7.050151800479982,
+   "gazebo_clearance": 0.12028753459117325,
+   "fast2d_clearance_mean": 0.11708859210391571,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 7.009240758576871,
+   "fast2d_astar0": 7.0111187519409
+  },
+  {
+   "scenario": "general_val_C3_e_0012",
+   "type": "C3",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 30.763000000000005,
+   "fast2d_time_mean": 30.754999999997967,
+   "gazebo_path": 9.069246277256655,
+   "fast2d_path_mean": 9.07185062651511,
+   "gazebo_clearance": 0.18957974947200373,
+   "fast2d_clearance_mean": 0.1784796006880124,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.155478080340785,
+   "fast2d_astar0": 9.262010105585649
+  },
+  {
+   "scenario": "general_val_C3_h_0009",
+   "type": "C3",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.011991050419023541,
+   "label_in_fast2d": true,
+   "gazebo_time": 29.252999999999986,
+   "fast2d_time_mean": 29.214999999998277,
+   "gazebo_path": 8.624108836063773,
+   "fast2d_path_mean": 8.609092260253988,
+   "gazebo_clearance": 0.12189175286331855,
+   "fast2d_clearance_mean": 0.12383412430694678,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.317413991321484,
+   "fast2d_astar0": 9.324210986408197
+  },
+  {
+   "scenario": "general_val_C3_m_0006",
+   "type": "C3",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.005995561508284278,
+   "label_in_fast2d": true,
+   "gazebo_time": 32.227000000000004,
+   "fast2d_time_mean": 32.19499999999853,
+   "gazebo_path": 9.501702145173574,
+   "fast2d_path_mean": 9.496762489878602,
+   "gazebo_clearance": 0.1930242288637729,
+   "fast2d_clearance_mean": 0.18436418983387953,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 9.730516141439072,
+   "fast2d_astar0": 9.741789317249488
+  },
+  {
+   "scenario": "general_val_C4_e_0007",
+   "type": "C4",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.011989343540677846,
+   "label_in_fast2d": true,
+   "gazebo_time": 20.200999999999993,
+   "fast2d_time_mean": 20.17500000000007,
+   "gazebo_path": 5.911319000263861,
+   "fast2d_path_mean": 5.907176064934044,
+   "gazebo_clearance": 0.33678491936635085,
+   "fast2d_clearance_mean": 0.4134482067200934,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.957474409719907,
+   "fast2d_astar0": 5.9591137003367125
+  },
+  {
+   "scenario": "general_val_C4_h_0003",
+   "type": "C4",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.011992689309826145,
+   "label_in_fast2d": true,
+   "gazebo_time": 14.691000000000017,
+   "fast2d_time_mean": 14.675000000001052,
+   "gazebo_path": 4.249009157067725,
+   "fast2d_path_mean": 4.240805705137925,
+   "gazebo_clearance": 0.23494656481235043,
+   "fast2d_clearance_mean": 0.21534676872660538,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.316527602929693,
+   "fast2d_astar0": 4.33970640286386
+  },
+  {
+   "scenario": "general_val_C4_m_0001",
+   "type": "C4",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.005994675981119504,
+   "label_in_fast2d": true,
+   "gazebo_time": 19.778999999999996,
+   "fast2d_time_mean": 19.755000000000155,
+   "gazebo_path": 5.769267457008502,
+   "fast2d_path_mean": 5.768433680952418,
+   "gazebo_clearance": 0.2851942187827833,
+   "fast2d_clearance_mean": 0.2854029908017162,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 5.809685773625064,
+   "fast2d_astar0": 5.811065819323561
+  },
+  {
+   "scenario": "general_val_N1_h_0001",
+   "type": "N1",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006002032022977245,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.558000000000021,
+   "fast2d_time_mean": 15.475000000001007,
+   "gazebo_path": 4.521761096417435,
+   "fast2d_path_mean": 4.50612745903634,
+   "gazebo_clearance": 0.43848664120986297,
+   "fast2d_clearance_mean": 0.43203792566601457,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.51910507275444,
+   "fast2d_astar0": 4.569566585379839
+  },
+  {
+   "scenario": "general_val_N2_h_0001",
+   "type": "N2",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.006000457925994969,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.903999999999996,
+   "fast2d_time_mean": 17.795000000000545,
+   "gazebo_path": 4.5917849437899765,
+   "fast2d_path_mean": 4.798111727846154,
+   "gazebo_clearance": 0.15417907671071907,
+   "fast2d_clearance_mean": 0.18897906209150195,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.76488779691879,
+   "fast2d_astar0": 4.908716825954582
+  },
+  {
+   "scenario": "general_val_N3_h_0007",
+   "type": "N3",
+   "param_set": "fast_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "fast2d_majority": "SUCCESS",
+   "label_match": true,
+   "gazebo_outcome": "SUCCEEDED",
+   "fast2d_outcomes": {
+    "SUCCEEDED": 5
+   },
+   "outcome_match": true,
+   "gazebo_loc_error": 0.0,
+   "label_in_fast2d": true,
+   "gazebo_time": 15.605000000000018,
+   "fast2d_time_mean": 15.635000000000975,
+   "gazebo_path": 4.507119927042085,
+   "fast2d_path_mean": 4.523160899206251,
+   "gazebo_clearance": 0.15622262723792957,
+   "fast2d_clearance_mean": 0.15762276168954326,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.0,
+   "gazebo_astar0": 4.888540088910277,
+   "fast2d_astar0": 4.89055128492056
+  }
+ ],
+ "summary": {
+  "n": 130,
+  "label_match_rate": 0.7538461538461538,
+  "outcome_match_rate": 0.7846153846153846,
+  "label_in_fast2d_rate": 0.7615384615384615,
+  "time_rel_err_median": 0.0044794523995892255,
+  "path_rel_err_median": 0.001878332097292215,
+  "astar0_rel_err_median": 0.0022036926164927264,
+  "mean_time_by_param_set": {
+   "gazebo": {
+    "base": 32.205368421052626,
+    "timid_short": 32.31105882352942,
+    "bold_long": 36.16857894736842,
+    "wO_low": 31.83152631578948,
+    "fast_short": 31.66084210526316
+   },
+   "fast2d": {
+    "base": 32.26657894736905,
+    "timid_short": 31.250294117647755,
+    "bold_long": 36.256052631579145,
+    "wO_low": 32.17052631579018,
+    "fast_short": 32.49780701754412
+   }
+  },
+  "n_valid": 110,
+  "label_match_rate_valid": 0.8909090909090909,
+  "by_param_set": {
+   "base": 0.9090909090909091,
+   "timid_short": 0.8181818181818182,
+   "bold_long": 0.9090909090909091,
+   "wO_low": 0.9090909090909091,
+   "fast_short": 0.9090909090909091
+  },
+  "by_type": {
+   "B1": 0.4,
+   "B2": 1.0,
+   "B3": 1.0,
+   "C1": 1.0,
+   "C2": 0.9333333333333333,
+   "C3": 1.0,
+   "C4": 1.0,
+   "N1": 1.0,
+   "N2": 1.0,
+   "N3": 1.0,
+   "S1": 0.5
+  },
+  "collisions": {
+   "gazebo": 0,
+   "fast2d_eps": 0
+  },
+  "fast2d_seed_unanimous_rate": 0.9545454545454546
+ },
+ "mismatches": [
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "base",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "gazebo_time": 0.028000000000002245,
+   "fast2d_time_mean": null,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.1355132688239359,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "base",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "TIMEOUT": 2,
+    "SUCCESS": 3
+   },
+   "gazebo_time": 0.030999999999998806,
+   "fast2d_time_mean": 41.95500000000352,
+   "gazebo_clearance": 0.49800000000000016,
+   "fast2d_clearance_mean": 0.10460729295813764,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 2.0
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "timid_short",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "gazebo_time": 0.03200000000000003,
+   "fast2d_time_mean": null,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.1372053216204528,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0
+  },
+  {
+   "scenario": "general_val_B1_e_0008",
+   "type": "B1",
+   "param_set": "timid_short",
+   "gazebo_label": "SUCCESS",
+   "gazebo_sub": "",
+   "fast2d_labels": {
+    "TIMEOUT": 3,
+    "SUCCESS": 1,
+    "STUCK": 1
+   },
+   "gazebo_time": 51.53699999999999,
+   "fast2d_time_mean": 39.7550000000024,
+   "gazebo_clearance": 0.1300277215764028,
+   "fast2d_clearance_mean": 0.09422244809788893,
+   "gazebo_replans": 2,
+   "fast2d_replans_mean": 3.2
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "gazebo_time": 0.03500000000000014,
+   "fast2d_time_mean": 36.51500000000074,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.08381582767503536,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0
+  },
+  {
+   "scenario": "general_val_C2_e_0013",
+   "type": "C2",
+   "param_set": "timid_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "ABORTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "gazebo_time": 24.289,
+   "fast2d_time_mean": 38.01500000000151,
+   "gazebo_clearance": 0.0472533504858553,
+   "fast2d_clearance_mean": 0.12267750432048538,
+   "gazebo_replans": 4,
+   "fast2d_replans_mean": 0.0
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "bold_long",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "gazebo_time": 0.03300000000000125,
+   "fast2d_time_mean": null,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.13080756903166144,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "bold_long",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "gazebo_time": 0.03399999999999892,
+   "fast2d_time_mean": 43.59500000000436,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.06065773434199284,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.2
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "wO_low",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "gazebo_time": 0.028999999999996362,
+   "fast2d_time_mean": null,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.0962176690416089,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "wO_low",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "gazebo_time": 0.03499999999999659,
+   "fast2d_time_mean": 36.45500000000071,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.049671838245263215,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.6
+  },
+  {
+   "scenario": "general_s1_val_S1_u_0024",
+   "type": "S1",
+   "param_set": "fast_short",
+   "gazebo_label": "TIMEOUT",
+   "gazebo_sub": "no safe stop (REJECTED)",
+   "fast2d_labels": {
+    "SAFE_STOP": 5
+   },
+   "gazebo_time": 0.03100000000000591,
+   "fast2d_time_mean": null,
+   "gazebo_clearance": 0.8,
+   "fast2d_clearance_mean": 0.12510413066797132,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 1.0
+  },
+  {
+   "scenario": "general_val_B1_h_0004",
+   "type": "B1",
+   "param_set": "fast_short",
+   "gazebo_label": "STUCK",
+   "gazebo_sub": "REJECTED",
+   "fast2d_labels": {
+    "SUCCESS": 5
+   },
+   "gazebo_time": 0.03499999999999659,
+   "fast2d_time_mean": 39.35500000000219,
+   "gazebo_clearance": 0.49799999999999994,
+   "fast2d_clearance_mean": 0.10835511787121477,
+   "gazebo_replans": 0,
+   "fast2d_replans_mean": 0.2
+  }
+ ]
+}

@@ -163,7 +163,6 @@ goal_path_bridge:
     # mỗi min_interval tới wait_timeout -> FAILED (Safe Stop, robot giữ đứng yên). NOT_VERIFIED trên robot.
     replan:
       enabled: true               # navigation.launch.py replan:=false để tắt (abort là dừng hẳn, như 2026-10-19)
-      trigger: stall              # stall (event-triggered) | immediate (lập lại ngay khi chặn, hành vi 1e87e65)
       lookahead_distance: 2.5     # m dọc đường phía trước robot được kiểm tra (= obstacle_max_range)
       start_offset: 0.10          # m, bỏ qua đoạn ngay tại robot (viền footprint)
       blocked_cost: 99            # 99 = nội tiếp (tâm robot ở đó là chạm), 100 = lethal. NavFn cũng coi >= 99 là vật cản
@@ -175,7 +174,35 @@ goal_path_bridge:
       max_obstacle_replans: 10    # lần lập lại do vật cản / phiên (<= 0: không giới hạn); quá -> FAILED
       max_abort_replans: 3        # lần lập lại sau khi FollowPath bị abort (DWB kẹt / không tiến) / phiên
       wait_timeout: 15.0          # s: không có đường -> robot dừng, thử lại mỗi min_interval tới hết rồi FAILED
-      costmap_timeout: 5.0        # s, /global_costmap/costmap cũ hơn -> không kiểm tra (cảnh báo)
+      # ---- V5 (2026-11-27): R2s "Local Avoidance First — Global Replanning Second" ----
+      # Đường bị chặn (PATH_BLOCKED, confirm_time) KHÔNG đủ để lập lại: CustomDWB được tự né trước. Lập lại A*
+      # (GLOBAL_BLOCKED) chỉ khi LOCAL_BLOCKED liên tục local_hold_time: tỷ lệ cung tiến tự do 0.6 m (DwaCore
+      # free_space, KHÔNG phụ thuộc trọng số / sim_time) < local_free_ratio_min, hoặc DWA BLOCKED / FOLLOW_PATH không
+      # còn quỹ đạo TIẾN (đứng yên / chỉ xoay không phải bằng chứng tiếp tục); dự phòng: không tiến hữu ích stall_time
+      # (tiến dọc đường >= stall_progress HOẶC dịch chuyển >= useful_displacement, nên đi vòng không bị coi là kẹt).
+      # Tiếp cận chậm: ô bị chặn còn <= approach_distance -> SpeedLimit approach_speed (gỡ khi thông / đường mới)
+      # để quyết định muộn vẫn dừng kịp (trễ 0.15 s + ramp 0.5 s). Ngưỡng chọn trên general_train (lưới 24 cấu
+      # hình), so sánh R0–R3 trên dev × 8 bộ tham số: stage5_benchmark/docs/ACCEPTANCE_2026-11-27.md.
+      # Dev default: SR 99.4 % (R1 100), STR 0.2 %, CR 0, replan 23 % ep (R1 38.6 %), LAR 41 % (R1 0 %), t +2.3 s.
+      # Khoảng hở tâm robot (local_clearance_min) KHÔNG dùng: không tách được né thành công / kẹt. NOT_VERIFIED robot.
+      trigger: conditional        # stall (V3) | immediate | conditional (V5)
+      local_free_ratio_min: 0.15
+      local_hold_time: 0.4        # s
+      local_clearance_min: 0.0    # m, tắt (xem trên)
+      useful_displacement: 0.3    # m
+      approach_speed: 0.15        # m/s, <= 0 tắt
+      approach_distance: 1.2      # m dọc đường tới ô bị chặn
+      speed_limit_topic: speed_limit
+      # V4 (2026-11-26) early_distance 1.0 m: TẮT ở V5 — A* làm thay việc tránh vật cản (LAR 0 %, replan cả khi DWA
+      # tự né được 114 đoạn dev), SR gần như không phụ thuộc trọng số DWA (98.9–100 % cả khi wO = 0) -> che độ nhạy.
+      early_distance: 0.0
+      early_max_deviation: 0.15
+      # Đã thử, KHÔNG bật: tỷ lệ quỹ đạo tiến hợp lệ (phụ thuộc sim_time) và watchdog tiến triển về đích.
+      early_valid_ratio: 0.0
+      early_valid_time: 0.5
+      goal_progress_timeout: 0.0
+      goal_progress_min: 0.5
+      costmap_timeout: 5.0       # s, /global_costmap/costmap cũ hơn -> không kiểm tra (cảnh báo)
       # false (mặc định): KHÔNG xóa vết vật cản khi lập lại thất bại. Offline 2026-10-15: xóa làm A* quên tường đã
       # thấy -> robot đi qua lại tới follow_timeout (livelock). Xóa tay: ros2 service call
       # /global_costmap/clear_entirely_global_costmap nav2_msgs/srv/ClearEntireCostmap

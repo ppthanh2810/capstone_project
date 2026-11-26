@@ -55,7 +55,7 @@ install(PROGRAMS test/s0_check.py test/s1_check.py test/s2_check.py test/s3_chec
   scripts/fetch_aws_warehouse.sh scripts/aws_warehouse_to_world.py
   scripts/fetch_aws_house.sh scripts/aws_house_to_world.py scripts/route_drive.py
   scripts/fetch_husarion_office.sh scripts/husarion_office_to_world.py scripts/world_to_ref_map.py
-  scripts/save_pose.py scripts/initial_pose.py
+  scripts/save_pose.py scripts/initial_pose.py scripts/gt_localization.py
   DESTINATION lib/${PROJECT_NAME})
 
 # Xuất mô hình driver (ROS-free) cho stage5_benchmark (Fast 2D simulator dùng cùng ZlacDriverModel).

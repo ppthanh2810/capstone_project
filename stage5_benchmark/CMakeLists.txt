@@ -40,6 +40,8 @@ install(TARGETS fast2d_py DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}")
 install(PROGRAMS
   scripts/gen_scenarios.py scripts/pilot.py scripts/gazebo_episode.py
   scripts/a_stage_tests.py scripts/tune_baseline.py scripts/sim2gz_compare.py scripts/eval_split.py
+  scripts/replan_study.py scripts/replan_compare.py scripts/replan_report.py scripts/replan_figures.py
+  scripts/sensitivity_study.py scripts/gen_stress.py
   DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 
@@ -51,6 +53,12 @@ if(BUILD_TESTING)
   set(ament_cmake_pep257_FOUND TRUE)
   set(ament_cmake_uncrustify_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
+  # R2 Local Avoidance First (ReplanSupervisor) + chẩn đoán không gian trống + dừng an toàn (DwaCore), 2026-11-27
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_replan_supervisor test/test_replan_supervisor.cpp)
+  target_link_libraries(test_replan_supervisor
+    stage3_navigation::dwa_core stage3_navigation::replan_supervisor stage3_navigation::path_blockage)
+  ament_target_dependencies(test_replan_supervisor nav2_costmap_2d)
 endif()
 
 ament_package()

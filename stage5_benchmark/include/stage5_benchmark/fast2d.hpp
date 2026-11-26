@@ -163,6 +163,14 @@ struct TraceRow
   int n_valid, n_forward, n_offmap, n_collision, n_unknown;
   double compute_ms;
   double carrot_shift;
+  // R2 (2026-11-27): chẩn đoán không gian trống (DwaCore, không phụ thuộc tham số) + trạng thái ReplanSupervisor
+  double fs_clearance{-1.0};
+  double fs_free_ratio{-1.0};
+  int sup_state{0};          // stage3_navigation::ReplanState
+  double block_dist{-1.0};   // m dọc đường tới ô bị chặn, -1 = thông
+  int local_bad{0};
+  int n_candidates{0};
+  double deviation{0.0};   // m lệch ngang khỏi Global Path hiện tại (ReplanSupervisor)
 };
 
 struct Event
@@ -185,9 +193,12 @@ struct EpisodeResult
   int replans{0};
   int obstacle_replans{0};
   int abort_replans{0};
+  double max_goal_stagnation{0.0};      // s, ReplanSupervisor::maxGoalStagnation (hiệu chỉnh watchdog V4)
   double path_length{0.0};                // m robot đi (GT)
   double initial_path_length{0.0};        // m A* ban đầu
   std::vector<double> plan_lengths;
+  // Mọi Global Path đã gửi FollowPath (t, đường): [0] = ban đầu, sau đó mỗi lần replan (để vẽ trước/sau replan)
+  std::vector<std::pair<double, std::vector<Pose2D>>> plans;
   int controller_cycles{0};
   int cycles_no_valid{0};
   int cycles_holding{0};
@@ -244,6 +255,7 @@ public:
   const std::string & bridgeState() const {return bridge_state_;}
   bool following() const {return following_;}
   bool blocked() const;
+  int replans() const;      // số lần lập lại trong phiên (đang chạy)
   double progress() const;
   double groundTruthClearance() const;     // CHỈ cho reward/evaluator, không đưa vào policy
 

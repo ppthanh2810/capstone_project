@@ -2,7 +2,8 @@
 
 Benchmark cho Master Plan v3 (`SAC_DWA_Research_Training_Master_Plan_v3.md`): Fast 2D simulator, Scenario Generator,
 Feasibility/Difficulty, Episode Evaluator, chạy Gazebo cùng scenario, pilot, sinh dataset, công cụ baseline.
-**Không chạm phần cứng.** Báo cáo nghiệm thu: `docs/ACCEPTANCE_2026-11-26.md`.
+**Không chạm phần cứng.** Báo cáo nghiệm thu: `docs/ACCEPTANCE_2026-11-26.md` (v3) và
+`docs/ACCEPTANCE_2026-11-27.md` (V5: cơ chế Replanning "Local Avoidance First", Sensitivity, Oracle Gap, G3).
 
 ## 1. Thành phần
 
@@ -18,6 +19,11 @@ Feasibility/Difficulty, Episode Evaluator, chạy Gazebo cùng scenario, pilot, 
 | Runner song song | `python/.../runner.py` |
 | Lưu manifest | `python/.../scenario_io.py` |
 | Env SAC (chưa train) | `python/.../env.py` |
+| So sánh cơ chế replan | `scripts/replan_compare.py` (R0–R3, R2s, nhiều bộ tham số, LAR, nguyên nhân replan) |
+| Báo cáo replan | `scripts/replan_report.py` (bảng theo nhóm, phân loại ghép cặp, tiềm năng SAC) |
+| Hình replan | `scripts/replan_figures.py` (map, Δ, A* trước/sau replan, vị trí kích hoạt, trạng thái DWA) |
+| Sensitivity / Oracle Gap | `scripts/sensitivity_study.py` (V5: Oracle Gap đúng định nghĩa + cận dưới chéo seed) |
+| gtest | `test/test_replan_supervisor.cpp` (R2/R3/R0, free-space, dừng an toàn) |
 | Script | `scripts/*.py` |
 
 ## 2. Fast 2D dùng lại code nào
@@ -58,6 +64,42 @@ python3 $S/tune_baseline.py --train <train> --val <val> --out <dir> --budget 120
 
 `gazebo_episode.py` tự launch `s3_navigation` headless với `ROS_DOMAIN_ID` riêng + `ROS_LOCALHOST_ONLY=1`.
 
+So sánh cơ chế Replanning (V5, chỉ train/dev; test bị khóa):
+
+```bash
+python3 $S/replan_compare.py --data ~/capstone_ws/bench_data/v3 --splits general_val,house_val,classroom_val,\
+general_s1_val,house_s1_val,classroom_s1_val --mechs R0,R1,R2,R2s,R3 --sets default,timid,bold --out dev.jsonl
+python3 $S/replan_report.py --inputs dev.jsonl --out report.json --md report.md
+python3 $S/replan_figures.py --data ~/capstone_ws/bench_data/v3 --split general_val --ids <id> --mechs R1,R2s,R3 --out figs
+colcon test --packages-select stage5_benchmark && colcon test-result --verbose     # gtest test_replan_supervisor
+```
+
+| Cơ chế | `goal_path_bridge.replan.*` |
+|---|---|
+| R0 | V3: `trigger: stall` (bị chặn + không tiến 4 s) |
+| R1 | V4: + `early_distance` 1.0 m (A\* né thay DWA, chỉ để so sánh) |
+| R2 | V5 không tiếp cận chậm: `trigger: conditional`, cung tự do < 0.15 / 0.4 s, dự phòng 4 s |
+| **R2s** | **V5 đã chọn** = R2 + `approach_speed` 0.15 m/s khi ô chặn ≤ 1.2 m (mặc định trong `nav2_params.yaml`) |
+| R3 | chỉ DWA sau đường ban đầu (`obstacle_replan: false`, `max_abort_replans: 0`), CHỈ chẩn đoán mô phỏng |
+
+Kết quả V5 (2026-11-27, chi tiết `docs/ACCEPTANCE_2026-11-27.md`, dữ liệu `results/2026-11-27/`):
+
+| Thí nghiệm | Kết quả |
+|---|---|
+| Dev 550, mặc định | R2s SR 99.2 %, STR 0.4, CR 0, replan 16.6 % ep, LAR 58 % (V4: LAR 0) |
+| Sensitivity main (125 × 30 bộ) | SR 82.8–100 % (V4 98.8–100 %), CR 0 mọi bộ |
+| Oracle Gap đúng, main / stress | SR 0 / 2.5 điểm; q 0.016 / 0.052 (< noise floor 0.088 / 0.231) |
+| Ceiling main / stress | 23 / 11 trên 30 bộ có SR ≥ 95 % |
+| G3 (planner_gt, 26 scenario × 5 bộ) | khớp nhãn 103/106 episode hợp lệ, 0 va chạm, sai số thời gian 0.45 % |
+
+`sensitivity_study.py`: `oracle_gap_v5` = J trung bình qua seed; oracle = TB theo scenario của max theo bộ;
+best fixed = max theo bộ của TB (CR ≤ 2 %); gap ≥ 0. `gap_*_cross` (chọn nửa A, đo nửa B) chỉ là cận dưới.
+`--replan '<json>'` ghi đè `replan.*` để so sánh cơ chế trên cùng dữ liệu.
+
+Trace Fast 2D (V5) thêm cột `fs_clearance`, `fs_free_ratio` (DwaCore, không phụ thuộc tham số), `sup_state`
+(0 NORMAL, 1 PATH_BLOCKED, 2 LOCAL_BLOCKED, 3 GLOBAL_BLOCKED, 4 SAFE_STOP), `block_dist`, `local_bad`,
+`n_candidates`, `deviation`; kết quả có `plans` (mọi Global Path đã gửi, để vẽ trước/sau replan).
+
 ## 4. Scenario
 
 | Trường | Ý nghĩa |
@@ -90,3 +132,4 @@ B1/B2 phải né được trong hành lang ±1 m, B3 phải cần replan; giới
 - Định vị hoàn hảo, không trượt bánh: Fast 2D không thay được Gazebo cho Full-system Benchmark.
 - Vật cản cao 0.6 m (LiDAR luôn thấy); không mô phỏng camera / vật thấp.
 - Không mô phỏng trễ mạng ROS, lịch chạy bất đồng bộ (pha cố định, xác định).
+- Báo cáo `/CustomDWB/state` tới bridge 5 Hz (Fast 2D báo mỗi 2 chu kỳ 10 Hz, như robot).

@@ -187,6 +187,7 @@ public:
   double sweepRadius() const {return sweep_radius_;}
   double resolution() const;
   CollisionMode mode() const {return mode_;}
+  const nav2_costmap_2d::Costmap2D * costmap() const {return costmap_;}
 
 private:
   const nav2_costmap_2d::Costmap2D * costmap_;
@@ -364,6 +365,23 @@ struct ControlInput
 // Mô phỏng quỹ đạo vẫn bắt đầu từ vận tốc ĐO (an toàn không phụ thuộc lựa chọn này).
 Velocity2D referenceVelocity(const DwbParams & p, const ControlInput & in);
 
+// Chẩn đoán không gian trống quanh robot (hằng số cố định, xem probeFreeSpace).
+struct FreeSpace
+{
+  bool valid{false};
+  double clearance{0.0};    // m: tâm robot -> ô gần nhất >= INSCRIBED (cắt ở kFreeSpaceRadius); 0 = đang ở trong
+  int arcs{0};              // số cung tiến được thử
+  int forward_free{0};      // số cung tiến dài kFreeSpaceArc không chạm ô >= INSCRIBED / unknown(*) / ngoài costmap
+  double forward_free_ratio() const {return arcs > 0 ? static_cast<double>(forward_free) / arcs : 0.0;}
+};
+constexpr double kFreeSpaceRadius = 1.0;   // m, bán kính tìm khoảng hở
+constexpr double kFreeSpaceArc = 0.6;      // m, độ dài cung tiến (= max_vel_x 0.3 × sim_time 2.0 danh nghĩa)
+constexpr double kFreeSpaceMaxCurv = 4.0;  // 1/m, |κ| tối đa (bán kính 0.25 m ~ bán kính nội tiếp)
+constexpr int kFreeSpaceArcs = 21;
+// Đo không gian trống từ pose: khoảng hở tới vùng cấm (>= INSCRIBED) + số cung tiến tự do (kFreeSpaceArcs cung
+// κ đều trong [-kFreeSpaceMaxCurv, kFreeSpaceMaxCurv], dài kFreeSpaceArc, kiểm tra như CollisionModel::check).
+FreeSpace probeFreeSpace(const Pose2D & robot, const CollisionModel & cm);
+
 struct ControlOutput
 {
   bool ok{false};
@@ -385,6 +403,9 @@ struct ControlOutput
   Velocity2D measured;                  // in.velocity (chẩn đoán)
   Velocity2D reference;                 // referenceVelocity() (chẩn đoán)
   double heading_error{0.0};            // rad, sai số của pha xoay (0 khi FOLLOW_PATH)
+  // Chẩn đoán KHÔNG gian trống (2026-11-27, R2 replan): tính ở MỌI pha từ local costmap, KHÔNG phụ thuộc tham số
+  // DWA (trọng số, sim_time, vận tốc) -> SAC đổi tham số không làm đổi tín hiệu replan. Không ảnh hưởng lệnh.
+  FreeSpace free_space;
 };
 
 class DwaCore

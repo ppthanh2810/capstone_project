@@ -32,8 +32,9 @@ sim:
 # Episode Evaluator (Master Plan v3 §6.2) — dùng chung Fast 2D và Gazebo.
 eval:
   collision_tolerance: 0.005      # m: clearance GT < -tol -> COLLISION
-  success_xy_fast2d: 0.15         # m GT (định vị hoàn hảo)
-  success_xy_gazebo: 0.25         # m GT (0.15 checker + 0.10 sai số AMCL đo trong sim)
+  success_xy: 0.15                # m GT, = goal checker; MỘT giá trị cho Fast 2D và Gazebo (V4)
+  success_xy_slack: 0.02          # m: lệch pha trạng thái bridge / GT / TF (Gazebo, v ≤ 0.3 m/s × ≤ 50 ms); Fast 2D = 0
+  loc_limited_slack: 0.05         # m: Full-system, lệch GT <= 0.15 + sai số AMCL + slack -> LOC_LIMITED
   success_yaw: 0.25               # rad
   safe_stop_v: 0.02               # m/s
   safe_stop_w: 0.05               # rad/s

@@ -740,6 +740,12 @@ void DwbController::publishState(
     kv("cost_heading", fmt(out->chosen.heading_cost, 4));
     kv("cost_speed", fmt(out->chosen.speed_cost, 4));
     kv("cost_oscillation", fmt(out->chosen.oscillation_cost, 4));
+    // Chẩn đoán không gian trống (R2 replan, không phụ thuộc tham số DWA); goal_path_bridge đọc các khóa này.
+    if (out->free_space.valid) {
+      kv("fs_clearance", fmt(out->free_space.clearance, 3));
+      kv("fs_forward_free", std::to_string(out->free_space.forward_free));
+      kv("fs_arcs", std::to_string(out->free_space.arcs));
+    }
   }
   state_pub_->publish(st);
 }

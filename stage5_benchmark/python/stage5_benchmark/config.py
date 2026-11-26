@@ -40,7 +40,8 @@ def load_yaml(path):
 
 
 DWB_SKIP = {'plugin', 'publish_trajectories', 'trajectory_marker_stride', 'debug_publish_rate'}
-REPLAN_SKIP = {'costmap_timeout', 'clear_costmap_on_failure', 'clear_keep_distance', 'clear_costmap_service'}
+REPLAN_SKIP = {'costmap_timeout', 'speed_limit_topic', 'clear_costmap_on_failure', 'clear_keep_distance', 'clear_costmap_service',
+               'controller_state_topic'}
 
 
 def load(profile=None, overrides=None):

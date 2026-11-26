@@ -126,6 +126,9 @@ py::dict controlDict(const s3::ControlOutput & o)
   d["w"] = o.cmd.w;
   d["carrot"] = std::vector<double>{o.carrot.x, o.carrot.y, o.carrot.theta};
   d["carrot_shift"] = o.carrot_shift;
+  d["fs_clearance"] = o.free_space.clearance;
+  d["fs_forward_free"] = o.free_space.forward_free;
+  d["fs_arcs"] = o.free_space.arcs;
   d["carrot_blocked"] = o.carrot_blocked;
   d["n_candidates"] = o.n_candidates;
   d["n_valid"] = o.n_valid;
@@ -157,6 +160,7 @@ py::dict resultDict(const stage5_benchmark::EpisodeResult & r)
   d["replans"] = r.replans;
   d["obstacle_replans"] = r.obstacle_replans;
   d["abort_replans"] = r.abort_replans;
+  d["max_goal_stagnation"] = r.max_goal_stagnation;
   d["path_length"] = r.path_length;
   d["initial_path_length"] = r.initial_path_length;
   d["plan_lengths"] = r.plan_lengths;
@@ -174,19 +178,33 @@ py::dict resultDict(const stage5_benchmark::EpisodeResult & r)
   d["stale_cycles"] = r.stale_cycles;
   d["final_pose"] = std::vector<double>{r.final_x, r.final_y, r.final_yaw};
   const auto n = static_cast<py::ssize_t>(r.trace.size());
-  py::array_t<double> tr({n, static_cast<py::ssize_t>(17)});
+  constexpr int NC = 24;
+  py::array_t<double> tr({n, static_cast<py::ssize_t>(NC)});
   auto m = tr.mutable_unchecked<2>();
   for (py::ssize_t i = 0; i < n; ++i) {
     const auto & q = r.trace[static_cast<std::size_t>(i)];
-    const double row[17] = {q.t, q.x, q.y, q.yaw, q.v, q.w, q.v_cmd, q.w_cmd, q.clearance,
+    const double row[NC] = {q.t, q.x, q.y, q.yaw, q.v, q.w, q.v_cmd, q.w_cmd, q.clearance,
       static_cast<double>(q.phase), static_cast<double>(q.n_valid), static_cast<double>(q.n_forward),
       static_cast<double>(q.n_offmap), static_cast<double>(q.n_collision), static_cast<double>(q.n_unknown),
-      q.compute_ms, q.carrot_shift};
-    for (int c = 0; c < 17; ++c) {m(i, c) = row[c];}
+      q.compute_ms, q.carrot_shift, q.fs_clearance, q.fs_free_ratio, static_cast<double>(q.sup_state),
+      q.block_dist, static_cast<double>(q.local_bad), static_cast<double>(q.n_candidates), q.deviation};
+    for (int c = 0; c < NC; ++c) {m(i, c) = row[c];}
   }
   d["trace"] = tr;
   d["trace_columns"] = std::vector<std::string>{"t", "x", "y", "yaw", "v", "w", "v_cmd", "w_cmd", "clearance",
-    "phase", "n_valid", "n_forward", "n_offmap", "n_collision", "n_unknown", "compute_ms", "carrot_shift"};
+    "phase", "n_valid", "n_forward", "n_offmap", "n_collision", "n_unknown", "compute_ms", "carrot_shift",
+    "fs_clearance", "fs_free_ratio", "sup_state", "block_dist", "local_bad", "n_candidates", "deviation"};
+  py::list plans;
+  for (const auto & pl : r.plans) {
+    py::array_t<double> a({static_cast<py::ssize_t>(pl.second.size()), static_cast<py::ssize_t>(2)});
+    auto am = a.mutable_unchecked<2>();
+    for (std::size_t k = 0; k < pl.second.size(); ++k) {
+      am(static_cast<py::ssize_t>(k), 0) = pl.second[k].x;
+      am(static_cast<py::ssize_t>(k), 1) = pl.second[k].y;
+    }
+    plans.append(py::make_tuple(pl.first, a));
+  }
+  d["plans"] = plans;
   py::list ev;
   for (const auto & e : r.events) {
     ev.append(py::make_tuple(e.t, e.text));
@@ -246,6 +264,18 @@ PYBIND11_MODULE(fast2d, m)
       return a;
     }, "A* NavFn trên một costmap uint8 cho trước (vd. W đã inflate để kiểm tra khả thi)");
 
+  // World GT dùng chung cho evaluator Gazebo (V4: cùng hàm khoảng hở với Fast 2D, không dùng EDT lượng tử ô).
+  py::class_<stage5_benchmark::World>(m, "World")
+  .def(py::init([](const py::dict & scenario) {
+      std::vector<Shape> extra;
+      for (const auto & o : scenario["obstacles"].cast<py::list>()) {
+        extra.push_back(toShape(o.cast<py::dict>()));
+      }
+      return std::make_unique<stage5_benchmark::World>(toGrid(scenario["map"].cast<py::dict>()), extra);
+    }), py::arg("scenario"))
+  .def("clearance", &stage5_benchmark::World::clearance, py::arg("x"), py::arg("y"), py::arg("search") = 1.0,
+    "Khoảng cách tâm -> biên vật cản gần nhất (m), < 0 trong vật cản; trừ robot_radius để ra hở thân");
+
   py::class_<Episode>(m, "Episode")
   .def(py::init([](const py::dict & scenario, const py::dict & sim, const py::dict & dwb, const py::dict & replan) {
       stage5_benchmark::Scenario sc;
@@ -300,6 +330,7 @@ PYBIND11_MODULE(fast2d, m)
   .def_property_readonly("bridge_state", &Episode::bridgeState)
   .def_property_readonly("following", &Episode::following)
   .def_property_readonly("blocked", &Episode::blocked)
+  .def_property_readonly("replans", &Episode::replans)
   .def_property_readonly("progress", &Episode::progress)
   .def("gt_clearance", &Episode::groundTruthClearance, "CHỈ cho reward/evaluator (ground truth)")
   .def("result", [](const Episode & e) {return resultDict(e.result());});

@@ -346,7 +346,10 @@ def build(rng, stype, gen, nav, base=None, hint='any'):
             s_obs = rng.uniform(s_lo, s_hi)
             if hint == 'hard':          # ngay sau góc rẽ (góc khuất) nếu có
                 corners = _corner_arcs(pm)
-                cand = [c + rng.uniform(0.6, 1.4) for c in corners if s_lo <= c + 0.6 and c + 1.4 <= s_hi]
+                lo_c, hi_c = gen.get('b_corner_offset', (0.6, 1.4))     # stress X1: (0.4, 0.9)
+                cand = [c + rng.uniform(lo_c, hi_c) for c in corners if s_lo <= c + lo_c and c + hi_c <= s_hi]
+                if gen.get('require_corner') and not cand:
+                    raise Reject('stress: no corner for occluded obstacle')
                 if cand:
                     s_obs = float(rng.choice(cand))
             x, y, hd = _point_on_path(pm, s_obs)
@@ -383,7 +386,14 @@ def build(rng, stype, gen, nav, base=None, hint='any'):
                                    _box(q['x'], q['y'] + gapw / 2 + seg / 2, t, seg)]
             known = False
         elif stype == 'C1':
-            x, y, hd = _point_on_path(pm, rng.uniform(s_lo, s_hi))
+            s_c1 = rng.uniform(s_lo, s_hi)
+            if gen.get('c1_corner_offset'):        # stress X3: khe hẹp ngay sau góc rẽ
+                lo_c, hi_c = gen['c1_corner_offset']
+                cand = [c + rng.uniform(lo_c, hi_c) for c in _corner_arcs(pm) if s_lo <= c + lo_c and c + hi_c <= s_hi]
+                if not cand:
+                    raise Reject('stress: no corner for C1 gap')
+                s_c1 = float(rng.choice(cand))
+            x, y, hd = _point_on_path(pm, s_c1)
             gapw = rng.uniform(*{'hard': (0.60, 0.66), 'easy': (0.72, 0.80)}.get(hint, gen['c1_gap']))
             th = rng.uniform(0.2, 0.6)
             off = rng.uniform(-0.08, 0.08)
@@ -396,7 +406,7 @@ def build(rng, stype, gen, nav, base=None, hint='any'):
                 raise Reject('C1: corridor narrower than gap')
             shapes = [_box(cx + (gapw / 2 + left / 2) * nx, cy + (gapw / 2 + left / 2) * ny, th, left, hd),
                       _box(cx - (gapw / 2 + right / 2) * nx, cy - (gapw / 2 + right / 2) * ny, th, right, hd)]
-            known = rng.random() < 0.5
+            known = rng.random() < 0.5 and not gen.get('force_unknown')
         elif stype == 'C2':
             lo_n, hi_n = gen['c2_count']
             n = int(rng.integers(*{'easy': (lo_n, lo_n + 2), 'medium': (lo_n + 1, hi_n - 1),
@@ -414,7 +424,7 @@ def build(rng, stype, gen, nav, base=None, hint='any'):
                     shapes = trial
             if len(shapes) < gen['c2_count'][0]:
                 raise Reject('C2: could not place obstacles')
-            known = rng.random() < 0.4
+            known = rng.random() < 0.4 and not gen.get('force_unknown')
         elif stype == 'C3':
             sp = rng.uniform(*{'hard': (1.0, 1.3), 'easy': (1.6, 2.0)}.get(hint, gen['c3_spacing']))
             s = s_lo
@@ -428,7 +438,7 @@ def build(rng, stype, gen, nav, base=None, hint='any'):
                 s += sp
             if len(shapes) < 3:
                 raise Reject('C3: < 3 obstacles')
-            known = rng.random() < 0.4
+            known = rng.random() < 0.4 and not gen.get('force_unknown')
         if known and shapes:
             M = G.world_grid(M, shapes)     # vật cản thuộc bản đồ (đã biết)
             shapes = []
@@ -447,7 +457,14 @@ def build(rng, stype, gen, nav, base=None, hint='any'):
         s_lo, s_hi = gen['new_obstacle_min_from_start'] + 0.3, L - gen['new_obstacle_min_to_goal'] - 0.5
         if s_hi <= s_lo:
             raise Reject('B3: path too short')
-        x, y, hd = _point_on_path(pm, rng.uniform(s_lo, s_hi))
+        s_b3 = rng.uniform(s_lo, s_hi)
+        if gen.get('b3_corner_offset'):            # stress X4: tường chặn ngay sau góc rẽ (phát hiện muộn)
+            lo_c, hi_c = gen['b3_corner_offset']
+            cand = [c + rng.uniform(lo_c, hi_c) for c in _corner_arcs(pm) if s_lo <= c + lo_c and c + hi_c <= s_hi]
+            if not cand:
+                raise Reject('stress: no corner for B3 wall')
+            s_b3 = float(rng.choice(cand))
+        x, y, hd = _point_on_path(pm, s_b3)
         th = rng.uniform(0.2, 0.4)
         cx, cy, Lw, ext = _wall_across(M, x, y, hd, th, max_len=3.0)
         if max(ext) >= 3.0:

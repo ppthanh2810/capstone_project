@@ -6,9 +6,12 @@ Mỗi layout (map M) cần một world -> script tự launch s3_navigation (env:
 ROS_DOMAIN_ID / IGN_PARTITION riêng, ROS_LOCALHOST_ONLY=1; rồi với mỗi bộ tham số DWA: spawn Δ, ros2 param set,
 gửi goal, ghi GT 10 Hz + trạng thái bridge, chấm, gỡ Δ, teleport về start, định vị lại.
 
-  gazebo_episode.py --manifest DIR --ids a,b,c --param-sets sets.json --out out.jsonl [--mode planner|full]
+  gazebo_episode.py --manifest DIR --ids a,b,c --param-sets sets.json --out out.jsonl [--mode planner_gt|planner|full]
   sets.json: {"base": {}, "set1": {"obstacle_scale": 2.0, "sim_time": 2.5}, ...}  (tên CustomDWB.*)
-mode planner = require_localized false (Planner Benchmark); full = monitor + require_localized (Full-system).
+mode planner_gt (V4, Gazebo Planner Benchmark) = TF map->odom từ ground truth (localization_source:=ground_truth),
+  không AMCL/monitor -> so ghép cặp với Fast 2D (định vị hoàn hảo);
+mode planner = AMCL + require_localized false (v3); full = AMCL + monitor + require_localized (Full-system).
+Khoảng hở GT: CÙNG hàm C++ World::clearance với Fast 2D (biên ô chính xác + Δ), lấy mẫu mỗi tin GT (50 Hz).
 """
 
 import argparse
@@ -27,7 +30,8 @@ import numpy as np  # noqa: E402
 
 from stage5_benchmark import config as C  # noqa: E402
 from stage5_benchmark import evaluator as E  # noqa: E402
-from stage5_benchmark import grid as G  # noqa: E402
+from stage5_benchmark import fast2d  # noqa: E402
+from stage5_benchmark import runner as RN  # noqa: E402
 from stage5_benchmark import scenario_io as IO  # noqa: E402
 
 ROBOT = 'ace492'
@@ -58,6 +62,9 @@ class GzEpisodes:
                              reliability=ReliabilityPolicy.RELIABLE)
         self.gt = None
         self.gt_t = None
+        self.cur_world = None
+        self.ep_min_clr = math.inf
+        self.robot_radius = 0.20
         self.state = None
         self.loc = None
         self.scan_t = None
@@ -97,6 +104,8 @@ class GzEpisodes:
         yaw = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
         self.gt = (p.x, p.y, yaw, tw.linear.x, tw.angular.z)
         self.gt_t = self.now()
+        if self.cur_world is not None:
+            self.ep_min_clr = min(self.ep_min_clr, self.cur_world.clearance(p.x, p.y) - self.robot_radius)
 
     def on_amcl(self, m):
         p, q = m.pose.pose.position, m.pose.pose.orientation
@@ -211,8 +220,10 @@ class GzEpisodes:
             self.spin(0.3)
 
     # ------------------------------------------------------------------ episode
-    def episode(self, sc, world, clr_static, M, ev, sim_cfg):
+    def episode(self, sc, world, M, ev, sim_cfg, localization):
         shapes = sc['obstacles']
+        self.robot_radius = sim_cfg['robot_radius']
+        w_gt = fast2d.World(RN.scenario_to_fast2d(sc))
         names = [f'd_{sc["id"]}_{k}' for k in range(len(shapes))]
         for nm, s in zip(names, shapes):
             self.spawn(world, nm, s)
@@ -226,6 +237,8 @@ class GzEpisodes:
         g.pose.position.x, g.pose.position.y = gx, gy
         g.pose.orientation.z, g.pose.orientation.w = quat_z(gyaw)
         t0 = self.now()
+        self.ep_min_clr = math.inf
+        self.cur_world = w_gt
         self.goal_pub.publish(g)
         T = sc['timeout']
         trace, events = [], []
@@ -242,12 +255,8 @@ class GzEpisodes:
             x, y, yaw, v, w = self.gt
             if t - last_row >= 0.1:
                 last_row = t
-                i, j = M.world_to_cell(x, y)
-                c = float(clr_static[j, i]) if 0 <= i < M.w and 0 <= j < M.h else 9.0
-                for s in shapes:
-                    c = min(c, float(G.shape_distance(s, np.array([x]), np.array([y]))[0]))
-                c -= sim_cfg['robot_radius']
-                min_clr = min(min_clr, c)
+                c = w_gt.clearance(x, y) - sim_cfg['robot_radius']
+                min_clr = min(min_clr, c, self.ep_min_clr)
                 trace.append([t, x, y, yaw, v, w, c])
                 hist.append((t, x, y))
             while self.states:
@@ -290,6 +299,8 @@ class GzEpisodes:
                     break
             else:
                 low_rtf_since = None
+        self.cur_world = None
+        min_clr = min(min_clr, self.ep_min_clr)
         self.call_trigger('/goal_path_bridge/cancel')
         for nm in names:
             self.remove(world, nm)
@@ -298,7 +309,8 @@ class GzEpisodes:
                'trace': np.array(trace), 'min_clearance': min_clr, 'infra_error': infra, 'timed_out': t > T,
                'replans': sum(1 for e in events if e[1].startswith('REPLANNING')), 'events': events,
                'plan_lengths': list(self.plan_lengths), 'loc_error_at_terminal': loc_err,
-               'initial_path_length': self.plan_lengths[0] if self.plan_lengths else 0.0}
+               'initial_path_length': self.plan_lengths[0] if self.plan_lengths else 0.0,
+               'localization': localization}
         rec['eval'] = E.evaluate(rec, ev)
         return rec
 
@@ -316,7 +328,9 @@ class GzEpisodes:
 def launch_stack(map_yaml, start, domain, mode, log_path):
     env = dict(os.environ, ROS_DOMAIN_ID=str(domain), ROS_LOCALHOST_ONLY='1', IGN_PARTITION=f'gzep{domain}')
     monitor = 'true' if mode == 'full' else 'false'
+    source = 'ground_truth' if mode == 'planner_gt' else 'amcl'
     cmd = ['ros2', 'launch', 'stage4_gazebo', 's3_navigation.launch.py', 'env:=map', f'world_map:={map_yaml}',
+           f'localization_source:={source}',
            'gui:=false', 'rviz:=false', 'joy:=false', 'csm:=false', f'monitor:={monitor}', 'init_pose:=true',
            f'x:={start[0]}', f'y:={start[1]}', f'yaw:={start[2]}']
     f = open(log_path, 'w')
@@ -329,7 +343,7 @@ def main():
     ap.add_argument('--ids', required=True)
     ap.add_argument('--param-sets', default='')
     ap.add_argument('--out', required=True)
-    ap.add_argument('--mode', default='planner', choices=['planner', 'full'])
+    ap.add_argument('--mode', default='planner_gt', choices=['planner_gt', 'planner', 'full'])
     ap.add_argument('--domain', type=int, default=91)
     ap.add_argument('--repeat', type=int, default=1)
     a = ap.parse_args()
@@ -357,12 +371,11 @@ def main():
                 out.flush()
                 continue
             g.spin(8.0)                                  # AMCL nhận pose spawn (init_pose:=true)
-            if a.mode == 'planner':
+            if a.mode in ('planner', 'planner_gt'):
                 g.set_params('/goal_path_bridge', {'require_localized': False,
                                                    'follow_timeout': float(sc['timeout'] + 10.0)})
             else:
                 g.set_params('/goal_path_bridge', {'follow_timeout': float(sc['timeout'] + 10.0)})
-            clr_static = G.clearance_field(M, unknown_is_obstacle=False)
             for rep in range(a.repeat):
                 for sname, params in sets.items():
                     base = {f'CustomDWB.{k}': float(cfg['dwb'][k]) for k in ACTION_KEYS}
@@ -370,11 +383,14 @@ def main():
                     why = g.set_params('/controller_server', base)
                     g.reset_to(world, sc['start'])
                     t0 = time.monotonic()
-                    rec = g.episode(sc, world, clr_static, M, ev, cfg['sim'])
+                    rec = g.episode(sc, world, M, ev, cfg['sim'],
+                                    'perfect' if a.mode == 'planner_gt' else 'amcl')
                     rec.update({'param_set': sname, 'params': params, 'param_error': why, 'repeat': rep,
                                 'wall_s': time.monotonic() - t0, 'mode': a.mode})
                     tr = rec.pop('trace')
                     rec['trace_len'] = len(tr)
+                    # V4: lưu trace gọn (t, x, y, yaw, v, w, hở) 10 Hz để chấm lại khi evaluator đổi
+                    rec['trace'] = np.round(np.asarray(tr, float), 4).tolist() if len(tr) else []
                     out.write(json.dumps(rec, default=float) + '\n')
                     out.flush()
                     print(sid, sname, rep, rec['eval']['label'], rec['eval'].get('sub_reason', ''),

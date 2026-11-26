@@ -881,10 +881,64 @@ ControlOutput DwaCore::checkedCommand(
   return out;
 }
 
+FreeSpace probeFreeSpace(const Pose2D & robot, const CollisionModel & cm)
+{
+  FreeSpace fs;
+  const nav2_costmap_2d::Costmap2D * cmap = cm.costmap();
+  if (cmap == nullptr || !finite(robot.x) || !finite(robot.y)) {
+    return fs;
+  }
+  fs.valid = true;
+  // (1) khoảng hở: quét đĩa bán kính kFreeSpaceRadius, ô >= INSCRIBED (không tính unknown / ngoài map).
+  const double res = cmap->getResolution();
+  double best2 = kFreeSpaceRadius * kFreeSpaceRadius;
+  const int r = static_cast<int>(std::ceil(kFreeSpaceRadius / res));
+  int cx, cy;
+  cmap->worldToMapNoBounds(robot.x, robot.y, cx, cy);
+  const int nx = static_cast<int>(cmap->getSizeInCellsX());
+  const int ny = static_cast<int>(cmap->getSizeInCellsY());
+  for (int j = std::max(0, cy - r); j <= std::min(ny - 1, cy + r); ++j) {
+    for (int i = std::max(0, cx - r); i <= std::min(nx - 1, cx + r); ++i) {
+      const unsigned char c = cmap->getCost(i, j);
+      if (c == NO_INFORMATION || c < INSCRIBED_INFLATED_OBSTACLE) {
+        continue;
+      }
+      double wx, wy;
+      cmap->mapToWorld(i, j, wx, wy);
+      // khoảng cách tới MÉP ô (không phải tâm ô): ô chứa robot -> 0
+      const double dx = std::max(0.0, std::fabs(wx - robot.x) - 0.5 * res);
+      const double dy = std::max(0.0, std::fabs(wy - robot.y) - 0.5 * res);
+      best2 = std::min(best2, dx * dx + dy * dy);
+    }
+  }
+  fs.clearance = std::sqrt(best2);
+  // (2) cung tiến tự do (hình học thuần, không động học, không trọng số).
+  const double step = 0.5 * res;
+  unsigned char cost = 0;
+  for (int k = 0; k < kFreeSpaceArcs; ++k) {
+    const double kappa = -kFreeSpaceMaxCurv + 2.0 * kFreeSpaceMaxCurv * k / (kFreeSpaceArcs - 1);
+    Pose2D q = robot;
+    bool free = true;
+    for (double s = 0.0; s < kFreeSpaceArc - 1e-9; s += step) {
+      integrateArc(q, 1.0, kappa, std::min(step, kFreeSpaceArc - s));
+      if (cm.check(q, cost) != CellCheck::FREE) {
+        free = false;
+        break;
+      }
+    }
+    ++fs.arcs;
+    if (free) {
+      ++fs.forward_free;
+    }
+  }
+  return fs;
+}
+
 ControlOutput DwaCore::compute(
   const DwbParams & p, const ControlInput & in, const CollisionModel & cm, bool keep_candidates)
 {
   ControlOutput out;
+  out.free_space = probeFreeSpace(in.robot, cm);
   out.dist_to_goal = std::hypot(in.goal.x - in.robot.x, in.goal.y - in.robot.y);
   out.carrot = in.goal;
   out.measured = in.velocity;
@@ -968,8 +1022,10 @@ ControlOutput DwaCore::compute(
   const double half_cell = 0.5 * cm.resolution();
   const double horizon = std::max(p.sim_time, p.control_latency + in.dt);
   const double vnorm = in.max_vel_x_eff > 1e-6 ? in.max_vel_x_eff : 1.0;
-  // Độ dài cung chung cho chi phí vật cản: quãng đi được ở tốc độ tối đa trong sim_time.
-  const double obstacle_lookahead = in.max_vel_x_eff * p.sim_time;
+  // Độ dài cung chung cho chi phí vật cản: quãng đi được ở tốc độ tối đa DANH NGHĨA trong sim_time.
+  // 2026-11-27: dùng p.max_vel_x (không phải max_vel_x_eff) -> giới hạn tốc độ từ ngoài (SpeedLimit, R2s tiếp cận
+  // chậm) không làm co tầm "nhìn" vật cản (0.6 m -> 0.3 m ở 0.15 m/s khiến DWB né muộn hơn; Gazebo R2_detour).
+  const double obstacle_lookahead = p.max_vel_x * p.sim_time;
 
   if (keep_candidates) {
     out.candidates.reserve(vs.size() * ws.size());

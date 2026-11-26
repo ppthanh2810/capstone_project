@@ -429,6 +429,7 @@ struct Episode::Impl
 const Costmap2D & Episode::localCostmap() const {return *impl_->local_master;}
 const Costmap2D & Episode::globalCostmap() const {return *impl_->global_master;}
 bool Episode::blocked() const {return impl_->sup.blocked();}
+int Episode::replans() const {return impl_->sup.totalReplans();}
 double Episode::progress() const {return impl_->tracker.progress();}
 double Episode::groundTruthClearance() const
 {
@@ -672,6 +673,7 @@ void Episode::tick()
   const auto sendFollow = [&](std::vector<Pose2D> path) {
       path.back().theta = I.goal.theta;
       plan_ = path;
+      res_.plans.emplace_back(t_, path);
       std::vector<s3::PathPoint> pts;
       for (const auto & q : path) {pts.push_back(s3::PathPoint{q.x, q.y});}
       I.sup.setPath(pts, t_);
@@ -804,6 +806,9 @@ void Episode::tick()
           in.tol = s3::GoalTolerance{cfg_.xy_goal_tolerance, cfg_.yaw_goal_tolerance};
           in.dt = dt;
           in.max_vel_x_eff = dwb_.max_vel_x;
+          // nav2_msgs/SpeedLimit tuyệt đối từ bridge (R2 tiếp cận chậm) -> CustomDWB setSpeedLimit
+          const double lim = I.session ? I.sup.speedLimit(replan_) : 0.0;
+          if (lim > 0.0) {in.max_vel_x_eff = std::min(in.max_vel_x_eff, lim);}
           in.now_s = t_;
           const s3::CollisionModel cm(
             I.local_master.get(), s3::CollisionMode::CENTER, {}, dwb_.unknown_is_obstacle);
@@ -818,6 +823,21 @@ void Episode::tick()
         if (out.ok && out.n_valid == 0) {++res_.cycles_no_valid;}
         if (out.ok && out.phase == s3::Phase::FOLLOW_PATH && out.n_forward_valid == 0) {++res_.cycles_holding;}
         last_out_ = out;
+        // bridge nghe /CustomDWB/state (trigger replan sớm V4); lỗi / BLOCKED = 0 quỹ đạo tiến hợp lệ
+        // /CustomDWB/state có debug_publish_rate 5 Hz -> báo mỗi 2 chu kỳ 10 Hz như bridge thật nhận được.
+        if ((res_.controller_cycles % 2) == 1) {
+          s3::ControllerReport rep;
+          rep.ok = out.ok;
+          rep.follow = out.ok && out.phase == s3::Phase::FOLLOW_PATH;
+          rep.rotating = out.ok && (out.phase == s3::Phase::ROTATE_TO_PATH || out.phase == s3::Phase::ROTATE_TO_GOAL);
+          rep.n_candidates = out.n_candidates;
+          rep.n_forward_valid = out.n_forward_valid;
+          rep.fs_valid = out.free_space.valid;
+          rep.fs_clearance = out.free_space.clearance;
+          rep.fs_forward_free = out.free_space.forward_free;
+          rep.fs_arcs = out.free_space.arcs;
+          I.sup.reportController(t_, rep, replan_);
+        }
         Velocity2D cmd;
         if (out.ok) {
           cmd = out.cmd;
@@ -837,6 +857,9 @@ void Episode::tick()
         cycle_row = TraceRow{t_, 0, 0, 0, 0, 0, cmd.v, cmd.w, 0, out.ok ? static_cast<int>(out.phase) : -2,
           out.n_valid, out.n_forward_valid, out.n_reject[3], out.n_reject[1], out.n_reject[2], ms,
           out.carrot_shift};
+        cycle_row.fs_clearance = out.free_space.valid ? out.free_space.clearance : -1.0;
+        cycle_row.fs_free_ratio = out.free_space.valid ? out.free_space.forward_free_ratio() : -1.0;
+        cycle_row.n_candidates = out.n_candidates;
         have_cycle_row = true;
       }
       if (!abort_reason.empty()) {
@@ -870,6 +893,10 @@ void Episode::tick()
     row.v = I.v_true;
     row.w = I.w_true;
     row.clearance = groundTruthClearance();
+    row.sup_state = I.session ? static_cast<int>(I.sup.state()) : 0;
+    row.block_dist = I.sup.blockDistance();
+    row.local_bad = I.sup.localBad() ? 1 : 0;
+    row.deviation = I.sup.deviation();
     res_.trace.push_back(row);
   }
 
@@ -898,6 +925,11 @@ void Episode::tick()
       apply(d);
     } else if (I.sup.waiting()) {
       apply(I.sup.retryWhileWaiting(t_, replan_));
+    }
+    // watchdog tiến triển về đích (V4, như bridge: sau kiểm tra chặn, cùng chu kỳ 5 Hz)
+    if (I.session) {
+      const auto g = I.sup.checkGoalProgress(t_, replan_);
+      if (g.type == s3::ReplanDecision::Type::END) {apply(g);}
     }
   }
 
@@ -982,6 +1014,7 @@ void Episode::tick()
     res_.replans = I.sup.totalReplans();
     res_.obstacle_replans = I.sup.obstacleReplans();
     res_.abort_replans = I.sup.abortReplans();
+    res_.max_goal_stagnation = I.sup.maxGoalStagnation();
     if (!I.compute_ms.empty()) {
       double sum = 0.0;
       for (double m : I.compute_ms) {sum += m;}
@@ -1053,6 +1086,20 @@ std::string setReplanField(s3::ReplanParams & p, const std::string & name, doubl
   if (name == "max_obstacle_replans") {p.max_obstacle_replans = static_cast<int>(value); return "";}
   if (name == "max_abort_replans") {p.max_abort_replans = static_cast<int>(value); return "";}
   if (name == "wait_timeout") {p.wait_timeout = value; return "";}
+  if (name == "early_valid_ratio") {p.early_valid_ratio = value; return "";}
+  if (name == "local_clearance_min") {p.local_clearance_min = value; return "";}
+  if (name == "local_free_ratio_min") {p.local_free_ratio_min = value; return "";}
+  if (name == "local_hold_time") {p.local_hold_time = value; return "";}
+  if (name == "useful_displacement") {p.useful_displacement = value; return "";}
+  if (name == "obstacle_replan") {p.obstacle_replan = value != 0.0; return "";}
+  if (name == "approach_speed") {p.approach_speed = value; return "";}
+  if (name == "approach_distance") {p.approach_distance = value; return "";}
+  if (name == "early_valid_time") {p.early_valid_time = value; return "";}
+  if (name == "early_distance") {p.early_distance = value; return "";}
+  if (name == "early_max_deviation") {p.early_max_deviation = value; return "";}
+  if (name == "controller_timeout") {p.controller_timeout = value; return "";}
+  if (name == "goal_progress_timeout") {p.goal_progress_timeout = value; return "";}
+  if (name == "goal_progress_min") {p.goal_progress_min = value; return "";}
   if (name == "costmap_timeout" || name == "clear_costmap_on_failure" || name == "clear_keep_distance" ||
     name == "clear_costmap_service")
   {
