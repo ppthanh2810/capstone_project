@@ -185,7 +185,7 @@ ros2 launch stage3_navigation planning.launch.py mode:=mapping allow_unknown:=tr
 | Đối số | Mặc định | Ý nghĩa |
 |---|---|---|
 | `mode` | `localization` | `localization` (AMCL) hoặc `mapping` (slam_toolbox); khác → lỗi |
-| `serial_port` | `/dev/ttyUSB2` | Cổng LiDAR |
+| `serial_port` | `/dev/ttyUSB1` | Cổng LiDAR |
 | `imu_port` | `/dev/ttyUSB0` | Cổng IMU |
 | `map` | `~/capstone_ws/capstone_project/maps/map.yaml` | Bản đồ (localization) |
 | `csm` | **`true`** | 2D Pose Estimate qua CSM (localization) |
@@ -1530,12 +1530,33 @@ Trong RViz (`planning.rviz`):
 - **Tắt sẵn:** `/marker` (Nav2 DWB), `/CustomDWB/local_path`.
 - Màu marker: xanh lá = hợp lệ, đỏ = bị loại, xanh dương = được chọn, cam = đuôi phanh, cầu vàng = cà rốt.
 
-Ghi bag cho lần thử né vật cản (để biết DWB dừng hay bridge hủy):
+### Ghi lại mỗi lần chạy (2026-11-27)
+
+Mỗi lần chạy tới đích nên ghi bằng `scripts/record_run.sh` (chỉ subscribe, không mở phần cứng),
+rồi phân tích offline bằng `scripts/analyze_run.py`:
 
 ```bash
-ros2 bag record -o ~/obstacle_run /cmd_vel_out /cmd_vel_nav /odometry/filtered /scan_filtered \
-  /local_costmap/costmap /CustomDWB/state /goal_path_bridge/follow_state /localization/status /amcl_pose
+# terminal 2, sau khi navigation.launch.py đã chạy; Ctrl+C để dừng ghi
+~/capstone_ws/capstone_project/stage3_navigation/scripts/record_run.sh cam_box_1m \
+  --note "hộp 0.3 m giữa đường, đích 3 m, đèn trần"        # --no-cloud: bỏ point cloud (~6 MB/s)
+python3 ~/capstone_ws/capstone_project/stage3_navigation/scripts/analyze_run.py ~/robot_runs/<lần_chạy>
 ```
+
+- Thư mục `~/robot_runs/<ngày_giờ>_<nhãn>/`: `bag/`, `meta.md` (node, cổng, git), `params/` (yaml + `ros2 param dump` lúc chạy), `logs/`.
+- `~/robot_runs/RUN_LOG.md`: mỗi lần chạy một dòng.
+- `report.md` + `report.png`:
+  - tần số / khoảng trống topic;
+  - đích, trạng thái bridge;
+  - định vị, CustomDWB, cảnh báo `/rosout`;
+  - trễ lệnh → odom.
+- Phần camera của báo cáo:
+  - fit **mặt sàn** trong `base_footprint` theo URDF: pitch/roll/độ cao ≠ 0 nghĩa là `camera_joint` sai;
+  - nhiễu sàn theo cự ly, % điểm sàn ≥ 5 cm (vật cản ma);
+  - ô chỉ camera thấy mà LiDAR không thấy;
+  - status `fusion_layer`.
+- Mục 5: trễ `/cmd_vel_out` → bánh / odom, gia tốc bánh đo; mục 8: % local costmap bị chiếm và phần không có LiDAR xác nhận.
+- Lần chạy thật đầu tiên `20261127_134811_test1`: costmap bị chiếm 61 % (89 % không có LiDAR) do sàn camera lệch 2.7–4.8°; motor trễ ~0.6–0.7 s.
+- Đã thử trên bag giả lập (camera nghiêng 2°, roll 1.5°, cao +2 cm → tìm lại đúng). **Chưa chạy trên bag thật.**
 
 ---
 

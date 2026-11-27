@@ -66,9 +66,9 @@ Cổng USB (có thể đổi khi cắm lại, kiểm tra `ls -l /dev/serial/by-i
 
 | Thiết bị | Cổng |
 |---|---|
-| Motor ZLAC8015D | `/dev/ttyUSB1` |
+| Motor ZLAC8015D | `/dev/ttyUSB2` |
 | IMU (ESP32) | `/dev/ttyUSB0` |
-| LiDAR C1 | `/dev/ttyUSB2` |
+| LiDAR C1 | `/dev/ttyUSB1` |
 
 ---
 

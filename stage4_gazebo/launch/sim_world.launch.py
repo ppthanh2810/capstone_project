@@ -160,9 +160,12 @@ def generate_launch_description():
                               description='true: thêm depth camera D435 vào robot (S3, tốn GPU)'),
         DeclareLaunchArgument('included', default_value='false',
                               description='true khi được launch giai đoạn include (ẩn lời nhắc)'),
-        # Gazebo tìm mesh package://robot_description/meshes/... trong các thư mục share này
+        # Gazebo tìm mesh package://robot_description/meshes/... trong các thư mục share này;
+        # models/test_obstacles = 6 vật cản thử nghiệm (GUI Resource Spawner, model://tall_small, ...).
+        # Không world nào include chúng -> mặc định không có vật cản nào được thêm.
         SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH',
                                os.pathsep.join([os.path.dirname(pkg),
+                                                os.path.join(pkg, 'models', 'test_obstacles'),
                                                 os.path.dirname(get_package_share_directory('robot_description')),
                                                 os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')])),
         OpaqueFunction(function=check_no_old_gazebo),

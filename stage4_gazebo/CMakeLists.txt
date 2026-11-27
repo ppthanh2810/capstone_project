@@ -56,6 +56,7 @@ install(PROGRAMS test/s0_check.py test/s1_check.py test/s2_check.py test/s3_chec
   scripts/fetch_aws_house.sh scripts/aws_house_to_world.py scripts/route_drive.py
   scripts/fetch_husarion_office.sh scripts/husarion_office_to_world.py scripts/world_to_ref_map.py
   scripts/save_pose.py scripts/initial_pose.py scripts/gt_localization.py
+  scripts/spawn_obstacle.py
   DESTINATION lib/${PROJECT_NAME})
 
 # Xuất mô hình driver (ROS-free) cho stage5_benchmark (Fast 2D simulator dùng cùng ZlacDriverModel).
@@ -69,8 +70,13 @@ install(
     urdf
     worlds
     rviz
+    models
   DESTINATION share/${PROJECT_NAME}
 )
+
+# Thư viện vật cản thử nghiệm (models/test_obstacles): source install/setup.bash là Gazebo tìm được
+# (ResourceSpawner trong GUI, model://<tên>) kể cả khi chạy `ign gazebo` trực tiếp, không cần export tay.
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/env-hooks/stage4_gazebo_models.dsv.in")
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)

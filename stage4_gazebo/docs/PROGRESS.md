@@ -550,3 +550,12 @@ Phát hiện:
   + ramp 0.5 s). Quỹ đạo cuối đã được kiểm tra va chạm trên toàn sim_time nên không chạm.
 - AMCL lệch 0.2–0.4 m tại đích trong layout sinh ra (phòng/hành lang ít đặc trưng) → goal checker đạt theo AMCL
   nhưng GT lệch. Evaluator ghi `LOC_LIMITED`.
+
+## 2026-11-27 — Thư viện vật cản thử nghiệm (thử tay)
+
+- `models/test_obstacles/` gồm 6 hộp tĩnh: `tall_small`, `tall_wide`, `tall_long` cắt mặt phẳng LiDAR 0.347 m; `low_small`, `low_wide`, `low_long` cao 0.07–0.10 m, dưới mặt phẳng LiDAR nhưng chặn bánh/caster.
+- Model được cài vào share. `IGN_GAZEBO_RESOURCE_PATH` được thêm thư mục này trong `sim_world.launch.py` và qua env-hook.
+- `gui.config` có thêm plugin Resource Spawner.
+- `scripts/spawn_obstacle.py` spawn/list/remove; `--remove-all` chỉ xoá tiền tố `test_obstacle_`.
+- Không đổi world, map, cấu hình điều hướng hay benchmark.
+- Kiểm chứng headless trên House và Classroom: 29/29 mỗi world. Chi tiết và hạn chế: `models/test_obstacles/README.md`.

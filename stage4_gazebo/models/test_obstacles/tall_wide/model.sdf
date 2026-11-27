@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Vật cản thử nghiệm tall_wide: hộp 0.35 x 0.22 x 0.60 m (x dài, y rộng, z cao).
+     static: không bị robot đẩy. Gốc model = tâm mặt đáy -> spawn ở z = 0 là nằm đúng trên sàn.
+     collision và visual dùng CÙNG một hộp, cùng pose. Tên model có tiền tố test_obstacle_ để
+     lệnh xoá tất cả của spawn_obstacle.py chỉ xoá vật cản thử nghiệm (không đụng đồ đạc / tường của world). -->
+<sdf version="1.8">
+  <model name="test_obstacle_tall_wide">
+    <static>true</static>
+    <link name="link">
+      <pose>0 0 0.300 0 0 0</pose>
+      <collision name="collision">
+        <geometry><box><size>0.35 0.22 0.60</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.35 0.22 0.60</size></box></geometry>
+        <material>
+          <ambient>0.55 0.25 0.19 1</ambient>
+          <diffuse>0.72 0.33 0.25 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
