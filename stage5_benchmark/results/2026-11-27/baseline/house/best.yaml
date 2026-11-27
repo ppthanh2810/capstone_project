@@ -1,0 +1,7 @@
+# M0 best (v3/house_finetune -> chọn trên v3/house_val,v3/house_s1_val; KHÔNG dùng test). trial 0 (current), V5 nav2_params ba6d0a24af59
+path_distance_scale: 0.5000
+carrot_distance_scale: 2.0000
+obstacle_scale: 4.0000
+heading_scale: 0.3000
+speed_scale: 1.5000
+sim_time: 2.0000

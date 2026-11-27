@@ -1,0 +1,206 @@
+[
+ {
+  "file": "house_val_B1_h_0002.png",
+  "case": "thành công, tự né (không replan)",
+  "split": "house_val",
+  "id": "house_val_B1_h_0002",
+  "type": "B1",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 51.6,
+    "replans": 0,
+    "clr": 0.099
+   }
+  }
+ },
+ {
+  "file": "stress_pilot_stress_X1_B2_014.png",
+  "case": "thành công, tự né (không replan)",
+  "split": "stress_pilot",
+  "id": "stress_X1_B2_014",
+  "type": "B2",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 52.6,
+    "replans": 0,
+    "clr": 0.109
+   }
+  }
+ },
+ {
+  "file": "stress_pilot_stress_X2_C2_013.png",
+  "case": "thành công nhờ replan",
+  "split": "stress_pilot",
+  "id": "stress_X2_C2_013",
+  "type": "C2",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 42.7,
+    "replans": 4,
+    "clr": 0.09
+   }
+  }
+ },
+ {
+  "file": "general_val_B2_h_0003.png",
+  "case": "thành công nhờ replan",
+  "split": "general_val",
+  "id": "general_val_B2_h_0003",
+  "type": "B2",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 54.8,
+    "replans": 3,
+    "clr": 0.122
+   }
+  }
+ },
+ {
+  "file": "classroom_val_B3_e_0001.png",
+  "case": "thành công nhờ replan (B3)",
+  "split": "classroom_val",
+  "id": "classroom_val_B3_e_0001",
+  "type": "B3",
+  "level": "easy",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 110.3,
+    "replans": 2,
+    "clr": 0.116
+   }
+  }
+ },
+ {
+  "file": "classroom_val_B3_e_0007.png",
+  "case": "thành công nhờ replan (B3)",
+  "split": "classroom_val",
+  "id": "classroom_val_B3_e_0007",
+  "type": "B3",
+  "level": "easy",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 71.7,
+    "replans": 1,
+    "clr": 0.112
+   }
+  }
+ },
+ {
+  "file": "classroom_val_B3_h_0009.png",
+  "case": "thất bại (bộ tốt nhất)",
+  "split": "classroom_val",
+  "id": "classroom_val_B3_h_0009",
+  "type": "B3",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "STUCK",
+    "sub": "ABORTED",
+    "time": 42.7,
+    "replans": 4,
+    "clr": 0.065
+   }
+  }
+ },
+ {
+  "file": "general_val_B1_h_0000.png",
+  "case": "thất bại (bộ tốt nhất)",
+  "split": "general_val",
+  "id": "general_val_B1_h_0000",
+  "type": "B1",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "STUCK",
+    "sub": "NO_PROGRESS",
+    "time": 87.0,
+    "replans": 3,
+    "clr": 0.116
+   }
+  }
+ },
+ {
+  "file": "classroom_s1_val_S1_u_0000.png",
+  "case": "S1 dừng an toàn",
+  "split": "classroom_s1_val",
+  "id": "classroom_s1_val_S1_u_0000",
+  "type": "S1",
+  "level": "unsolvable",
+  "result": {
+   "m0_general": {
+    "label": "SAFE_STOP",
+    "sub": "FAILED",
+    "time": 92.9,
+    "replans": 2,
+    "clr": 0.098
+   }
+  }
+ },
+ {
+  "file": "classroom_s1_val_S1_u_0001.png",
+  "case": "S1 dừng an toàn",
+  "split": "classroom_s1_val",
+  "id": "classroom_s1_val_S1_u_0001",
+  "type": "S1",
+  "level": "unsolvable",
+  "result": {
+   "m0_general": {
+    "label": "SAFE_STOP",
+    "sub": "FAILED",
+    "time": 91.3,
+    "replans": 3,
+    "clr": 0.114
+   }
+  }
+ },
+ {
+  "file": "house_s1_val_S1_u_0004.png",
+  "case": "S1 không dừng an toàn",
+  "split": "house_s1_val",
+  "id": "house_s1_val_S1_u_0004",
+  "type": "S1",
+  "level": "unsolvable",
+  "result": {
+   "m0_general": {
+    "label": "TIMEOUT",
+    "sub": "",
+    "time": 115.0,
+    "replans": 3,
+    "clr": 0.125
+   }
+  }
+ },
+ {
+  "file": "house_s1_val_S1_u_0005.png",
+  "case": "S1 không dừng an toàn",
+  "split": "house_s1_val",
+  "id": "house_s1_val_S1_u_0005",
+  "type": "S1",
+  "level": "unsolvable",
+  "result": {
+   "m0_general": {
+    "label": "TIMEOUT",
+    "sub": "",
+    "time": 99.9,
+    "replans": 4,
+    "clr": 0.11
+   }
+  }
+ }
+]

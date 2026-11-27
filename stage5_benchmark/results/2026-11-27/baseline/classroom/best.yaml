@@ -1,0 +1,7 @@
+# M0 best (v3/classroom_finetune -> chọn trên v3/classroom_val,v3/classroom_s1_val; KHÔNG dùng test). trial 29 (t29), V5 nav2_params ba6d0a24af59
+path_distance_scale: 0.0000
+carrot_distance_scale: 0.5000
+obstacle_scale: 4.2789
+heading_scale: 0.0000
+speed_scale: 1.6370
+sim_time: 1.5000

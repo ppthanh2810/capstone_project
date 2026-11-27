@@ -1,0 +1,19 @@
+{
+ "m0_general": {},
+ "alt_t48": {
+  "path_distance_scale": 1.7399,
+  "carrot_distance_scale": 4.0,
+  "obstacle_scale": 4.5334,
+  "heading_scale": 0.0,
+  "speed_scale": 0.516,
+  "sim_time": 1.5
+ },
+ "m0_classroom": {
+  "path_distance_scale": 0.0,
+  "carrot_distance_scale": 0.5,
+  "obstacle_scale": 4.2789,
+  "heading_scale": 0.0,
+  "speed_scale": 1.637,
+  "sim_time": 1.5
+ }
+}

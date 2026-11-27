@@ -1,0 +1,26 @@
+frozen V5 config OK ba6d0a24af59 dataset splits 16
+v3/general_val m0_general: 1500 ep, SR 99.3, 262 s wall, 0.80 core-h
+v3/general_val alt_t48: 1500 ep, SR 99.5, 223 s wall, 0.68 core-h
+v3/general_val m0_classroom: 1500 ep, SR 96.5, 217 s wall, 0.66 core-h
+v3/general_s1_val m0_general: 150 ep, SR 0.0, 29 s wall, 0.08 core-h
+v3/general_s1_val alt_t48: 150 ep, SR 0.0, 26 s wall, 0.07 core-h
+v3/general_s1_val m0_classroom: 150 ep, SR 0.0, 27 s wall, 0.08 core-h
+v3/classroom_val m0_general: 500 ep, SR 99.2, 123 s wall, 0.37 core-h
+v3/classroom_val alt_t48: 500 ep, SR 100.0, 110 s wall, 0.33 core-h
+v3/classroom_val m0_classroom: 500 ep, SR 99.0, 109 s wall, 0.33 core-h
+v3/classroom_s1_val m0_general: 50 ep, SR 0.0, 23 s wall, 0.06 core-h
+v3/classroom_s1_val alt_t48: 50 ep, SR 0.0, 24 s wall, 0.07 core-h
+v3/classroom_s1_val m0_classroom: 50 ep, SR 0.0, 21 s wall, 0.06 core-h
+v3/house_val m0_general: 500 ep, SR 99.8, 89 s wall, 0.27 core-h
+v3/house_val alt_t48: 500 ep, SR 99.0, 77 s wall, 0.23 core-h
+v3/house_val m0_classroom: 500 ep, SR 97.8, 74 s wall, 0.22 core-h
+v3/house_s1_val m0_general: 50 ep, SR 0.0, 22 s wall, 0.06 core-h
+v3/house_s1_val alt_t48: 50 ep, SR 0.0, 20 s wall, 0.05 core-h
+v3/house_s1_val m0_classroom: 50 ep, SR 0.0, 19 s wall, 0.05 core-h
+stress_pilot m0_general: 600 ep, SR 95.7, 171 s wall, 0.51 core-h
+stress_pilot alt_t48: 600 ep, SR 95.7, 148 s wall, 0.45 core-h
+stress_pilot m0_classroom: 600 ep, SR 93.7, 150 s wall, 0.45 core-h
+
+real	32m43,957s
+user	351m51,953s
+sys	0m34,416s

@@ -174,7 +174,10 @@ def episodes(a):
                                      'time': round(recs[n]['eval']['time'], 1), 'replans': recs[n]['replans'],
                                      'clr': round(recs[n]['min_clearance'], 3)} for n in names}})
         print(fn, tag, {n: (v['label'], v['replans']) for n, v in index[-1]['result'].items()}, flush=True)
-    json.dump(index, open(os.path.join(a.out, 'index.json'), 'w'), indent=1, ensure_ascii=False)
+    ip = os.path.join(a.out, 'index.json')
+    old = json.load(open(ip)) if os.path.exists(ip) else []
+    keep = {e['file'] for e in index}
+    json.dump([e for e in old if e['file'] not in keep] + index, open(ip, 'w'), indent=1, ensure_ascii=False)
 
 
 def summary(a):

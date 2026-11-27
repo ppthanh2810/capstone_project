@@ -1,0 +1,43 @@
+frozen V5 config OK ba6d0a24af59 dataset splits 16
+[  0] init  current  J 100.61 SRb 98.3 SR 98.3 STR 0.4 CR 0.00 q 0.844 rp 18% 43s {'path_distance_scale': 0.5, 'carrot_distance_scale': 2.0, 'obstacle_scale': 4.0, 'heading_scale': 0.3, 'speed_scale': 1.5, 'sim_time': 2.0}
+[  1] init  general_t48 J 102.56 SRb 100.0 SR 100.0 STR 0.0 CR 0.00 q 0.854 rp 18% 36s {'path_distance_scale': 1.7399, 'carrot_distance_scale': 4.0, 'obstacle_scale': 4.5334, 'heading_scale': 0.0, 'speed_scale': 0.516, 'sim_time': 1.5}
+[  2] init  lhs0     J 101.36 SRb 99.1 SR 99.2 STR 0.4 CR 0.00 q 0.807 rp 20% 55s {'path_distance_scale': 1.3853, 'carrot_distance_scale': 1.0586, 'obstacle_scale': 1.1607, 'heading_scale': 0.7444, 'speed_scale': 1.3185, 'sim_time': 2.8342}
+[  3] init  lhs1     J 101.46 SRb 99.1 SR 99.2 STR 0.4 CR 0.00 q 0.842 rp 18% 45s {'path_distance_scale': 0.1559, 'carrot_distance_scale': 3.4648, 'obstacle_scale': 3.613, 'heading_scale': 0.3595, 'speed_scale': 2.6398, 'sim_time': 2.1616}
+[  4] init  lhs2     J 93.09 SRb 93.2 SR 93.3 STR 5.0 CR 0.00 q 0.810 rp 28% 40s {'path_distance_scale': 0.3648, 'carrot_distance_scale': 3.5898, 'obstacle_scale': 0.6413, 'heading_scale': 1.2849, 'speed_scale': 0.9724, 'sim_time': 1.9238}
+[  5] init  lhs3     J 98.37 SRb 96.2 SR 96.2 STR 0.4 CR 0.00 q 0.797 rp 38% 50s {'path_distance_scale': 1.21, 'carrot_distance_scale': 1.5979, 'obstacle_scale': 5.5109, 'heading_scale': 1.4537, 'speed_scale': 0.0555, 'sim_time': 2.4037}
+[  6] init  lhs4     J 101.29 SRb 99.1 SR 99.2 STR 0.8 CR 0.00 q 0.855 rp 18% 36s {'path_distance_scale': 0.6708, 'carrot_distance_scale': 2.1569, 'obstacle_scale': 4.1916, 'heading_scale': 0.9004, 'speed_scale': 1.5717, 'sim_time': 1.5153}
+[  7] init  lhs5     J 102.49 SRb 100.0 SR 100.0 STR 0.0 CR 0.00 q 0.829 rp 20% 51s {'path_distance_scale': 1.7138, 'carrot_distance_scale': 2.6268, 'obstacle_scale': 6.8765, 'heading_scale': 1.026, 'speed_scale': 2.3528, 'sim_time': 2.6263}
+[  8] init  lhs6     J 101.84 SRb 99.6 SR 99.6 STR 0.4 CR 0.00 q 0.824 rp 19% 52s {'path_distance_scale': 0.9114, 'carrot_distance_scale': 3.0025, 'obstacle_scale': 7.8356, 'heading_scale': 0.0529, 'speed_scale': 1.9557, 'sim_time': 2.5574}
+[  9] init  lhs7     J 100.39 SRb 97.9 SR 97.9 STR 0.0 CR 0.00 q 0.841 rp 18% 40s {'path_distance_scale': 1.9513, 'carrot_distance_scale': 0.9216, 'obstacle_scale': 2.1505, 'heading_scale': 0.4654, 'speed_scale': 0.7105, 'sim_time': 1.7668}
+[ 10] bo    bo0      J 99.58 SRb 97.9 SR 97.9 STR 1.7 CR 0.00 q 0.849 rp 18% 35s {'path_distance_scale': 1.6859, 'carrot_distance_scale': 3.2535, 'obstacle_scale': 5.542, 'heading_scale': 1.0117, 'speed_scale': 3.0, 'sim_time': 1.5}
+[ 11] bo    bo1      J 101.68 SRb 99.6 SR 99.6 STR 0.4 CR 0.00 q 0.772 rp 19% 59s {'path_distance_scale': 2.0, 'carrot_distance_scale': 1.3982, 'obstacle_scale': 8.0, 'heading_scale': 0.887, 'speed_scale': 2.2729, 'sim_time': 3.0}
+[ 12] bo    bo2      J 101.68 SRb 99.6 SR 99.6 STR 0.4 CR 0.00 q 0.772 rp 21% 59s {'path_distance_scale': 2.0, 'carrot_distance_scale': 2.5499, 'obstacle_scale': 8.0, 'heading_scale': 0.8319, 'speed_scale': 2.8196, 'sim_time': 3.0}
+[ 13] bo    bo3      J 101.71 SRb 99.6 SR 99.6 STR 0.4 CR 0.00 q 0.781 rp 18% 58s {'path_distance_scale': 2.0, 'carrot_distance_scale': 1.149, 'obstacle_scale': 7.2485, 'heading_scale': 1.5, 'speed_scale': 3.0, 'sim_time': 3.0}
+[ 14] bo    bo4      J 94.83 SRb 94.6 SR 94.6 STR 4.2 CR 0.00 q 0.781 rp 20% 57s {'path_distance_scale': 2.0, 'carrot_distance_scale': 0.5, 'obstacle_scale': 1.4987, 'heading_scale': 0.0555, 'speed_scale': 2.1249, 'sim_time': 3.0}
+[ 15] bo    bo5      J 92.33 SRb 90.2 SR 90.4 STR 0.4 CR 0.00 q 0.788 rp 37% 37s {'path_distance_scale': 0.0, 'carrot_distance_scale': 0.5, 'obstacle_scale': 5.3416, 'heading_scale': 0.4324, 'speed_scale': 0.0, 'sim_time': 1.5}
+[ 16] bo    bo6      J 98.12 SRb 96.2 SR 96.2 STR 0.4 CR 0.00 q 0.725 rp 22% 61s {'path_distance_scale': 1.5134, 'carrot_distance_scale': 4.0, 'obstacle_scale': 6.5571, 'heading_scale': 1.4925, 'speed_scale': 1.4627, 'sim_time': 3.0}
+[ 17] bo    bo7      J 102.53 SRb 100.0 SR 100.0 STR 0.0 CR 0.00 q 0.843 rp 34% 36s {'path_distance_scale': 1.7958, 'carrot_distance_scale': 4.0, 'obstacle_scale': 3.493, 'heading_scale': 0.0, 'speed_scale': 0.0, 'sim_time': 1.5005}
+[ 18] bo    bo8      J 98.73 SRb 97.4 SR 97.5 STR 2.5 CR 0.00 q 0.846 rp 18% 35s {'path_distance_scale': 0.0, 'carrot_distance_scale': 2.8435, 'obstacle_scale': 2.4443, 'heading_scale': 0.8558, 'speed_scale': 1.7587, 'sim_time': 1.5}
+[ 19] bo    bo9      J 100.73 SRb 98.7 SR 98.8 STR 0.8 CR 0.00 q 0.808 rp 19% 54s {'path_distance_scale': 2.0, 'carrot_distance_scale': 2.5394, 'obstacle_scale': 8.0, 'heading_scale': 1.348, 'speed_scale': 2.0478, 'sim_time': 2.7577}
+[ 20] bo    bo10     J 101.47 SRb 99.1 SR 99.2 STR 0.4 CR 0.00 q 0.843 rp 19% 48s {'path_distance_scale': 0.7133, 'carrot_distance_scale': 3.2552, 'obstacle_scale': 6.8957, 'heading_scale': 0.0036, 'speed_scale': 2.6932, 'sim_time': 2.4869}
+[ 21] bo    bo11     J 76.31 SRb 81.2 SR 81.7 STR 14.2 CR 0.00 q 0.733 rp 37% 32s {'path_distance_scale': 1.3723, 'carrot_distance_scale': 2.872, 'obstacle_scale': 0.0, 'heading_scale': 0.3443, 'speed_scale': 0.0, 'sim_time': 1.5}
+[ 22] bo    bo12     J 73.8 SRb 80.3 SR 80.8 STR 17.5 CR 0.00 q 0.735 rp 37% 31s {'path_distance_scale': 0.0, 'carrot_distance_scale': 1.981, 'obstacle_scale': 0.0, 'heading_scale': 1.5, 'speed_scale': 2.6104, 'sim_time': 1.5}
+[ 23] bo    bo13     J 102.26 SRb 100.0 SR 100.0 STR 0.0 CR 0.00 q 0.754 rp 18% 61s {'path_distance_scale': 2.0, 'carrot_distance_scale': 4.0, 'obstacle_scale': 5.8607, 'heading_scale': 1.5, 'speed_scale': 3.0, 'sim_time': 3.0}
+[ 24] bo    bo14     J 81.79 SRb 83.7 SR 83.8 STR 7.5 CR 0.00 q 0.614 rp 47% 65s {'path_distance_scale': 2.0, 'carrot_distance_scale': 0.5, 'obstacle_scale': 3.18, 'heading_scale': 1.5, 'speed_scale': 0.0, 'sim_time': 3.0}
+[ 25] bo    bo15     J 86.65 SRb 88.1 SR 88.3 STR 7.1 CR 0.00 q 0.710 rp 38% 53s {'path_distance_scale': 0.0, 'carrot_distance_scale': 4.0, 'obstacle_scale': 0.0, 'heading_scale': 1.3867, 'speed_scale': 0.0, 'sim_time': 2.8446}
+[ 26] bo    bo16     J 96.79 SRb 96.2 SR 96.2 STR 3.8 CR 0.00 q 0.837 rp 18% 35s {'path_distance_scale': 0.0, 'carrot_distance_scale': 4.0, 'obstacle_scale': 3.6856, 'heading_scale': 0.0, 'speed_scale': 3.0, 'sim_time': 1.5}
+[ 27] bo    bo17     J 101.7 SRb 99.1 SR 99.2 STR 0.0 CR 0.00 q 0.852 rp 18% 39s {'path_distance_scale': 2.0, 'carrot_distance_scale': 4.0, 'obstacle_scale': 5.9053, 'heading_scale': 1.5, 'speed_scale': 3.0, 'sim_time': 1.781}
+[ 28] bo    bo18     J 98.37 SRb 96.2 SR 96.2 STR 0.4 CR 0.00 q 0.807 rp 37% 50s {'path_distance_scale': 2.0, 'carrot_distance_scale': 4.0, 'obstacle_scale': 4.3563, 'heading_scale': 0.9556, 'speed_scale': 0.0, 'sim_time': 2.5027}
+[ 29] bo    bo19     J 102.56 SRb 100.0 SR 100.0 STR 0.0 CR 0.00 q 0.852 rp 16% 36s {'path_distance_scale': 2.0, 'carrot_distance_scale': 3.6913, 'obstacle_scale': 4.7947, 'heading_scale': 0.0, 'speed_scale': 0.8498, 'sim_time': 1.5}
+VAL t1: SR 98.67 STR 0.00 SSR 63.3 CR {'house_val': 0.0, 'house_s1_val': 0.0} q 0.8381 rp 22.0 LAR 44.5
+VAL t29: SR 99.33 STR 0.33 SSR 73.3 CR {'house_val': 0.0, 'house_s1_val': 0.0} q 0.8466 rp 21.0 LAR 47.1
+VAL t17: SR 99.67 STR 0.33 SSR 80.0 CR {'house_val': 0.0, 'house_s1_val': 0.0} q 0.8375 rp 36.0 LAR 9.2
+VAL t7: SR 99.00 STR 0.67 SSR 80.0 CR {'house_val': 0.0, 'house_s1_val': 0.0} q 0.8222 rp 22.3 LAR 44.5
+VAL t23: SR 99.00 STR 0.67 SSR 70.0 CR {'house_val': 0.0, 'house_s1_val': 0.0} q 0.7410 rp 24.0 LAR 40.3
+VAL current: SR 99.67 STR 0.00 SSR 80.0 CR {'house_val': 0.0, 'house_s1_val': 0.0} q 0.8485 rp 22.0 LAR 44.5
+SELECT (a) CR <= 2.0 %: 6/6
+SELECT (b) SR >= 99.67 - 0.5: ['t29', 't17', 'current']
+SELECT (c) STR <= 0.00 + 0.3: ['current']
+SELECT (d) SSR >= 80.00 - 1.2: ['current']
+SELECT (e) q max: current (q 0.8485)
+COST {"episodes": 9180, "core_s": 19210.7853474617, "sim_s": 391932.5050000197, "wall_s": 1823.2808363437653, "wall_train_s": 1400.0120980739594, "wall_val_s": 423.2649438381195, "core_h": 5.3363292631838055, "sim_h": 108.87014027778325, "trials": 30, "trials_valid": 30, "finalists": 6, "workers": 11, "train_episodes_per_trial": 240, "val_episodes_per_finalist": 330}

@@ -1,0 +1,121 @@
+[
+ {
+  "file": "general_val_B3_h_0001.png",
+  "case": "",
+  "split": "general_val",
+  "id": "general_val_B3_h_0001",
+  "type": "B3",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "TIMEOUT",
+    "sub": "",
+    "time": 94.6,
+    "replans": 1,
+    "clr": 0.124
+   }
+  }
+ },
+ {
+  "file": "general_val_B1_h_0004.png",
+  "case": "",
+  "split": "general_val",
+  "id": "general_val_B1_h_0004",
+  "type": "B1",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "TIMEOUT",
+    "sub": "",
+    "time": 55.0,
+    "replans": 4,
+    "clr": 0.122
+   }
+  }
+ },
+ {
+  "file": "general_val_C2_e_0010.png",
+  "case": "",
+  "split": "general_val",
+  "id": "general_val_C2_e_0010",
+  "type": "C2",
+  "level": "easy",
+  "result": {
+   "m0_general": {
+    "label": "SUCCESS",
+    "sub": "",
+    "time": 35.9,
+    "replans": 1,
+    "clr": 0.122
+   }
+  }
+ },
+ {
+  "file": "classroom_val_B3_h_0009.png",
+  "case": "",
+  "split": "classroom_val",
+  "id": "classroom_val_B3_h_0009",
+  "type": "B3",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "STUCK",
+    "sub": "ABORTED",
+    "time": 42.7,
+    "replans": 4,
+    "clr": 0.065
+   }
+  }
+ },
+ {
+  "file": "house_s1_val_S1_u_0004.png",
+  "case": "",
+  "split": "house_s1_val",
+  "id": "house_s1_val_S1_u_0004",
+  "type": "S1",
+  "level": "unsolvable",
+  "result": {
+   "m0_general": {
+    "label": "TIMEOUT",
+    "sub": "",
+    "time": 115.0,
+    "replans": 3,
+    "clr": 0.125
+   }
+  }
+ },
+ {
+  "file": "stress_pilot_stress_X2_C2_006.png",
+  "case": "",
+  "split": "stress_pilot",
+  "id": "stress_X2_C2_006",
+  "type": "C2",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "TIMEOUT",
+    "sub": "",
+    "time": 47.0,
+    "replans": 3,
+    "clr": 0.111
+   }
+  }
+ },
+ {
+  "file": "stress_pilot_stress_X1_B1_012.png",
+  "case": "",
+  "split": "stress_pilot",
+  "id": "stress_X1_B1_012",
+  "type": "B1",
+  "level": "hard",
+  "result": {
+   "m0_general": {
+    "label": "STUCK",
+    "sub": "ABORTED",
+    "time": 41.0,
+    "replans": 5,
+    "clr": 0.043
+   }
+  }
+ }
+]

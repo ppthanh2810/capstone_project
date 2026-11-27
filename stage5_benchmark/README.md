@@ -4,6 +4,7 @@ Benchmark cho Master Plan v3 (`SAC_DWA_Research_Training_Master_Plan_v3.md`): Fa
 Feasibility/Difficulty, Episode Evaluator, chạy Gazebo cùng scenario, pilot, sinh dataset, công cụ baseline.
 **Không chạm phần cứng.** Báo cáo nghiệm thu: `docs/ACCEPTANCE_2026-11-26.md` (v3) và
 `docs/ACCEPTANCE_2026-11-27.md` (V5: cơ chế Replanning "Local Avoidance First", Sensitivity, Oracle Gap, G3).
+Baseline M0 (bước 8): `docs/BASELINE_2026-11-27.md`.
 
 ## 1. Thành phần
 
@@ -24,6 +25,11 @@ Feasibility/Difficulty, Episode Evaluator, chạy Gazebo cùng scenario, pilot, 
 | Hình replan | `scripts/replan_figures.py` (map, Δ, A* trước/sau replan, vị trí kích hoạt, trạng thái DWA) |
 | Sensitivity / Oracle Gap | `scripts/sensitivity_study.py` (V5: Oracle Gap đúng định nghĩa + cận dưới chéo seed) |
 | gtest | `test/test_replan_supervisor.cpp` (R2/R3/R0, free-space, dừng an toàn) |
+| Đóng băng V5 | `scripts/freeze_v5.py` (`--write` / `--check`) → `config/navigation_v5_frozen.json` |
+| Tối ưu M0 | `scripts/tune_baseline.py` (GP-BO + chọn từ điển trên val) |
+| Đánh giá bộ cố định | `scripts/baseline_eval.py` (LAR, replan, q, nhiều seed) + `scripts/baseline_report.py` |
+| Hình baseline | `scripts/baseline_figures.py` (`episodes` / `summary`) |
+| M0 cho bước 9 | `config/m0_v5.yaml` |
 | Script | `scripts/*.py` |
 
 ## 2. Fast 2D dùng lại code nào
@@ -59,7 +65,10 @@ python3 $S/a_stage_tests.py --scenarios <pilot>/scenarios --out a.json --exp foo
 python3 $S/gen_scenarios.py --out ~/capstone_ws/bench_data/v3
 python3 $S/gazebo_episode.py --manifest <dir> --ids a,b --param-sets sets.json --out gz.jsonl
 python3 $S/sim2gz_compare.py --manifest <dir> --gazebo gz.jsonl --param-sets sets.json --out cmp.json
-python3 $S/tune_baseline.py --train <train> --val <val> --out <dir> --budget 120
+python3 $S/freeze_v5.py --check                       # trước mọi lần tối ưu / đánh giá / training
+python3 $S/tune_baseline.py --train v3/general_train --val v3/general_val,v3/general_s1_val --out <dir>
+python3 $S/baseline_eval.py --splits v3/general_val,stress_pilot --sets sets.json --names default --seeds 0,1,2 --out ev.jsonl.gz
+python3 $S/baseline_report.py --inputs ev.jsonl.gz --out rep.json --md rep.md
 ```
 
 `gazebo_episode.py` tự launch `s3_navigation` headless với `ROS_DOMAIN_ID` riêng + `ROS_LOCALHOST_ONLY=1`.
@@ -95,6 +104,21 @@ Kết quả V5 (2026-11-27, chi tiết `docs/ACCEPTANCE_2026-11-27.md`, dữ li�
 `sensitivity_study.py`: `oracle_gap_v5` = J trung bình qua seed; oracle = TB theo scenario của max theo bộ;
 best fixed = max theo bộ của TB (CR ≤ 2 %); gap ≥ 0. `gap_*_cross` (chọn nửa A, đo nửa B) chỉ là cận dưới.
 `--replan '<json>'` ghi đè `replan.*` để so sánh cơ chế trên cùng dữ liệu.
+
+### Baseline M0 (bước 8, 2026-11-27)
+
+Chi tiết + lệnh tái lập: `docs/BASELINE_2026-11-27.md`. Dữ liệu: `results/2026-11-27/baseline/`.
+
+| Mục | Kết quả |
+|---|---|
+| Phương pháp | GP-BO (Matern 5/2 ARD, EI) trên miền action SAC; chọn trên val: CR → SR → STR → SSR → q |
+| Ngân sách | 109 lần thử + đánh giá cuối: 84 060 episode, ≈ 49 giờ·lõi, 4.6 h |
+| M0 General | = bộ hiện tại (wP 0.5, wG 2.0, wO 4.0, wH 0.3, wS 1.5, T 2.0) |
+| General val (5 seed) | SR 99.3, CR 0, STR 0.2, SSR 100, LAR 64 %, replan 15 % ep |
+| Zero-shot Classroom / House | SR 99.2 / 99.8; SSR 100 / 82 |
+| Stress | SR 95.7 (C2 Hard 87.6) |
+| Per-map tuning | không lợi (Classroom 99.0 so với 99.2 zero-shot) |
+| Cảnh báo | wS ≈ 0 làm A\* né thay DWA (LAR 3–32 %) → cần chặn khi thiết kế SAC |
 
 Trace Fast 2D (V5) thêm cột `fs_clearance`, `fs_free_ratio` (DwaCore, không phụ thuộc tham số), `sup_state`
 (0 NORMAL, 1 PATH_BLOCKED, 2 LOCAL_BLOCKED, 3 GLOBAL_BLOCKED, 4 SAFE_STOP), `block_dist`, `local_bad`,

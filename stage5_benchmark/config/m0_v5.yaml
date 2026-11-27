@@ -1,0 +1,36 @@
+# M0 — DWA tối ưu CỐ ĐỊNH dưới Navigation V5 (Master Plan v5 bước 8, 2026-11-27). KHÔNG dùng test để chọn.
+# Chỉ 6 tham số action; mọi tham số khác = nav2_params.yaml đã đóng băng (config/navigation_v5_frozen.json,
+# nav2_params sha256 ba6d0a24af59…, commit 4a730be). Báo cáo: docs/BASELINE_2026-11-27.md.
+#
+# m0_general: quy tắc chọn định trước (CR -> SR -> STR -> SSR -> q) chọn đúng bộ hiện tại trong 49 lần thử BO.
+# m0_classroom: tối ưu riêng classroom (chỉ để so sánh zero-shot ↔ per-map; 5 seed KHÔNG tốt hơn m0_general).
+# m0_house: quy tắc chọn bộ hiện tại (= m0_general).
+m0_general:
+  path_distance_scale: 0.5
+  carrot_distance_scale: 2.0
+  obstacle_scale: 4.0
+  heading_scale: 0.3
+  speed_scale: 1.5
+  sim_time: 2.0
+m0_classroom:
+  path_distance_scale: 0.0
+  carrot_distance_scale: 0.5
+  obstacle_scale: 4.2789
+  heading_scale: 0.0
+  speed_scale: 1.637
+  sim_time: 1.5
+m0_house:
+  path_distance_scale: 0.5
+  carrot_distance_scale: 2.0
+  obstacle_scale: 4.0
+  heading_scale: 0.3
+  speed_scale: 1.5
+  sim_time: 2.0
+# Á quân General (SR val cao nhất 99.67 % / 3 seed, bị loại ở bước STR): KHÔNG phải M0, chỉ tham khảo.
+alt_t48:
+  path_distance_scale: 1.7399
+  carrot_distance_scale: 4.0
+  obstacle_scale: 4.5334
+  heading_scale: 0.0
+  speed_scale: 0.516
+  sim_time: 1.5

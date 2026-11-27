@@ -1,7 +1,7 @@
 # SAC–DWA — RESEARCH & TRAINING MASTER PLAN
 
-**Phiên bản 5.0 (2026-11-27) | Đồ án tốt nghiệp — Navigation System**
-**Repository:** ppthanh2810/capstone_project (thay đổi v3–v5 **chưa commit**)
+**Phiên bản 5.1 (2026-11-27, + Baseline M0 §8.3) | Đồ án tốt nghiệp — Navigation System**
+**Repository:** ppthanh2810/capstone_project (V5 commit `4a730be`; bước 8 **chưa commit**)
 **Phạm vi:** điều hướng robot vi sai trong môi trường tĩnh, biết trước một phần; SAC chỉnh thích nghi 5 trọng số DWA
 và thời gian dự đoán. Không nghiên cứu động lực học, không nghiên cứu SLAM/localization.
 
@@ -31,13 +31,13 @@ Nhãn nguồn: **[ĐO]** đo (sim/robot, có log), **[CFG]** cấu hình, **[DX]
 |---:|---|
 | 1 Problem | Đã chốt (không đổi) |
 | 2 Hypothesis | Đã chốt (không đổi) |
-| 3 System Characterization | SIM_READY; **Replanning V5 (R2s) được chọn, chờ bạn nghiệm thu** |
+| 3 System Characterization | SIM_READY; **Replanning V5 (R2s) đã nghiệm thu 2026-11-27, đóng băng** (`config/navigation_v5_frozen.json`) |
 | 4 Scenario Taxonomy | Không đổi (v3 §4) |
 | 5 Scenario Generation | Không đổi; thêm split `stress_pilot` (ngoài dataset v3, chỉ dùng chẩn đoán) |
 | 6 Metrics/Protocol | Thêm LAR, trạng thái replan, nguyên nhân kích hoạt (§6) |
 | 7 Dataset | Không đổi: 2.140 + 100 S1, `*_test` vẫn khóa |
-| 8 Baseline | **Tạm dừng** đến khi V5 được nghiệm thu; Sensitivity / Oracle / Ceiling đã chạy lại (§8) |
-| 9 Training | **Tạm dừng** (chưa training) |
+| 8 Baseline | **Xong (Fast 2D), chờ bạn đánh giá**: M0 General = bộ hiện tại (BO 49 lần thử), §8.3, `docs/BASELINE_2026-11-27.md` |
+| 9 Training | Chưa training; chờ chốt Observation / Action / Reward / mạng / hyperparameter (§9, câu hỏi B1–B5 §8.3) |
 | 10 Real-world | Chưa |
 
 ---
@@ -169,6 +169,47 @@ So sánh V4 (R1) trên **cùng 125 scenario, cùng 30 bộ, cùng seed**: §8.1.
 - Hệ quả: H1 (SAC > M0 tối ưu) có khoảng trống **nhỏ** trên phân bố chung. Nơi có khoảng trống là tập khó (stress,
   B1/B2/C2 Hard) và chỉ số q (thời gian, quãng đường, hở), không phải SR. Cần thêm seed trước khi kết luận.
 
+### 8.3 Baseline M0 (bước 8, 2026-11-27) — chi tiết `stage5_benchmark/docs/BASELINE_2026-11-27.md`
+
+Cấu hình V5 đóng băng (commit `4a730be`, `nav2_params` sha256 `ba6d0a24af59…`, hash 16 split). Kiểm lại nghiệm thu
+dev 550 trùng khớp. GP-BO (Matern 5/2 ARD, EI) trên miền action SAC. Tối ưu trên train / finetune, chọn trên val
+bằng quy tắc từ điển định trước (CR ≤ 2 % → SR → STR → SSR → q). Không dùng test. Chi phí 84 060 episode,
+≈ 49 giờ·lõi, 4.6 h.
+
+| Tham số | M0 General | M0 Classroom |
+|---|---:|---:|
+| wP / wG / wO | 0.5 / 2.0 / 4.0 | 0.0 / 0.5 / 4.28 |
+| wH / wS / T_sim | 0.3 / 1.5 / 2.0 | 0.0 / 1.64 / 1.5 |
+
+M0 General = **bộ hiện tại** (6/7 ứng viên trong 0.5 điểm SR; á quân t48 SR cao hơn 0.44 điểm nhưng STR cao hơn,
+bị loại). M0 House = bộ hiện tại.
+
+| M0 General, 5 seed | SR | STR | SSR | LAR | Replan % ep |
+|---|---:|---:|---:|---:|---:|
+| General val | 99.3 ±0.3 | 0.2 | 100 | 63.7 | 15.0 |
+| Classroom (zero-shot) | 99.2 ±0.4 | 0.8 | 100 | 59.4 | 14.8 |
+| House (zero-shot) | 99.8 ±0.4 | 0 | 82 | 44.9 | 21.6 |
+| Stress (chẩn đoán) | 95.7 ±1.1 | 2.3 | – | 39.2 | 52.8 |
+
+- CR 0 ở mọi benchmark, bộ, seed. Hở min 0.043–0.057 m.
+- Thời gian / quãng đường TB (SUCCESS): General 31.4 s / 7.90 m, Stress 50.0 s / 12.13 m.
+- Tuning riêng map **không lợi**: Classroom t29 99.0 so với 99.2 zero-shot (5 seed); áp lên General còn 96.5
+  (quá khớp).
+- Chỗ yếu:
+  - Stress C2 Hard 87.6 %; B1 Hard 94 %;
+  - B3 Hard: 1 scenario đường vòng 25 m > T_max;
+  - kẹt sát vật / góc không lùi được (Q6);
+  - House S1 vòng tới T_max (Q8).
+- **Phát hiện:** `speed_scale` ≈ 0 làm DWA dừng trước vật → LOCAL_BLOCKED → A\* né thay (LAR 3–32 % nhưng SR train
+  vẫn ≥ 99 %). Spearman: wS–LAR +0.75, wS–replan −0.72. §3.5 chỉ chứng minh T_sim không mua được replan;
+  **wS mua được** → phải chặn trong thiết kế SAC (B2).
+- Cần bạn quyết:
+  - B1: chấp nhận M0 = bộ hiện tại;
+  - B2: chặn mua replan bằng wS (phạt replan / sàn wS / LAR bắt buộc);
+  - B3: fine-tune per-map cho M1;
+  - B4: T_max cho B3;
+  - B5: tập train SAC.
+
 ## 9. SAC-DWA — đề xuất thiết kế (CHƯA TRAINING)
 
 Giữ bảng v3 §9 (action, chu kỳ 0.5 s, reward, an toàn, ngân sách). Bổ sung từ V5:
@@ -180,6 +221,8 @@ Giữ bảng v3 §9 (action, chu kỳ 0.5 s, reward, an toàn, ngân sách). B�
 | Chống khai thác | bằng chứng replan không phụ thuộc T_sim / trọng số (§3.5) → SAC không thể "mua" replan bằng horizon |
 | Reward | có thể thêm phạt nhỏ mỗi replan (−1) để SAC ưu tiên tự né, chỉ khi baseline cho thấy cần |
 | Tập huấn luyện | ưu tiên B1/B2/C2 Hard và stress (nơi có khoảng trống, §8.2) |
+| **Chống mua replan bằng wS** (§8.3) | wS ≈ 0 → DWA đứng → A\* né thay (LAR 3–32 %). Cần phạt replan, sàn wS, hoặc ràng buộc LAR — **chờ bạn chọn** |
+| Tham chiếu M0 | `stage5_benchmark/config/m0_v5.yaml` (`m0_general`); env phải chạy `freeze_v5.py --check` |
 
 ## 10. Real-world Validation
 
@@ -218,4 +261,6 @@ Gazebo dùng để xác nhận.
 | Q12 | R12 (LiDAR ngừng) dừng 1.8–2.1 s > 1.5 s | có từ trước, ngoài phạm vi replan |
 | Q13 | Gazebo: một số scenario sinh ra không khởi động được (bridge không có trạng thái 15 s / REJECTED) | xem §G3; lỗi hạ tầng, không phải điều hướng |
 | Q14 | G3: S1 Gazebo replan 8 lần so với 1 ở Fast 2D (cùng SAFE_STOP) | xem log bridge trước khi dùng Gazebo đo replan rate S1 |
-| — | V5 chưa commit, chưa chạy robot; baseline / SAC chờ bạn nghiệm thu V5 | chờ bạn |
+| Q15 | wS ≈ 0 mua replan (§8.3) | quyết trước bước 9 (B2) |
+| Q16 | B3 đường vòng dài > T_max (T_max theo L_ref ban đầu) | xem lại T_max cho B3 (B4) |
+| — | V5 đã commit (`4a730be`); bước 8 chưa commit; chưa chạy robot; SAC chờ bạn chốt thiết kế | chờ bạn |
