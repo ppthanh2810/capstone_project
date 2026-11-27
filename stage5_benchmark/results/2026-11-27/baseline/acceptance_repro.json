@@ -1,0 +1,2624 @@
+{
+ "sets": [
+  "default"
+ ],
+ "groups": [
+  "classroom",
+  "general",
+  "house"
+ ],
+ "summary": {
+  "classroom": {
+   "default": {
+    "n": 110,
+    "Nf": 100,
+    "Nu": 10,
+    "labels": {
+     "SUCCESS": 99,
+     "STUCK": 1
+    },
+    "labels_unsolvable": {
+     "SAFE_STOP": 10
+    },
+    "SR": 99.0,
+    "STR": 1.0,
+    "TOR": 0.0,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "system_errors": 0,
+    "replan_rate": 14.0,
+    "replan_per_ep": 0.19,
+    "segments": 36,
+    "seg_status": {
+     "local": 21,
+     "replan_pass": 14,
+     "failed": 1
+    },
+    "LAR": 58.333333333333336,
+    "q": 0.8710469294391804,
+    "clr_min": 0.06501839739741017,
+    "clr_p05": 0.09095521893133203,
+    "clr_mean": 0.25940059363486,
+    "time_mean": 41.167121212121714,
+    "path_mean": 11.131013215984634,
+    "path_ratio": 1.0957066415749643,
+    "S1_time": 78.67199999999727,
+    "S1_replans": 2.9,
+    "replan_causes": {
+     "abort": 14,
+     "local_free_space": 5
+    },
+    "failures": [
+     [
+      "B3:STUCK:ABORTED",
+      1
+     ]
+    ]
+   }
+  },
+  "general": {
+   "default": {
+    "n": 330,
+    "Nf": 300,
+    "Nu": 30,
+    "labels": {
+     "SUCCESS": 297,
+     "STUCK": 1,
+     "TIMEOUT": 2
+    },
+    "labels_unsolvable": {
+     "SAFE_STOP": 30
+    },
+    "SR": 99.0,
+    "STR": 0.3333333333333333,
+    "TOR": 0.6666666666666666,
+    "CR": 0.0,
+    "SSR": 100.0,
+    "system_errors": 0,
+    "replan_rate": 15.666666666666666,
+    "replan_per_ep": 0.19,
+    "segments": 120,
+    "seg_status": {
+     "local": 74,
+     "failed": 2,
+     "replan_pass": 44
+    },
+    "LAR": 61.666666666666664,
+    "q": 0.8243679393799306,
+    "clr_min": 0.059513443081712414,
+    "clr_p05": 0.10098809391230634,
+    "clr_mean": 0.20599026467853515,
+    "time_mean": 31.38159932659974,
+    "path_mean": 7.884366946274267,
+    "path_ratio": 1.1021050372277494,
+    "S1_time": 38.858333333335395,
+    "S1_replans": 1.0,
+    "replan_causes": {
+     "local_free_space": 43,
+     "abort": 12,
+     "no_useful_progress": 2
+    },
+    "failures": [
+     [
+      "B1:STUCK:NO_PROGRESS",
+      1
+     ],
+     [
+      "B1:TIMEOUT:",
+      1
+     ],
+     [
+      "B3:TIMEOUT:",
+      1
+     ]
+    ]
+   }
+  },
+  "house": {
+   "default": {
+    "n": 110,
+    "Nf": 100,
+    "Nu": 10,
+    "labels": {
+     "SUCCESS": 100
+    },
+    "labels_unsolvable": {
+     "SAFE_STOP": 8,
+     "TIMEOUT": 2
+    },
+    "SR": 100.0,
+    "STR": 0.0,
+    "TOR": 0.0,
+    "CR": 0.0,
+    "SSR": 80.0,
+    "system_errors": 0,
+    "replan_rate": 22.0,
+    "replan_per_ep": 0.25,
+    "segments": 40,
+    "seg_status": {
+     "local": 18,
+     "replan_pass": 22
+    },
+    "LAR": 45.0,
+    "q": 0.8497195022623221,
+    "clr_min": 0.06179693950967452,
+    "clr_p05": 0.0875189958521896,
+    "clr_mean": 0.1577775516914262,
+    "time_mean": 39.07800000000116,
+    "path_mean": 10.180540547901845,
+    "path_ratio": 1.0990728898320552,
+    "S1_time": 97.24599999998156,
+    "S1_replans": 3.4,
+    "replan_causes": {
+     "local_free_space": 16,
+     "abort": 7,
+     "no_useful_progress": 2
+    },
+    "failures": [
+     [
+      "S1:TIMEOUT:",
+      2
+     ]
+    ]
+   }
+  }
+ },
+ "by_type": {
+  "classroom": {
+   "B1": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 9.090909090909092,
+     "replan_per_ep": 0.09090909090909091,
+     "segments": 11,
+     "seg_status": {
+      "local": 10,
+      "replan_pass": 1
+     },
+     "LAR": 90.9090909090909,
+     "q": 0.7884588828625549,
+     "clr_min": 0.1047024798909943,
+     "clr_p05": 0.10825211560566739,
+     "clr_mean": 0.11735782894395864,
+     "time_mean": 44.12772727273213,
+     "path_mean": 10.793546446583044,
+     "path_ratio": 1.0228584715815008,
+     "replan_causes": {
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "B2": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 9.090909090909092,
+     "replan_per_ep": 0.09090909090909091,
+     "segments": 11,
+     "seg_status": {
+      "local": 10,
+      "replan_pass": 1
+     },
+     "LAR": 90.9090909090909,
+     "q": 0.7381710715543559,
+     "clr_min": 0.09530739313051045,
+     "clr_p05": 0.10401697286619532,
+     "clr_mean": 0.12102154445092378,
+     "time_mean": 44.80045454545953,
+     "path_mean": 10.519293847307138,
+     "path_ratio": 1.0578020265815569,
+     "replan_causes": {
+      "abort": 1
+     },
+     "failures": []
+    }
+   },
+   "B3": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 10,
+      "STUCK": 1
+     },
+     "labels_unsolvable": {},
+     "SR": 90.9090909090909,
+     "STR": 9.090909090909092,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 100.0,
+     "replan_per_ep": 1.4545454545454546,
+     "segments": 11,
+     "seg_status": {
+      "replan_pass": 10,
+      "failed": 1
+     },
+     "LAR": 0.0,
+     "q": 0.4067343173838399,
+     "clr_min": 0.06501839739741017,
+     "clr_p05": 0.0886036071217575,
+     "clr_mean": 0.12550569543909978,
+     "time_mean": 90.58499999998611,
+     "path_mean": 23.63144024678106,
+     "path_ratio": 2.0204528160542448,
+     "replan_causes": {
+      "abort": 12,
+      "local_free_space": 4
+     },
+     "failures": [
+      [
+       "B3:STUCK:ABORTED",
+       1
+      ]
+     ]
+    }
+   },
+   "C1": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9954458263647421,
+     "clr_min": 0.0885525000304137,
+     "clr_p05": 0.09651616095316437,
+     "clr_mean": 0.33801435677900354,
+     "time_mean": 38.44590909091187,
+     "path_mean": 11.24881252753279,
+     "path_ratio": 0.9793861836469753,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "C2": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 9.090909090909092,
+     "replan_per_ep": 0.09090909090909091,
+     "segments": 3,
+     "seg_status": {
+      "local": 1,
+      "replan_pass": 2
+     },
+     "LAR": 33.333333333333336,
+     "q": 0.9487257159677135,
+     "clr_min": 0.10164577217049936,
+     "clr_p05": 0.10672784706752272,
+     "clr_mean": 0.33129938419149974,
+     "time_mean": 32.16409090909219,
+     "path_mean": 8.898323026688479,
+     "path_ratio": 0.9991321122500056,
+     "replan_causes": {
+      "abort": 1
+     },
+     "failures": []
+    }
+   },
+   "C3": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 1.0,
+     "clr_min": 0.1739195752358349,
+     "clr_p05": 0.19551497787157815,
+     "clr_mean": 0.5022425534884714,
+     "time_mean": 36.68227272727408,
+     "path_mean": 10.742255479448076,
+     "path_ratio": 0.987745905687645,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N1": {
+    "default": {
+     "n": 12,
+     "Nf": 12,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 12
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9679029053366456,
+     "clr_min": 0.14431182622094596,
+     "clr_p05": 0.18444718973655455,
+     "clr_mean": 0.5799908770689189,
+     "time_mean": 23.821666666666633,
+     "path_mean": 6.859232579139892,
+     "path_ratio": 0.9856171414729283,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N2": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9908922460062595,
+     "clr_min": 0.12750692369461997,
+     "clr_p05": 0.13518654817562886,
+     "clr_mean": 0.1798459696468793,
+     "time_mean": 35.72772727272882,
+     "path_mean": 10.32171484362072,
+     "path_ratio": 0.9638677671387934,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N3": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9942863107585612,
+     "clr_min": 0.12812485586965933,
+     "clr_p05": 0.12952890085281554,
+     "clr_mean": 0.1558332540534446,
+     "time_mean": 30.218636363636815,
+     "path_mean": 8.689246098364253,
+     "path_ratio": 0.9385733201775136,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "S1": {
+    "default": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 10,
+     "labels": {},
+     "labels_unsolvable": {
+      "SAFE_STOP": 10
+     },
+     "SR": null,
+     "STR": null,
+     "TOR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "system_errors": 0,
+     "S1_time": 78.67199999999727,
+     "S1_replans": 2.9,
+     "replan_causes": {},
+     "failures": []
+    }
+   }
+  },
+  "general": {
+   "B1": {
+    "default": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 33,
+      "STUCK": 1,
+      "TIMEOUT": 1
+     },
+     "labels_unsolvable": {},
+     "SR": 94.28571428571429,
+     "STR": 2.857142857142857,
+     "TOR": 2.857142857142857,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 25.714285714285715,
+     "replan_per_ep": 0.4,
+     "segments": 35,
+     "seg_status": {
+      "local": 26,
+      "failed": 2,
+      "replan_pass": 7
+     },
+     "LAR": 74.28571428571429,
+     "q": 0.6913071414026682,
+     "clr_min": 0.059513443081712414,
+     "clr_p05": 0.08949156150332055,
+     "clr_mean": 0.11460235273606985,
+     "time_mean": 35.92772727272793,
+     "path_mean": 8.196998587613903,
+     "path_ratio": 1.0353643052647947,
+     "replan_causes": {
+      "local_free_space": 9,
+      "abort": 5
+     },
+     "failures": [
+      [
+       "B1:STUCK:NO_PROGRESS",
+       1
+      ],
+      [
+       "B1:TIMEOUT:",
+       1
+      ]
+     ]
+    }
+   },
+   "B2": {
+    "default": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 35
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 17.142857142857142,
+     "replan_per_ep": 0.22857142857142856,
+     "segments": 35,
+     "seg_status": {
+      "local": 29,
+      "replan_pass": 6
+     },
+     "LAR": 82.85714285714286,
+     "q": 0.6604700283968215,
+     "clr_min": 0.0824136495674283,
+     "clr_p05": 0.09196030556720139,
+     "clr_mean": 0.1190701289688655,
+     "time_mean": 39.575000000002355,
+     "path_mean": 8.393792812875517,
+     "path_ratio": 1.0757387331611088,
+     "replan_causes": {
+      "local_free_space": 6,
+      "abort": 1,
+      "no_useful_progress": 1
+     },
+     "failures": []
+    }
+   },
+   "B3": {
+    "default": {
+     "n": 21,
+     "Nf": 21,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 20,
+      "TIMEOUT": 1
+     },
+     "labels_unsolvable": {},
+     "SR": 95.23809523809524,
+     "STR": 0.0,
+     "TOR": 4.761904761904762,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 100.0,
+     "replan_per_ep": 1.0,
+     "segments": 21,
+     "seg_status": {
+      "replan_pass": 21
+     },
+     "LAR": 0.0,
+     "q": 0.3107663650269683,
+     "clr_min": 0.10900712444761956,
+     "clr_p05": 0.11298596181648313,
+     "clr_mean": 0.13019890994053443,
+     "time_mean": 78.6599999999984,
+     "path_mean": 19.568711266453736,
+     "path_ratio": 2.579025469375268,
+     "replan_causes": {
+      "local_free_space": 18,
+      "abort": 2,
+      "no_useful_progress": 1
+     },
+     "failures": [
+      [
+       "B3:TIMEOUT:",
+       1
+      ]
+     ]
+    }
+   },
+   "C1": {
+    "default": {
+     "n": 10,
+     "Nf": 10,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 10
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 10.0,
+     "replan_per_ep": 0.1,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9626870697498123,
+     "clr_min": 0.08372279387000264,
+     "clr_p05": 0.08651735289281502,
+     "clr_mean": 0.1011992211784593,
+     "time_mean": 22.474999999999703,
+     "path_mean": 6.192862170552447,
+     "path_ratio": 0.948152314088326,
+     "replan_causes": {
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "C2": {
+    "default": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 35
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 20.0,
+     "replan_per_ep": 0.2571428571428571,
+     "segments": 25,
+     "seg_status": {
+      "local": 17,
+      "replan_pass": 8
+     },
+     "LAR": 68.0,
+     "q": 0.8077706647804659,
+     "clr_min": 0.07740837702680009,
+     "clr_p05": 0.08070565420936904,
+     "clr_mean": 0.13584175296285897,
+     "time_mean": 34.7835714285729,
+     "path_mean": 8.367028041345643,
+     "path_ratio": 1.0257497259193025,
+     "replan_causes": {
+      "local_free_space": 6,
+      "abort": 3
+     },
+     "failures": []
+    }
+   },
+   "C3": {
+    "default": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 35
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 2.857142857142857,
+     "replan_per_ep": 0.02857142857142857,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.983042221180015,
+     "clr_min": 0.10130642937977052,
+     "clr_p05": 0.1080958423396723,
+     "clr_mean": 0.1628019674735106,
+     "time_mean": 32.42642857142794,
+     "path_mean": 9.293172876302199,
+     "path_ratio": 0.961760896151918,
+     "replan_causes": {
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "C4": {
+    "default": {
+     "n": 35,
+     "Nf": 35,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 35
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 5.714285714285714,
+     "replan_per_ep": 0.08571428571428572,
+     "segments": 4,
+     "seg_status": {
+      "local": 2,
+      "replan_pass": 2
+     },
+     "LAR": 50.0,
+     "q": 0.9286388104170621,
+     "clr_min": 0.10383308020796234,
+     "clr_p05": 0.1081955905172096,
+     "clr_mean": 0.26211820714200473,
+     "time_mean": 21.21214285714337,
+     "path_mean": 5.616323457588077,
+     "path_ratio": 0.9837839977251901,
+     "replan_causes": {
+      "local_free_space": 2,
+      "abort": 1
+     },
+     "failures": []
+    }
+   },
+   "N1": {
+    "default": {
+     "n": 37,
+     "Nf": 37,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 37
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9549762478665834,
+     "clr_min": 0.25016436255003016,
+     "clr_p05": 0.2704778216074308,
+     "clr_mean": 0.5139820847467693,
+     "time_mean": 16.17662162162214,
+     "path_mean": 4.550185824771131,
+     "path_ratio": 0.9756286817277795,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N2": {
+    "default": {
+     "n": 21,
+     "Nf": 21,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 21
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9620470924935711,
+     "clr_min": 0.11587879278678948,
+     "clr_p05": 0.11798372115740913,
+     "clr_mean": 0.15040489945464758,
+     "time_mean": 18.60738095238127,
+     "path_mean": 5.101742883451882,
+     "path_ratio": 0.9420094501431082,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N3": {
+    "default": {
+     "n": 36,
+     "Nf": 36,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 36
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9202026950358336,
+     "clr_min": 0.09737391527223288,
+     "clr_p05": 0.11510878613294123,
+     "clr_mean": 0.26635292452940884,
+     "time_mean": 24.099444444443932,
+     "path_mean": 6.49718347124106,
+     "path_ratio": 0.9602642895574558,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "S1": {
+    "default": {
+     "n": 30,
+     "Nf": 0,
+     "Nu": 30,
+     "labels": {},
+     "labels_unsolvable": {
+      "SAFE_STOP": 30
+     },
+     "SR": null,
+     "STR": null,
+     "TOR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "system_errors": 0,
+     "S1_time": 38.858333333335395,
+     "S1_replans": 1.0,
+     "replan_causes": {},
+     "failures": []
+    }
+   }
+  },
+  "house": {
+   "B1": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 9.090909090909092,
+     "replan_per_ep": 0.09090909090909091,
+     "segments": 11,
+     "seg_status": {
+      "local": 10,
+      "replan_pass": 1
+     },
+     "LAR": 90.9090909090909,
+     "q": 0.7576077773234986,
+     "clr_min": 0.09884788407512346,
+     "clr_p05": 0.09906636683548825,
+     "clr_mean": 0.11323828369730699,
+     "time_mean": 39.318636363638696,
+     "path_mean": 9.195347957938921,
+     "path_ratio": 1.026210940178616,
+     "replan_causes": {
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "B2": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 45.45454545454545,
+     "replan_per_ep": 0.6363636363636364,
+     "segments": 11,
+     "seg_status": {
+      "local": 6,
+      "replan_pass": 5
+     },
+     "LAR": 54.54545454545455,
+     "q": 0.6854565025669843,
+     "clr_min": 0.08232778416163239,
+     "clr_p05": 0.09454305818128433,
+     "clr_mean": 0.11839394568223092,
+     "time_mean": 44.64590909091399,
+     "path_mean": 9.929050936716992,
+     "path_ratio": 1.1084198830183978,
+     "replan_causes": {
+      "local_free_space": 5,
+      "abort": 2
+     },
+     "failures": []
+    }
+   },
+   "B3": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 100.0,
+     "replan_per_ep": 1.0909090909090908,
+     "segments": 11,
+     "seg_status": {
+      "replan_pass": 11
+     },
+     "LAR": 0.0,
+     "q": 0.45947516720258347,
+     "clr_min": 0.10639927721067716,
+     "clr_p05": 0.11076494631522926,
+     "clr_mean": 0.12519782978621738,
+     "time_mean": 74.21863636363713,
+     "path_mean": 18.451893272341593,
+     "path_ratio": 1.8797468573804466,
+     "replan_causes": {
+      "local_free_space": 6,
+      "abort": 4,
+      "no_useful_progress": 2
+     },
+     "failures": []
+    }
+   },
+   "C1": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 9.090909090909092,
+     "replan_per_ep": 0.09090909090909091,
+     "segments": 1,
+     "seg_status": {
+      "replan_pass": 1
+     },
+     "LAR": 0.0,
+     "q": 0.9613779341978176,
+     "clr_min": 0.08812375252344867,
+     "clr_p05": 0.10044716557978231,
+     "clr_mean": 0.17857655588524432,
+     "time_mean": 28.96409090909035,
+     "path_mean": 8.255831889187052,
+     "path_ratio": 0.9613763030358538,
+     "replan_causes": {
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "C2": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 36.36363636363637,
+     "replan_per_ep": 0.36363636363636365,
+     "segments": 6,
+     "seg_status": {
+      "replan_pass": 4,
+      "local": 2
+     },
+     "LAR": 33.333333333333336,
+     "q": 0.8163025337952606,
+     "clr_min": 0.08702419493934127,
+     "clr_p05": 0.08859325273702948,
+     "clr_mean": 0.14187985382973303,
+     "time_mean": 40.75500000000154,
+     "path_mean": 10.018904734169547,
+     "path_ratio": 1.0657489318903886,
+     "replan_causes": {
+      "local_free_space": 3,
+      "abort": 1
+     },
+     "failures": []
+    }
+   },
+   "C3": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9989149329999226,
+     "clr_min": 0.12599957659058164,
+     "clr_p05": 0.1261126352427224,
+     "clr_mean": 0.17885793327484828,
+     "time_mean": 34.63681818181829,
+     "path_mean": 10.01969834584211,
+     "path_ratio": 0.9760789672032775,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N1": {
+    "default": {
+     "n": 12,
+     "Nf": 12,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 12
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9802318735939125,
+     "clr_min": 0.11444549215753586,
+     "clr_p05": 0.13556279373092056,
+     "clr_mean": 0.25901120195772737,
+     "time_mean": 28.26333333333366,
+     "path_mean": 8.150616638849842,
+     "path_ratio": 0.9711013624628051,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N2": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9872290370004656,
+     "clr_min": 0.11875924542311272,
+     "clr_p05": 0.12272327722165377,
+     "clr_mean": 0.17931366522463293,
+     "time_mean": 33.509545454546576,
+     "path_mean": 9.682930067911501,
+     "path_ratio": 0.9658038440541677,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "N3": {
+    "default": {
+     "n": 11,
+     "Nf": 11,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 11
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 0.0,
+     "replan_per_ep": 0.0,
+     "segments": 0,
+     "seg_status": {},
+     "LAR": null,
+     "q": 0.9890150006503088,
+     "clr_min": 0.11729246611954147,
+     "clr_p05": 0.12427515962462515,
+     "clr_mean": 0.16754835388227232,
+     "time_mean": 28.373181818181816,
+     "path_mean": 8.105129625345581,
+     "path_ratio": 0.9488026944799305,
+     "replan_causes": {},
+     "failures": []
+    }
+   },
+   "S1": {
+    "default": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 10,
+     "labels": {},
+     "labels_unsolvable": {
+      "SAFE_STOP": 8,
+      "TIMEOUT": 2
+     },
+     "SR": null,
+     "STR": null,
+     "TOR": null,
+     "CR": 0.0,
+     "SSR": 80.0,
+     "system_errors": 0,
+     "S1_time": 97.24599999998156,
+     "S1_replans": 3.4,
+     "replan_causes": {},
+     "failures": [
+      [
+       "S1:TIMEOUT:",
+       2
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "by_level": {
+  "classroom": {
+   "easy": {
+    "default": {
+     "n": 46,
+     "Nf": 46,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 46
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 10.869565217391305,
+     "replan_per_ep": 0.13043478260869565,
+     "segments": 23,
+     "seg_status": {
+      "replan_pass": 6,
+      "local": 17
+     },
+     "LAR": 73.91304347826087,
+     "q": 0.8629424795178317,
+     "clr_min": 0.09530739313051045,
+     "clr_p05": 0.10647729774833084,
+     "clr_mean": 0.3174016650996691,
+     "time_mean": 37.96369565217584,
+     "path_mean": 9.861755599648333,
+     "path_ratio": 1.0416310428946431,
+     "replan_causes": {
+      "abort": 5,
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "hard": {
+    "default": {
+     "n": 21,
+     "Nf": 21,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 20,
+      "STUCK": 1
+     },
+     "labels_unsolvable": {},
+     "SR": 95.23809523809524,
+     "STR": 4.761904761904762,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 19.047619047619047,
+     "replan_per_ep": 0.38095238095238093,
+     "segments": 4,
+     "seg_status": {
+      "replan_pass": 3,
+      "failed": 1
+     },
+     "LAR": 0.0,
+     "q": 0.8575914114931811,
+     "clr_min": 0.06501839739741017,
+     "clr_p05": 0.0885525000304137,
+     "clr_mean": 0.2530661411412989,
+     "time_mean": 45.6199999999978,
+     "path_mean": 12.845183700766105,
+     "path_ratio": 1.2098765818106094,
+     "replan_causes": {
+      "abort": 5,
+      "local_free_space": 3
+     },
+     "failures": [
+      [
+       "B3:STUCK:ABORTED",
+       1
+      ]
+     ]
+    }
+   },
+   "medium": {
+    "default": {
+     "n": 33,
+     "Nf": 33,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 33
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 15.151515151515152,
+     "replan_per_ep": 0.15151515151515152,
+     "segments": 9,
+     "seg_status": {
+      "local": 4,
+      "replan_pass": 5
+     },
+     "LAR": 44.44444444444444,
+     "q": 0.8909066437800298,
+     "clr_min": 0.11744694291100505,
+     "clr_p05": 0.11979233453440577,
+     "clr_mean": 0.23113186130912303,
+     "time_mean": 42.93378787878804,
+     "path_mean": 11.86139020555556,
+     "path_ratio": 1.1018908456532035,
+     "replan_causes": {
+      "abort": 4,
+      "local_free_space": 1
+     },
+     "failures": []
+    }
+   },
+   "unsolvable": {
+    "default": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 10,
+     "labels": {},
+     "labels_unsolvable": {
+      "SAFE_STOP": 10
+     },
+     "SR": null,
+     "STR": null,
+     "TOR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "system_errors": 0,
+     "S1_time": 78.67199999999727,
+     "S1_replans": 2.9,
+     "replan_causes": {},
+     "failures": []
+    }
+   }
+  },
+  "general": {
+   "easy": {
+    "default": {
+     "n": 100,
+     "Nf": 100,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 100
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 3.0,
+     "replan_per_ep": 0.04,
+     "segments": 41,
+     "seg_status": {
+      "local": 38,
+      "replan_pass": 3
+     },
+     "LAR": 92.6829268292683,
+     "q": 0.8624988496384042,
+     "clr_min": 0.07762940128967122,
+     "clr_p05": 0.10932872690526678,
+     "clr_mean": 0.29062458580316286,
+     "time_mean": 29.483000000000665,
+     "path_mean": 7.47049318451029,
+     "path_ratio": 1.0043868493088959,
+     "replan_causes": {
+      "local_free_space": 3,
+      "abort": 1
+     },
+     "failures": []
+    }
+   },
+   "hard": {
+    "default": {
+     "n": 100,
+     "Nf": 100,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 97,
+      "STUCK": 1,
+      "TIMEOUT": 2
+     },
+     "labels_unsolvable": {},
+     "SR": 97.0,
+     "STR": 1.0,
+     "TOR": 2.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 26.0,
+     "replan_per_ep": 0.33,
+     "segments": 36,
+     "seg_status": {
+      "failed": 2,
+      "local": 11,
+      "replan_pass": 23
+     },
+     "LAR": 30.555555555555557,
+     "q": 0.8046909835042855,
+     "clr_min": 0.07740837702680009,
+     "clr_p05": 0.08993030340998949,
+     "clr_mean": 0.15356873757696993,
+     "time_mean": 30.490051546392323,
+     "path_mean": 7.705349506199526,
+     "path_ratio": 1.153403623935151,
+     "replan_causes": {
+      "local_free_space": 25,
+      "abort": 8
+     },
+     "failures": [
+      [
+       "B1:STUCK:NO_PROGRESS",
+       1
+      ],
+      [
+       "B1:TIMEOUT:",
+       1
+      ],
+      [
+       "B3:TIMEOUT:",
+       1
+      ]
+     ]
+    }
+   },
+   "medium": {
+    "default": {
+     "n": 100,
+     "Nf": 100,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 100
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 18.0,
+     "replan_per_ep": 0.2,
+     "segments": 43,
+     "seg_status": {
+      "replan_pass": 18,
+      "local": 25
+     },
+     "LAR": 58.13953488372093,
+     "q": 0.8059139849971024,
+     "clr_min": 0.059513443081712414,
+     "clr_p05": 0.10413112157615535,
+     "clr_mean": 0.18896586614675165,
+     "time_mean": 34.14500000000001,
+     "path_mean": 8.471887624910744,
+     "path_ratio": 1.150063596040423,
+     "replan_causes": {
+      "local_free_space": 15,
+      "abort": 3,
+      "no_useful_progress": 2
+     },
+     "failures": []
+    }
+   },
+   "unsolvable": {
+    "default": {
+     "n": 30,
+     "Nf": 0,
+     "Nu": 30,
+     "labels": {},
+     "labels_unsolvable": {
+      "SAFE_STOP": 30
+     },
+     "SR": null,
+     "STR": null,
+     "TOR": null,
+     "CR": 0.0,
+     "SSR": 100.0,
+     "system_errors": 0,
+     "S1_time": 38.858333333335395,
+     "S1_replans": 1.0,
+     "replan_causes": {},
+     "failures": []
+    }
+   }
+  },
+  "house": {
+   "easy": {
+    "default": {
+     "n": 24,
+     "Nf": 24,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 24
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 12.5,
+     "replan_per_ep": 0.125,
+     "segments": 6,
+     "seg_status": {
+      "local": 3,
+      "replan_pass": 3
+     },
+     "LAR": 50.0,
+     "q": 0.9055979311175498,
+     "clr_min": 0.11444549215753586,
+     "clr_p05": 0.11660290782575347,
+     "clr_mean": 0.20698649286898738,
+     "time_mean": 36.45500000000101,
+     "path_mean": 9.834210954500689,
+     "path_ratio": 1.0223664794221465,
+     "replan_causes": {
+      "local_free_space": 2,
+      "abort": 1
+     },
+     "failures": []
+    }
+   },
+   "hard": {
+    "default": {
+     "n": 28,
+     "Nf": 28,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 28
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 32.142857142857146,
+     "replan_per_ep": 0.35714285714285715,
+     "segments": 12,
+     "seg_status": {
+      "local": 3,
+      "replan_pass": 9
+     },
+     "LAR": 25.0,
+     "q": 0.8197363341238202,
+     "clr_min": 0.08232778416163239,
+     "clr_p05": 0.08740904009377887,
+     "clr_mean": 0.15356134950613565,
+     "time_mean": 41.6014285714301,
+     "path_mean": 10.675469193661485,
+     "path_ratio": 1.1653940308572401,
+     "replan_causes": {
+      "local_free_space": 7,
+      "abort": 2,
+      "no_useful_progress": 1
+     },
+     "failures": []
+    }
+   },
+   "medium": {
+    "default": {
+     "n": 48,
+     "Nf": 48,
+     "Nu": 0,
+     "labels": {
+      "SUCCESS": 48
+     },
+     "labels_unsolvable": {},
+     "SR": 100.0,
+     "STR": 0.0,
+     "TOR": 0.0,
+     "CR": 0.0,
+     "SSR": null,
+     "system_errors": 0,
+     "replan_rate": 20.833333333333332,
+     "replan_per_ep": 0.25,
+     "segments": 22,
+     "seg_status": {
+      "local": 12,
+      "replan_pass": 10
+     },
+     "LAR": 54.54545454545455,
+     "q": 0.8392704692488341,
+     "clr_min": 0.09928484959585304,
+     "clr_p05": 0.10490528830496028,
+     "clr_mean": 0.14737107171567876,
+     "time_mean": 38.91750000000103,
+     "path_mean": 10.064996967909298,
+     "path_ratio": 1.0987387627723184,
+     "replan_causes": {
+      "local_free_space": 7,
+      "abort": 4,
+      "no_useful_progress": 1
+     },
+     "failures": []
+    }
+   },
+   "unsolvable": {
+    "default": {
+     "n": 10,
+     "Nf": 0,
+     "Nu": 10,
+     "labels": {},
+     "labels_unsolvable": {
+      "SAFE_STOP": 8,
+      "TIMEOUT": 2
+     },
+     "SR": null,
+     "STR": null,
+     "TOR": null,
+     "CR": 0.0,
+     "SSR": 80.0,
+     "system_errors": 0,
+     "S1_time": 97.24599999998156,
+     "S1_replans": 3.4,
+     "replan_causes": {},
+     "failures": [
+      [
+       "S1:TIMEOUT:",
+       2
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "by_type_level": {
+  "classroom": {
+   "B1:easy": {
+    "default": {
+     "n": 9,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 11.11111111111111,
+     "LAR": 88.88888888888889,
+     "time_mean": 43.01055555555989
+    }
+   },
+   "B1:medium": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 49.155000000007206
+    }
+   },
+   "B2:easy": {
+    "default": {
+     "n": 9,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 11.11111111111111,
+     "LAR": 88.88888888888889,
+     "time_mean": 44.82166666667165
+    }
+   },
+   "B2:medium": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 44.70500000000493
+    }
+   },
+   "B3:easy": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 90.95499999998886
+    }
+   },
+   "B3:hard": {
+    "default": {
+     "n": 4,
+     "SR": 75.0,
+     "STR": 25.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 102.62166666664491
+    }
+   },
+   "B3:medium": {
+    "default": {
+     "n": 5,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 83.21499999998971
+    }
+   },
+   "C1:hard": {
+    "default": {
+     "n": 9,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 37.36611111111357
+    }
+   },
+   "C1:medium": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 43.30500000000421
+    }
+   },
+   "C2:easy": {
+    "default": {
+     "n": 8,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 12.5,
+     "LAR": 33.333333333333336,
+     "time_mean": 34.45500000000207
+    }
+   },
+   "C2:hard": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 29.35499999999862
+    }
+   },
+   "C2:medium": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 19.455000000000215
+    }
+   },
+   "C3:easy": {
+    "default": {
+     "n": 4,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 35.9800000000014
+    }
+   },
+   "C3:hard": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 39.555000000002295
+    }
+   },
+   "C3:medium": {
+    "default": {
+     "n": 6,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 36.671666666667825
+    }
+   },
+   "N1:easy": {
+    "default": {
+     "n": 12,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 23.821666666666633
+    }
+   },
+   "N2:easy": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 34.255000000002795
+    }
+   },
+   "N2:hard": {
+    "default": {
+     "n": 2,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 31.404999999999312
+    }
+   },
+   "N2:medium": {
+    "default": {
+     "n": 7,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 37.38357142857325
+    }
+   },
+   "N3:hard": {
+    "default": {
+     "n": 3,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 35.721666666667
+    }
+   },
+   "N3:medium": {
+    "default": {
+     "n": 8,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 28.155000000000495
+    }
+   },
+   "S1:unsolvable": {
+    "default": {
+     "n": 10,
+     "SR": null,
+     "STR": null,
+     "SSR": 100.0,
+     "CR": 0.0,
+     "replan_rate": null,
+     "LAR": null,
+     "time_mean": null
+    }
+   }
+  },
+  "general": {
+   "B1:easy": {
+    "default": {
+     "n": 14,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 36.73357142857254
+    }
+   },
+   "B1:hard": {
+    "default": {
+     "n": 10,
+     "SR": 80.0,
+     "STR": 10.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 60.0,
+     "LAR": 40.0,
+     "time_mean": 35.30500000000045
+    }
+   },
+   "B1:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 27.272727272727273,
+     "LAR": 72.72727272727273,
+     "time_mean": 35.35500000000024
+    }
+   },
+   "B2:easy": {
+    "default": {
+     "n": 14,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 38.14785714285875
+    }
+   },
+   "B2:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 50.0,
+     "LAR": 50.0,
+     "time_mean": 41.95500000000365
+    }
+   },
+   "B2:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 9.090909090909092,
+     "LAR": 90.9090909090909,
+     "time_mean": 39.2277272727294
+    }
+   },
+   "B3:hard": {
+    "default": {
+     "n": 10,
+     "SR": 90.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 74.71055555555708
+    }
+   },
+   "B3:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 81.89136363635954
+    }
+   },
+   "C1:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 10.0,
+     "LAR": null,
+     "time_mean": 22.474999999999703
+    }
+   },
+   "C2:easy": {
+    "default": {
+     "n": 14,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 21.428571428571427,
+     "LAR": 72.72727272727273,
+     "time_mean": 35.79785714285895
+    }
+   },
+   "C2:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 30.0,
+     "LAR": 33.333333333333336,
+     "time_mean": 31.735000000000902
+    }
+   },
+   "C2:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 9.090909090909092,
+     "LAR": 87.5,
+     "time_mean": 36.26409090909244
+    }
+   },
+   "C3:easy": {
+    "default": {
+     "n": 14,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 34.95499999999996
+    }
+   },
+   "C3:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 10.0,
+     "LAR": null,
+     "time_mean": 30.034999999998416
+    }
+   },
+   "C3:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 31.382272727272206
+    }
+   },
+   "C4:easy": {
+    "default": {
+     "n": 14,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 20.305000000000234
+    }
+   },
+   "C4:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 19.10500000000028
+    }
+   },
+   "C4:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 18.181818181818183,
+     "LAR": 0.0,
+     "time_mean": 24.282272727273813
+    }
+   },
+   "N1:easy": {
+    "default": {
+     "n": 15,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 19.52833333333364
+    }
+   },
+   "N1:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 13.325000000000804
+    }
+   },
+   "N1:medium": {
+    "default": {
+     "n": 12,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 14.36333333333389
+    }
+   },
+   "N2:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 17.06500000000058
+    }
+   },
+   "N2:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 20.00954545454554
+    }
+   },
+   "N3:easy": {
+    "default": {
+     "n": 15,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 22.148333333333085
+    }
+   },
+   "N3:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 24.574999999999513
+    }
+   },
+   "N3:medium": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 26.327727272726374
+    }
+   },
+   "S1:unsolvable": {
+    "default": {
+     "n": 30,
+     "SR": null,
+     "STR": null,
+     "SSR": 100.0,
+     "CR": 0.0,
+     "replan_rate": null,
+     "LAR": null,
+     "time_mean": null
+    }
+   }
+  },
+  "house": {
+   "B1:easy": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 34.55499999999974
+    }
+   },
+   "B1:hard": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": 100.0,
+     "time_mean": 51.555000000008434
+    }
+   },
+   "B1:medium": {
+    "default": {
+     "n": 9,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 11.11111111111111,
+     "LAR": 88.88888888888889,
+     "time_mean": 38.48833333333528
+    }
+   },
+   "B2:easy": {
+    "default": {
+     "n": 3,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 33.333333333333336,
+     "LAR": 66.66666666666667,
+     "time_mean": 42.98833333333738
+    }
+   },
+   "B2:hard": {
+    "default": {
+     "n": 3,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 33.333333333333336,
+     "LAR": 66.66666666666667,
+     "time_mean": 44.155000000004655
+    }
+   },
+   "B2:medium": {
+    "default": {
+     "n": 5,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 60.0,
+     "LAR": 40.0,
+     "time_mean": 45.93500000000556
+    }
+   },
+   "B3:easy": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 90.15499999998958
+    }
+   },
+   "B3:hard": {
+    "default": {
+     "n": 5,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 70.99500000000499
+    }
+   },
+   "B3:medium": {
+    "default": {
+     "n": 5,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 74.25499999999877
+    }
+   },
+   "C1:hard": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 10.0,
+     "LAR": 0.0,
+     "time_mean": 29.2049999999995
+    }
+   },
+   "C1:medium": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 26.554999999998802
+    }
+   },
+   "C2:easy": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 100.0,
+     "LAR": 0.0,
+     "time_mean": 41.355000000003216
+    }
+   },
+   "C2:hard": {
+    "default": {
+     "n": 3,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 66.66666666666667,
+     "LAR": 0.0,
+     "time_mean": 50.62166666666801
+    }
+   },
+   "C2:medium": {
+    "default": {
+     "n": 7,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 14.285714285714286,
+     "LAR": 66.66666666666667,
+     "time_mean": 36.44071428571567
+    }
+   },
+   "C3:easy": {
+    "default": {
+     "n": 3,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 38.35500000000169
+    }
+   },
+   "C3:hard": {
+    "default": {
+     "n": 5,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 32.23499999999926
+    }
+   },
+   "C3:medium": {
+    "default": {
+     "n": 3,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 34.92166666666659
+    }
+   },
+   "N1:easy": {
+    "default": {
+     "n": 11,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 27.20045454545466
+    }
+   },
+   "N1:medium": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 39.9550000000025
+    }
+   },
+   "N2:easy": {
+    "default": {
+     "n": 4,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 41.40500000000324
+    }
+   },
+   "N2:medium": {
+    "default": {
+     "n": 7,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 28.997857142857065
+    }
+   },
+   "N3:hard": {
+    "default": {
+     "n": 1,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 20.754999999999956
+    }
+   },
+   "N3:medium": {
+    "default": {
+     "n": 10,
+     "SR": 100.0,
+     "STR": 0.0,
+     "SSR": null,
+     "CR": 0.0,
+     "replan_rate": 0.0,
+     "LAR": null,
+     "time_mean": 29.135
+    }
+   },
+   "S1:unsolvable": {
+    "default": {
+     "n": 10,
+     "SR": null,
+     "STR": null,
+     "SSR": 80.0,
+     "CR": 0.0,
+     "replan_rate": null,
+     "LAR": null,
+     "time_mean": null
+    }
+   }
+  }
+ },
+ "paired": {},
+ "failure_cases": {
+  "classroom": {
+   "default": [
+    {
+     "id": "classroom_val_B3_h_0009",
+     "type": "B3",
+     "level": "hard",
+     "n_fail": 1,
+     "labels": [
+      "STUCK:ABORTED"
+     ],
+     "replans": [
+      4
+     ]
+    }
+   ]
+  },
+  "general": {
+   "default": [
+    {
+     "id": "general_val_B1_h_0000",
+     "type": "B1",
+     "level": "hard",
+     "n_fail": 1,
+     "labels": [
+      "STUCK:NO_PROGRESS"
+     ],
+     "replans": [
+      3
+     ]
+    },
+    {
+     "id": "general_val_B1_h_0004",
+     "type": "B1",
+     "level": "hard",
+     "n_fail": 1,
+     "labels": [
+      "TIMEOUT:"
+     ],
+     "replans": [
+      4
+     ]
+    },
+    {
+     "id": "general_val_B3_h_0001",
+     "type": "B3",
+     "level": "hard",
+     "n_fail": 1,
+     "labels": [
+      "TIMEOUT:"
+     ],
+     "replans": [
+      1
+     ]
+    }
+   ]
+  },
+  "house": {
+   "default": [
+    {
+     "id": "house_s1_val_S1_u_0004",
+     "type": "S1",
+     "level": "unsolvable",
+     "n_fail": 1,
+     "labels": [
+      "TIMEOUT:"
+     ],
+     "replans": [
+      3
+     ]
+    },
+    {
+     "id": "house_s1_val_S1_u_0005",
+     "type": "S1",
+     "level": "unsolvable",
+     "n_fail": 1,
+     "labels": [
+      "TIMEOUT:"
+     ],
+     "replans": [
+      4
+     ]
+    }
+   ]
+  }
+ }
+}

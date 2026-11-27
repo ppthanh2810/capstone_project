@@ -1,0 +1,266 @@
+{
+ "name": "Navigation V5 (R2s Local Avoidance First + Slow Approach), SIM_READY",
+ "git_commit": "4a730be668dd5313ae7db00ec394a7792e966db0",
+ "git_dirty_paths": [
+  "?? stage5_benchmark/scripts/freeze_v5.py"
+ ],
+ "nav2_params_sha256": "ba6d0a24af59820774cb1fec90a6cacf1ab2ba0a74cbd7cea377e330dbb6b8a6",
+ "benchmark_yaml_sha256": "7c0e5dfdac8f8d4119ca25013db8c61ae7b44478c416438bdc2cd79e86b02f46",
+ "fast2d_module_sha256": "95b34372d525e8e59226bedc006b7145a9d7151ff366144d2bf40b09308fc596",
+ "sources_sha256": {
+  "stage3_navigation/src/dwa_core.cpp": "7a7a3e43eb616da199488e77689c92abd1541cf53bd8371dc80a03f40dd2b7ab",
+  "stage3_navigation/include/stage3_navigation/dwa_core.hpp": "c33a8618d648f4bfcf96d6a5e2b0ee95d35bfa1b7bb462f6e74f1ce0d9928f4a",
+  "stage3_navigation/src/replan_supervisor.cpp": "12b318cddf27503518f69f4b19c38c861324a3103fd8fb4b1bdbf2adf1a32b6e",
+  "stage3_navigation/include/stage3_navigation/replan_supervisor.hpp": "5b89b109d4cc2e5e31a3c8b2858f5cd14dd16d6dc7e02e38864b0ccd283366e2",
+  "stage3_navigation/src/path_blockage.cpp": "ddbd60ee11874d414280e8ec5dea0903ec8ea1b01aa653f426dad1ba6dac2e7d",
+  "stage3_navigation/src/goal_path_bridge.cpp": "2860f815045259570e5cd9402721445a162b632c8cb82a048b7109a37762ba84",
+  "stage5_benchmark/src/fast2d.cpp": "a6f5979a5c5619ac82bb1f6b0c330bc51261740989a64681d5e34b35f2d802d1",
+  "stage5_benchmark/include/stage5_benchmark/fast2d.hpp": "750df84aac77238d22500a82f857e7003d0acb31ba3b8de0503d55a44148dcb8",
+  "stage5_benchmark/src/fast2d_py.cpp": "c1846d106f69a438c4f3c104cdeaba12d8340fbfd1e8e54b4ecb5c57ee206f84",
+  "stage5_benchmark/python/stage5_benchmark/evaluator.py": "324b846e353933650b692e6f6cb0b9d1f151c1716efbd76ddb0d3b617d74a9d0",
+  "stage5_benchmark/python/stage5_benchmark/runner.py": "423e80ca6d998ad0e59988cf205a947f02d18965019a23e585204f2a2e26fca4",
+  "stage5_benchmark/python/stage5_benchmark/config.py": "eccd7851b43ec178212e4266246a87d6e3f260155f56cef73ee414dca0cffc12",
+  "stage4_gazebo/include/stage4_gazebo/zlac_driver_model.hpp": "7e8e2719768e0717a02342e4fe1339023f4999f620631c391074dcb6cb453767",
+  "stage4_gazebo/src/s0_control/zlac_driver_model.cpp": "2fa387bbccffe693be83199a881cdf6bfcf59dc498beefd439696405b9d7098f",
+  "stage4_gazebo/test/test_zlac_driver_model.cpp": "83fc1316bce96f0ba506681c9604acb146ed316cf09b199f1d90ad8580f9371f"
+ },
+ "config": {
+  "dwb": {
+   "max_vel_x": 0.3,
+   "min_vel_x": 0.0,
+   "max_vel_theta": 1.0,
+   "min_in_place_vel_theta": 0.1,
+   "acc_lim_x": 0.5,
+   "decel_lim_x": 0.5,
+   "acc_lim_theta": 2.0,
+   "decel_lim_theta": 2.0,
+   "vx_samples": 20,
+   "vtheta_samples": 21,
+   "sim_time": 2.0,
+   "sim_granularity": 0.05,
+   "control_latency": 0.2,
+   "stopping_margin": 0.02,
+   "velocity_reference": "command",
+   "max_feedback_gap_x": 0.15,
+   "max_feedback_gap_theta": 0.5,
+   "local_plan_length": 1.5,
+   "carrot_distance": 0.8,
+   "carrot_validation": 1.0,
+   "closest_search_distance": 1.0,
+   "max_path_deviation": 1.0,
+   "rotate_to_heading_angle": 2.5,
+   "rotate_gain": 1.5,
+   "xy_goal_tolerance": 0.15,
+   "yaw_goal_tolerance": 0.25,
+   "goal_tolerance_fraction": 0.9,
+   "goal_latch_release_margin": 0.05,
+   "path_distance_scale": 0.5,
+   "carrot_distance_scale": 2.0,
+   "heading_scale": 0.3,
+   "obstacle_scale": 4.0,
+   "speed_scale": 1.5,
+   "oscillation_scale": 1.0,
+   "oscillation_reset_dist": 0.05,
+   "oscillation_reset_angle": 0.2,
+   "oscillation_reset_time": 2.0,
+   "unknown_is_obstacle": 1.0,
+   "transform_tolerance": 0.3,
+   "max_tf_age": 1.0,
+   "max_pose_age": 0.5,
+   "odom_timeout": 0.5,
+   "collision_check": "auto"
+  },
+  "replan": {
+   "enabled": 1.0,
+   "lookahead_distance": 2.5,
+   "start_offset": 0.1,
+   "blocked_cost": 99,
+   "confirm_time": 0.5,
+   "clear_time": 1.0,
+   "stall_time": 4.0,
+   "stall_progress": 0.15,
+   "min_interval": 2.0,
+   "max_obstacle_replans": 10,
+   "max_abort_replans": 3,
+   "wait_timeout": 15.0,
+   "trigger": "conditional",
+   "local_free_ratio_min": 0.15,
+   "local_hold_time": 0.4,
+   "local_clearance_min": 0.0,
+   "useful_displacement": 0.3,
+   "approach_speed": 0.15,
+   "approach_distance": 1.2,
+   "early_distance": 0.0,
+   "early_max_deviation": 0.15,
+   "early_valid_ratio": 0.0,
+   "early_valid_time": 0.5,
+   "goal_progress_timeout": 0.0,
+   "goal_progress_min": 0.5
+  },
+  "sim": {
+   "wheel_radius": 0.0535,
+   "wheel_distance": 0.34,
+   "accel_time": 0.5,
+   "decel_time": 0.5,
+   "command_delay": 0.15,
+   "command_timeout": 0.5,
+   "twist_mux_timeout": 0.5,
+   "robot_radius": 0.2,
+   "lidar_x": 0.15,
+   "lidar_beams": 720,
+   "lidar_half_fov": 1.57,
+   "lidar_noise": 0.01,
+   "lidar_range_min": 0.05,
+   "lidar_range_max": 16.0,
+   "physics_dt": 0.005,
+   "warmup": 1.0,
+   "post_terminal": 2.5,
+   "stuck_window": 30.0,
+   "stuck_radius": 0.25,
+   "odom_alpha": 0.2,
+   "watch_rate": 5.0,
+   "allow_unknown": 0.0,
+   "local_size": 4.0,
+   "resolution": 0.05,
+   "local_resolution": 0.025,
+   "footprint_radius": 0.2,
+   "local_padding": 0.05,
+   "global_padding": 0.05,
+   "local_inflation": 0.3,
+   "global_inflation": 0.4,
+   "cost_scaling": 3.0,
+   "local_track_unknown": 0.0,
+   "inf_is_valid": 0.0,
+   "obstacle_max_range": 2.5,
+   "raytrace_max_range": 3.0,
+   "local_update_rate": 5.0,
+   "global_update_rate": 2.0,
+   "expected_update_rate": 0.5,
+   "global_obstacle_layer": 1.0,
+   "local_footprint_clearing": 0.0,
+   "global_footprint_clearing": 1.0,
+   "controller_rate": 10.0,
+   "failure_tolerance": 0.3,
+   "progress_radius": 0.25,
+   "progress_time": 10.0,
+   "xy_goal_tolerance": 0.15,
+   "yaw_goal_tolerance": 0.25,
+   "follow_timeout": 120.0,
+   "max_start_distance": 0.5
+  },
+  "eval": {
+   "collision_tolerance": 0.005,
+   "success_xy": 0.15,
+   "success_xy_slack": 0.02,
+   "loc_limited_slack": 0.05,
+   "success_yaw": 0.25,
+   "safe_stop_v": 0.02,
+   "safe_stop_w": 0.05,
+   "safe_stop_hold": 2.0,
+   "stuck_window": 30.0,
+   "stuck_radius": 0.25,
+   "timeout_base": 30.0,
+   "timeout_factor": 3.0,
+   "timeout_vref": 0.3,
+   "sensor_gap_error": 2.0,
+   "rtf_min": 0.5,
+   "rtf_window": 10.0
+  }
+ },
+ "dataset": {
+  "root": "/home/thanhpham/capstone_ws/bench_data",
+  "generator_version": "v3.0-2026-11-26",
+  "config_hash": "d6a4f8682630",
+  "splits": {
+   "v3/classroom_finetune": {
+    "sha256": "5fc8d390b5a22f8be556c320f581c47254dc2a84cd061b309c2da77bdf049948",
+    "n_scenarios": 120,
+    "n_maps": 1
+   },
+   "v3/classroom_s1_test": {
+    "sha256": "3173f3182eb73aea6a136f83296fde9eef14ab0a21ede685e26be685063664ac",
+    "n_scenarios": 10,
+    "n_maps": 1
+   },
+   "v3/classroom_s1_val": {
+    "sha256": "776a8f717c77964429588f2e944937adf5e5c443091a779c78c79702a21af079",
+    "n_scenarios": 10,
+    "n_maps": 1
+   },
+   "v3/classroom_test": {
+    "sha256": "5fde6303134590896a4fae77f0c00bb94b708e67042eb2c943c3ab8a6bdf6a33",
+    "n_scenarios": 100,
+    "n_maps": 1
+   },
+   "v3/classroom_val": {
+    "sha256": "f028a6a8fed497ab81a37c261c0cf07c7a0680e983f602e1c33888e7f35b0ece",
+    "n_scenarios": 100,
+    "n_maps": 1
+   },
+   "v3/general_s1_test": {
+    "sha256": "2c57607846888757c7a6c54f543b62412de169bc8807afb9cf12cefeb99e13a0",
+    "n_scenarios": 30,
+    "n_maps": 30
+   },
+   "v3/general_s1_val": {
+    "sha256": "bd4f196c984be903caa96facf1db2441a3c221166665b91c4effddab74a0b1e7",
+    "n_scenarios": 30,
+    "n_maps": 30
+   },
+   "v3/general_test": {
+    "sha256": "510f217835ab9ac09bee4a3b97d8cd185976561443ee172c64c9337ba753250b",
+    "n_scenarios": 300,
+    "n_maps": 300
+   },
+   "v3/general_train": {
+    "sha256": "3ee44b7a58d88f73ebeb0be872ba227edb83c1efa22844d0fecac4f056b04540",
+    "n_scenarios": 900,
+    "n_maps": 900
+   },
+   "v3/general_val": {
+    "sha256": "24c247b95aec674c31033b43b8febd3613d840b8e4cbca1f9a0175673606c35c",
+    "n_scenarios": 300,
+    "n_maps": 300
+   },
+   "v3/house_finetune": {
+    "sha256": "c1beef3bc9bb03171e752344e1a28a437867921fdc3a75ba9c86c37523d9a21e",
+    "n_scenarios": 120,
+    "n_maps": 1
+   },
+   "v3/house_s1_test": {
+    "sha256": "25c5b82e865e12261df67fdb3a77659b92a3e397bda6dc5b44c8a3dcb1d1153b",
+    "n_scenarios": 10,
+    "n_maps": 1
+   },
+   "v3/house_s1_val": {
+    "sha256": "b1ed755c7360fb7b92a8123bc8646bfa454a8bb8bc56424cc4b82b53112fc93c",
+    "n_scenarios": 10,
+    "n_maps": 1
+   },
+   "v3/house_test": {
+    "sha256": "feb1ce50c1c5b2f8bda82e169e2da0051f1266eb569018a29d68251c64a2396c",
+    "n_scenarios": 100,
+    "n_maps": 1
+   },
+   "v3/house_val": {
+    "sha256": "66d706a257a4bc7554fa7f08ca3a35b7b49b431ec4fefaca25df5614857d94fd",
+    "n_scenarios": 100,
+    "n_maps": 1
+   },
+   "stress_pilot": {
+    "sha256": "7207601fcdf5469ce5b42c3bb7335f2b832f78e708b8027b196364fc610fd47f",
+    "n_scenarios": 120,
+    "n_maps": 120
+   }
+  }
+ },
+ "locked_splits": [
+  "v3/classroom_s1_test",
+  "v3/classroom_test",
+  "v3/general_s1_test",
+  "v3/general_test",
+  "v3/house_s1_test",
+  "v3/house_test"
+ ],
+ "frozen_at": "2026-11-27"
+}
